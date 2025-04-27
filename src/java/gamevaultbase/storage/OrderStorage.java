@@ -7,7 +7,8 @@ import gamevaultbase.helpers.DBUtil;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.Timestamp; // Use Timestamp for DATETIME/TIMESTAMP columns
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderStorage implements StorageInterface<Order, Integer>{
@@ -19,7 +20,7 @@ public class OrderStorage implements StorageInterface<Order, Integer>{
             List<Order> orders = DBUtil.executeQuery(sql, rs -> mapResultSetToOrder(rs), orderId);
             return orders.isEmpty() ? null : orders.get(0);
         } catch (SQLException | IOException e) {
-            System.err.println("Error finding order by ID: " + e.getMessage());
+            System.err.println("Error finding order by ID: " + orderId + " - " + e.getMessage());
             return null;
         }
     }
@@ -31,40 +32,68 @@ public class OrderStorage implements StorageInterface<Order, Integer>{
             return DBUtil.executeQuery(sql, rs -> mapResultSetToOrder(rs));
         } catch (SQLException | IOException e) {
             System.err.println("Error finding all orders: " + e.getMessage());
-            return null;
+            return new ArrayList<>(); // Return empty list on error
         }
     }
 
     @Override
     public void save(Order order) {
         String sql = "INSERT INTO Orders (userId, totalAmount, orderDate) VALUES (?, ?, ?)";
-        try (ResultSet generatedKeys = DBUtil.executeInsert(sql, order.getUserId(), order.getTotalAmount(), new Timestamp(order.getOrderDate().getTime()))) {
+        // Ensure orderDate is not null
+        Timestamp sqlOrderDate = (order.getOrderDate() != null) ? new Timestamp(order.getOrderDate().getTime()) : new Timestamp(System.currentTimeMillis()); // Default to now if null
 
-            if (generatedKeys.next()) {
-                order.setOrderId(generatedKeys.getInt(1));
+        try {
+             int generatedId = DBUtil.executeInsertAndGetKey(sql,
+                order.getUserId(),
+                order.getTotalAmount(),
+                sqlOrderDate // Use java.sql.Timestamp
+             );
+
+            if (generatedId != -1) {
+                order.setOrderId(generatedId);
+            } else {
+                 System.err.println("WARN: Order insert did not return a generated ID for userId: " + order.getUserId());
             }
         } catch (SQLException | IOException e) {
-            System.err.println("Error saving order: " + e.getMessage());
+            System.err.println("Error saving order for userId: " + order.getUserId() + " - " + e.getMessage());
+            // Consider rethrowing
         }
     }
 
     @Override
     public void update(Order order) {
+        // Typically orders aren't updated, but if needed:
         String sql = "UPDATE Orders SET userId = ?, totalAmount = ?, orderDate = ? WHERE orderId = ?";
+        Timestamp sqlOrderDate = (order.getOrderDate() != null) ? new Timestamp(order.getOrderDate().getTime()) : null;
+
         try {
-            DBUtil.executeUpdate(sql, order.getUserId(), order.getTotalAmount(), new Timestamp(order.getOrderDate().getTime()), order.getOrderId());
+             int rowsAffected = DBUtil.executeUpdate(sql,
+                order.getUserId(),
+                order.getTotalAmount(),
+                sqlOrderDate,
+                order.getOrderId()
+             );
+             if (rowsAffected == 0) {
+                 System.err.println("WARN: Update affected 0 rows for orderId: " + order.getOrderId());
+             }
         } catch (SQLException | IOException e) {
-            System.err.println("Error updating order: " + e.getMessage());
+            System.err.println("Error updating order: " + order.getOrderId() + " - " + e.getMessage());
+            // Consider rethrowing
         }
     }
 
     @Override
     public void delete(Integer orderId) {
+        // Deleting an order should cascade delete OrderItems if set up correctly in DB
         String sql = "DELETE FROM Orders WHERE orderId = ?";
         try {
-            DBUtil.executeUpdate(sql, orderId);
+             int rowsAffected = DBUtil.executeUpdate(sql, orderId);
+             if (rowsAffected == 0) {
+                 System.err.println("WARN: Delete affected 0 rows for orderId: " + orderId);
+             }
         } catch (SQLException | IOException e) {
-            System.err.println("Error deleting order: " + e.getMessage());
+            System.err.println("Error deleting order: " + orderId + " - " + e.getMessage());
+            // Consider rethrowing
         }
     }
 
@@ -73,8 +102,8 @@ public class OrderStorage implements StorageInterface<Order, Integer>{
         order.setOrderId(rs.getInt("orderId"));
         order.setUserId(rs.getInt("userId"));
         order.setTotalAmount(rs.getDouble("totalAmount"));
-        order.setOrderDate(rs.getTimestamp("orderDate"));
-        //need games table to get games
+        order.setOrderDate(rs.getTimestamp("orderDate")); // Retrieve as Timestamp, compatible with java.util.Date
+        // Note: Does not load associated OrderItems here. That would require another query.
         return order;
     }
 }

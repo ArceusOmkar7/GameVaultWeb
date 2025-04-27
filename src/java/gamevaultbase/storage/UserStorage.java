@@ -48,14 +48,26 @@ public class UserStorage implements StorageInterface<User, Integer> {
 
     @Override
     public void save(User user) {
+        // WARNING: Storing plain text password - INSECURE
         String sql = "INSERT INTO Users (email, password, username, walletBalance, createdAt) VALUES (?, ?, ?, ?, ?)";
-        try (ResultSet generatedKeys = DBUtil.executeInsert(sql, user.getEmail(), user.getPassword(), user.getUsername(), user.getWalletBalance(), new Timestamp(user.getCreatedAt().getTime()))) {
-
-            if (generatedKeys.next()) {
-                user.setUserId(generatedKeys.getInt(1));
+        try {
+            int generatedId = DBUtil.executeInsertAndGetKey(sql,
+                user.getEmail(),
+                user.getPassword(), // Plain text password
+                user.getUsername(),
+                user.getWalletBalance(),
+                new Timestamp(user.getCreatedAt().getTime())
+            );
+            if (generatedId != -1) {
+                user.setUserId(generatedId);
+            } else {
+                 // This might indicate a problem or just that the DB didn't return a key
+                 System.err.println("WARN: User insert did not return a generated ID for email: " + user.getEmail());
             }
         } catch (SQLException | IOException e) {
-            System.err.println("Error saving user: " + e.getMessage());
+            System.err.println("Error saving user: " + user.getEmail() + " - " + e.getMessage());
+            // Consider rethrowing a custom exception
+            // throw new DataAccessException("Failed to save user", e);
         }
     }
 
