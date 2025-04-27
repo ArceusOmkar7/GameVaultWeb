@@ -1,86 +1,114 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gamevaultbase.servlets;
 
+import gamevaultbase.entities.Game;
+import gamevaultbase.entities.User;
+import gamevaultbase.exceptions.CartEmptyException;
+import gamevaultbase.management.CartManagement;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Omkar
- */
+// Mapped in web.xml as /viewCart
 public class ViewCartServlet extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ViewCartServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ViewCartServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
      * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Fetches and displays the user's shopping cart contents.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession(false); // Don't create a new session if one doesn't exist
+        User currentUser = (session != null) ? (User) session.getAttribute("loggedInUser") : null;
+
+        // --- Authentication Check ---
+        if (currentUser == null) {
+            // User is not logged in, redirect to login page with a message
+            String message = "Please login to view your cart.";
+            response.sendRedirect(request.getContextPath() + "/login?message=" + java.net.URLEncoder.encode(message, "UTF-8") + "&messageType=error");
+            return; // Stop processing
+        }
+
+        // --- Get Cart Management Service ---
+        CartManagement cartManagement = (CartManagement) getServletContext().getAttribute("cartManagement");
+        if (cartManagement == null) {
+             System.err.println("FATAL: CartManagement not found in ServletContext!");
+             // Forward to a generic error page or show an error on the cart page
+             request.setAttribute("errorMessage", "Cart service is currently unavailable.");
+             request.getRequestDispatcher("/WEB-INF/jsp/cart.jsp").forward(request, response); // Still show cart page structure
+             return;
+        }
+
+        List<Game> cartGames = Collections.emptyList(); // Default to empty list
+        String requestErrorMessage = null; // Error specific to this request processing
+        double total = 0.0;
+
+        // --- Fetch Cart Contents ---
+        try {
+            cartGames = cartManagement.getGamesInCart(currentUser.getUserId());
+            // Calculate total only if cartGames is not null (it shouldn't be null from storage, but check anyway)
+            if (cartGames != null) {
+                total = cartGames.stream()
+                                 .mapToDouble(Game::getPrice) // Assumes getPrice() returns double or float
+                                 .sum();
+            }
+        } catch (CartEmptyException e) {
+             // This is a normal condition, not an error to display prominently.
+             // The JSP will handle displaying "Your cart is empty."
+             System.out.println("Cart view: Cart is empty for user " + currentUser.getUserId());
+             cartGames = Collections.emptyList(); // Ensure it's an empty list for the JSP
+        } catch (Exception e) {
+            // Catch other potential errors (like database connection issues in storage)
+            System.err.println("Error viewing cart for user " + currentUser.getUserId() + ": " + e.getMessage());
+            e.printStackTrace(); // Log the full error
+            requestErrorMessage = "An error occurred while retrieving your cart contents.";
+            cartGames = Collections.emptyList(); // Ensure it's an empty list for the JSP
+        }
+
+        // --- Prepare data for JSP ---
+        // Pass any message forwarded from another servlet (like PlaceOrderServlet)
+        String redirectMessage = request.getParameter("message");
+        String redirectMessageType = request.getParameter("messageType");
+
+        if (redirectMessage != null) {
+            request.setAttribute("message", redirectMessage);
+            request.setAttribute("messageType", redirectMessageType);
+        }
+        // Also pass any error message generated during cart retrieval
+        if (requestErrorMessage != null) {
+             request.setAttribute("errorMessage", requestErrorMessage);
+        }
+
+        request.setAttribute("cartGames", cartGames); // The list of games in the cart
+        request.setAttribute("cartTotal", total);     // The calculated total price
+
+        // --- Forward to JSP ---
+        request.getRequestDispatcher("/WEB-INF/jsp/cart.jsp").forward(request, response);
     }
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * In this case, viewing the cart is typically a GET request.
+     * Redirect POST requests to GET to avoid issues with browser refresh.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // Redirect to the GET handler for this servlet
+        response.sendRedirect(request.getContextPath() + "/viewCart");
     }
 
     /**
      * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Displays the contents of the user's shopping cart.";
+    }
 }

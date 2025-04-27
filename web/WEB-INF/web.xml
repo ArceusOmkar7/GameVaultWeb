@@ -14,7 +14,9 @@
     </context-param>
     <context-param>
         <param-name>db.url</param-name>
-        <!-- Using sslMode=DISABLED for explicitness -->
+        <!-- !!!!USER INSTRUCTION!!!! -->
+        <!-- Create database with the given name -->
+        <!-- Also add your database username and password in the fields below -->
         <param-value>jdbc:mysql://localhost:3306/gamevaultdb?sslMode=DISABLED</param-value>
     </context-param>
     <context-param>
