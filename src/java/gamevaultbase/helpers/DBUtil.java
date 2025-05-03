@@ -263,14 +263,15 @@ public class DBUtil {
     }
 
     // --- SQL Constants for Table Creation (Unchanged from previous version) ---
-     private static final String SQL_CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS Users (" +
-             "userId INT AUTO_INCREMENT PRIMARY KEY," +
-             "email VARCHAR(255) NOT NULL UNIQUE," +
-             "password VARCHAR(255) NOT NULL," + // Store plain text (INSECURE)
-             "username VARCHAR(255) NOT NULL UNIQUE," +
-             "walletBalance FLOAT NOT NULL DEFAULT 0.0," +
-             "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-             ") ENGINE=InnoDB;";
+    private static final String SQL_CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS Users (" +
+            "userId INT AUTO_INCREMENT PRIMARY KEY," +
+            "email VARCHAR(255) NOT NULL UNIQUE," +
+            // CONFIRM THIS LINE: Should be VARCHAR(255) for plain text
+            "password VARCHAR(255) NOT NULL," +
+            "username VARCHAR(255) NOT NULL UNIQUE," +
+            "walletBalance FLOAT NOT NULL DEFAULT 0.0," +
+            "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+            ") ENGINE=InnoDB;";
 
      private static final String SQL_CREATE_GAMES_TABLE = "CREATE TABLE IF NOT EXISTS Games (" +
              "gameId INT AUTO_INCREMENT PRIMARY KEY," +

@@ -48,33 +48,32 @@ public class UserStorage implements StorageInterface<User, Integer> {
 
     @Override
     public void save(User user) {
-        // WARNING: Storing plain text password - INSECURE
+        // CONFIRM: Storing plain text password directly
         String sql = "INSERT INTO Users (email, password, username, walletBalance, createdAt) VALUES (?, ?, ?, ?, ?)";
         try {
             int generatedId = DBUtil.executeInsertAndGetKey(sql,
-                user.getEmail(),
-                user.getPassword(), // Plain text password
-                user.getUsername(),
-                user.getWalletBalance(),
-                new Timestamp(user.getCreatedAt().getTime())
+                    user.getEmail(),
+                    user.getPassword(), // Should be the plain text password
+                    user.getUsername(),
+                    user.getWalletBalance(),
+                    new Timestamp(user.getCreatedAt().getTime())
             );
             if (generatedId != -1) {
                 user.setUserId(generatedId);
             } else {
-                 // This might indicate a problem or just that the DB didn't return a key
-                 System.err.println("WARN: User insert did not return a generated ID for email: " + user.getEmail());
+                System.err.println("WARN: User insert did not return a generated ID for email: " + user.getEmail());
             }
         } catch (SQLException | IOException e) {
             System.err.println("Error saving user: " + user.getEmail() + " - " + e.getMessage());
-            // Consider rethrowing a custom exception
-            // throw new DataAccessException("Failed to save user", e);
         }
     }
 
     @Override
     public void update(User user) {
+        // CONFIRM: Updating with plain text password directly
         String sql = "UPDATE Users SET email = ?, password = ?, username = ?, walletBalance = ? WHERE userId = ?";
         try {
+            // Passing user.getPassword() directly
             DBUtil.executeUpdate(sql, user.getEmail(), user.getPassword(), user.getUsername(), user.getWalletBalance(), user.getUserId());
         } catch (SQLException | IOException e) {
             System.err.println("Error updating user: " + e.getMessage());

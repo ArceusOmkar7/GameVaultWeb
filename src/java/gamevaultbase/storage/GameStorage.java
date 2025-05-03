@@ -13,7 +13,8 @@ import java.util.List;
 
 public class GameStorage implements StorageInterface<Game, Integer> {
 
-    @Override
+    // ... (findById, findAll, findOwnedGamesByUser remain the same) ...
+     @Override
     public Game findById(Integer gameId) {
         String sql = "SELECT * FROM Games WHERE gameId = ?";
         try {
@@ -52,6 +53,20 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             return new ArrayList<>(); // Return empty list on error
         }
     }
+
+
+    // Method to get a few featured games (e.g., first 3 added)
+    // TODO: Implement a proper "featured" flag or logic if needed
+    public List<Game> findFeaturedGames() {
+        String sql = "SELECT * FROM Games ORDER BY gameId ASC LIMIT 3"; // Simple example: Get first 3 games
+        try {
+            return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs));
+        } catch (SQLException | IOException e) {
+            System.err.println("Error finding featured games: " + e.getMessage());
+            return new ArrayList<>(); // Return empty list on error
+        }
+    }
+
 
     @Override
     public void save(Game game) {

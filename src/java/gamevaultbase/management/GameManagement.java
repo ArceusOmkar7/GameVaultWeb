@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gamevaultbase.management;
 
 import gamevaultbase.entities.Game;
@@ -30,6 +26,11 @@ public class GameManagement {
         return gameStorage.findAll();
     }
 
+    // Add this method
+    public List<Game> getFeaturedGames() {
+        return gameStorage.findFeaturedGames(); // Delegate to storage
+    }
+
     // Get games that a user owns (from completed orders)
     public List<Game> getOwnedGames(int userId) {
         return gameStorage.findOwnedGamesByUser(userId);
@@ -42,14 +43,17 @@ public class GameManagement {
     }
 
     public void addGame(Game game) {
+        // TODO: Add validation before saving if needed
         gameStorage.save(game);
     }
 
     public void updateGame(Game game) {
+        // TODO: Add validation before updating if needed
         gameStorage.update(game);
     }
 
     public void deleteGame(int gameId) {
+        // TODO: Add checks (e.g., is game in active carts/orders?) if necessary
         gameStorage.delete(gameId);
     }
 }
