@@ -95,8 +95,19 @@
                     <h2 class="text-2xl font-bold mb-4">Featured Game</h2>
                     <c:choose>
                         <c:when test="${not empty mainFeaturedGame}">
-                             <div class="bg-gray-200 h-64 md:h-96 rounded flex items-center justify-center text-gray-500 text-2xl mb-4">
-                                 Game Poster for <c:out value="${mainFeaturedGame.title}"/>
+                             <div class="mb-4">
+                                 <c:choose>
+                                     <c:when test="${not empty mainFeaturedGame.imagePath}">
+                                         <img src="${pageContext.request.contextPath}/${mainFeaturedGame.imagePath}" 
+                                             alt="${mainFeaturedGame.title}" 
+                                             class="w-full h-64 md:h-96 object-cover rounded shadow">
+                                     </c:when>
+                                     <c:otherwise>
+                                         <div class="bg-gray-200 h-64 md:h-96 rounded flex items-center justify-center text-gray-500 text-2xl">
+                                             No Image Available for ${mainFeaturedGame.title}
+                                         </div>
+                                     </c:otherwise>
+                                 </c:choose>
                              </div>
                              <h3 class="text-xl font-semibold"><c:out value="${mainFeaturedGame.title}"/></h3>
                              <p class="text-gray-600 mt-1 mb-3"><c:out value="${mainFeaturedGame.description}"/></p>
@@ -118,9 +129,18 @@
                              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                  <c:forEach var="featuredGame" items="${featuredGamesList}">
                                      <div class="border rounded p-3 hover:shadow-lg transition duration-200">
-                                         <div class="bg-gray-200 h-32 rounded mb-2 flex items-center justify-center text-gray-400 text-sm">
-                                              Poster: <c:out value="${featuredGame.title}"/>
-                                         </div>
+                                         <c:choose>
+                                             <c:when test="${not empty featuredGame.imagePath}">
+                                                 <img src="${pageContext.request.contextPath}/${featuredGame.imagePath}" 
+                                                     alt="${featuredGame.title}" 
+                                                     class="w-full h-32 object-cover rounded mb-2">
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <div class="bg-gray-200 h-32 rounded mb-2 flex items-center justify-center text-gray-400 text-sm">
+                                                     No Image Available
+                                                 </div>
+                                             </c:otherwise>
+                                         </c:choose>
                                          <h4 class="font-semibold text-md mb-1">
                                              <a href="${pageContext.request.contextPath}/game?id=${featuredGame.gameId}" class="text-blue-600 hover:underline">
                                                 <c:out value="${featuredGame.title}"/>

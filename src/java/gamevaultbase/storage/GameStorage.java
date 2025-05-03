@@ -14,7 +14,7 @@ import java.util.List;
 public class GameStorage implements StorageInterface<Game, Integer> {
 
     // ... (findById, findAll, findOwnedGamesByUser remain the same) ...
-     @Override
+    @Override
     public Game findById(Integer gameId) {
         String sql = "SELECT * FROM Games WHERE gameId = ?";
         try {
@@ -42,9 +42,9 @@ public class GameStorage implements StorageInterface<Game, Integer> {
     // Find all games owned by a specific user from completed orders
     public List<Game> findOwnedGamesByUser(Integer userId) {
         String sql = "SELECT DISTINCT g.* FROM Games g " +
-                     "JOIN OrderItems oi ON g.gameId = oi.gameId " +
-                     "JOIN Orders o ON oi.orderId = o.orderId " +
-                     "WHERE o.userId = ?";
+                "JOIN OrderItems oi ON g.gameId = oi.gameId " +
+                "JOIN Orders o ON oi.orderId = o.orderId " +
+                "WHERE o.userId = ?";
         try {
             return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), userId);
         } catch (SQLException | IOException e) {
@@ -53,7 +53,6 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             return new ArrayList<>(); // Return empty list on error
         }
     }
-
 
     // Method to get a few featured games (e.g., first 3 added)
     // TODO: Implement a proper "featured" flag or logic if needed
@@ -67,21 +66,20 @@ public class GameStorage implements StorageInterface<Game, Integer> {
         }
     }
 
-
     @Override
     public void save(Game game) {
-        String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath) VALUES (?, ?, ?, ?, ?, ?, ?)";
         // Ensure releaseDate is not null before attempting to get time
         Date sqlReleaseDate = (game.getReleaseDate() != null) ? new Date(game.getReleaseDate().getTime()) : null;
         try {
             int generatedId = DBUtil.executeInsertAndGetKey(sql,
-                game.getTitle(),
-                game.getDescription(),
-                game.getDeveloper(),
-                game.getPlatform(),
-                game.getPrice(),
-                sqlReleaseDate // Use java.sql.Date
-            );
+                    game.getTitle(),
+                    game.getDescription(),
+                    game.getDeveloper(),
+                    game.getPlatform(),
+                    game.getPrice(),
+                    sqlReleaseDate, // Use java.sql.Date
+                    game.getImagePath());
 
             if (generatedId != -1) {
                 game.setGameId(generatedId);
@@ -97,22 +95,22 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
     @Override
     public void update(Game game) {
-        String sql = "UPDATE Games SET title = ?, description = ?, developer = ?, platform = ?, price = ?, releaseDate = ? WHERE gameId = ?";
+        String sql = "UPDATE Games SET title = ?, description = ?, developer = ?, platform = ?, price = ?, releaseDate = ?, imagePath = ? WHERE gameId = ?";
         Date sqlReleaseDate = (game.getReleaseDate() != null) ? new Date(game.getReleaseDate().getTime()) : null;
         try {
             int rowsAffected = DBUtil.executeUpdate(sql,
-                game.getTitle(),
-                game.getDescription(),
-                game.getDeveloper(),
-                game.getPlatform(),
-                game.getPrice(),
-                sqlReleaseDate, // Use java.sql.Date
-                game.getGameId()
-            );
-             if (rowsAffected == 0) {
-                 System.err.println("WARN: Update affected 0 rows for gameId: " + game.getGameId());
-                 // This could mean the gameId didn't exist
-             }
+                    game.getTitle(),
+                    game.getDescription(),
+                    game.getDeveloper(),
+                    game.getPlatform(),
+                    game.getPrice(),
+                    sqlReleaseDate, // Use java.sql.Date
+                    game.getImagePath(),
+                    game.getGameId());
+            if (rowsAffected == 0) {
+                System.err.println("WARN: Update affected 0 rows for gameId: " + game.getGameId());
+                // This could mean the gameId didn't exist
+            }
         } catch (SQLException | IOException e) {
             System.err.println("Error updating game: " + game.getGameId() + " - " + e.getMessage());
             // Consider rethrowing a custom exception
@@ -122,15 +120,17 @@ public class GameStorage implements StorageInterface<Game, Integer> {
     @Override
     public void delete(Integer gameId) {
         // Consider dependencies: Check if game is in OrderItems before deleting?
-        // The DB foreign key constraint (ON DELETE RESTRICT) should prevent this if set up correctly.
+        // The DB foreign key constraint (ON DELETE RESTRICT) should prevent this if set
+        // up correctly.
         String sql = "DELETE FROM Games WHERE gameId = ?";
         try {
             int rowsAffected = DBUtil.executeUpdate(sql, gameId);
-             if (rowsAffected == 0) {
-                 System.err.println("WARN: Delete affected 0 rows for gameId: " + gameId);
-             }
+            if (rowsAffected == 0) {
+                System.err.println("WARN: Delete affected 0 rows for gameId: " + gameId);
+            }
         } catch (SQLException | IOException e) {
-            // Catch potential foreign key constraint violation errors specifically if needed
+            // Catch potential foreign key constraint violation errors specifically if
+            // needed
             System.err.println("Error deleting game: " + gameId + " - " + e.getMessage());
             // Consider rethrowing a custom exception
         }
@@ -145,7 +145,8 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                 rs.getString("developer"),
                 rs.getString("platform"),
                 rs.getFloat("price"),
-                rs.getDate("releaseDate") // Retrieve as java.sql.Date, compatible with java.util.Date
+                rs.getDate("releaseDate"), // Retrieve as java.sql.Date, compatible with java.util.Date
+                rs.getString("imagePath") // Added image path
         );
     }
 }

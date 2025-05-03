@@ -9,6 +9,7 @@ public class User {
     private String username;
     private float walletBalance;
     private Date createdAt;
+    private boolean isAdmin;
 
     public User(String email, String password, String username, float walletBalance) {
         this.email = email;
@@ -16,6 +17,7 @@ public class User {
         this.username = username;
         this.walletBalance = walletBalance;
         this.createdAt = new Date();
+        this.isAdmin = false; // Default to regular user
     }
 
     public User(int userId, String email, String password, String username, float walletBalance, Date createdAt) {
@@ -25,6 +27,7 @@ public class User {
         this.username = username;
         this.walletBalance = walletBalance;
         this.createdAt = createdAt;
+        this.isAdmin = false; // Default to regular user
     }
 
     public int getUserId() {
@@ -73,5 +76,13 @@ public class User {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

@@ -74,31 +74,63 @@ public class ReviewStorage { // Could implement StorageInterface<Review, Integer
         return review;
     }
 
-    // --- Optional: Add other standard CRUD methods if needed ---
-    /*
+    // Find a review by its ID
     public Review findById(Integer reviewId) {
-        // Implementation needed
-        return null;
+        String sql = "SELECT r.reviewId, r.gameId, r.userId, r.comment, r.reviewDate, u.username " +
+                     "FROM Reviews r JOIN Users u ON r.userId = u.userId " +
+                     "WHERE r.reviewId = ?";
+        try {
+            List<Review> reviews = DBUtil.executeQuery(sql, rs -> mapResultSetToReviewWithUser(rs), reviewId);
+            return reviews.isEmpty() ? null : reviews.get(0);
+        } catch (SQLException | IOException e) {
+            System.err.println("Error finding review by ID " + reviewId + ": " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Review> findAll() {
-        // Implementation needed
-        return new ArrayList<>();
+        String sql = "SELECT r.reviewId, r.gameId, r.userId, r.comment, r.reviewDate, u.username " +
+                     "FROM Reviews r JOIN Users u ON r.userId = u.userId " +
+                     "ORDER BY r.reviewDate DESC";
+        try {
+            return DBUtil.executeQuery(sql, rs -> mapResultSetToReviewWithUser(rs));
+        } catch (SQLException | IOException e) {
+            System.err.println("Error finding all reviews: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
-    public void update(Review review) {
-        // Implementation needed
+    public void update(Review review) throws SQLException {
+        String sql = "UPDATE Reviews SET comment = ? WHERE reviewId = ?";
+        try {
+            int rowsAffected = DBUtil.executeUpdate(sql, review.getComment(), review.getReviewId());
+            if (rowsAffected == 0) {
+                System.err.println("WARN: Update affected 0 rows for reviewId: " + review.getReviewId());
+                // This could mean the reviewId didn't exist
+                throw new SQLException("Review with ID " + review.getReviewId() + " not found or not updated");
+            }
+        } catch (IOException e) {
+            System.err.println("IO Error updating review: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("IO Error updating review", e);
+        }
     }
 
-    public void delete(Integer reviewId) {
-         String sql = "DELETE FROM Reviews WHERE reviewId = ?";
-         try {
-             DBUtil.executeUpdate(sql, reviewId);
-         } catch (SQLException | IOException e) {
-             System.err.println("Error deleting review: " + reviewId + " - " + e.getMessage());
-             e.printStackTrace();
-             // Consider rethrowing
-         }
+    public void delete(Integer reviewId) throws SQLException {
+        String sql = "DELETE FROM Reviews WHERE reviewId = ?";
+        try {
+            int rowsAffected = DBUtil.executeUpdate(sql, reviewId);
+            if (rowsAffected == 0) {
+                System.err.println("WARN: Delete affected 0 rows for reviewId: " + reviewId);
+                // This could mean the reviewId didn't exist
+                throw new SQLException("Review with ID " + reviewId + " not found or not deleted");
+            }
+        } catch (IOException e) {
+            System.err.println("Error deleting review: " + reviewId + " - " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("IO Error deleting review", e);
+        }
     }
-    */
 }

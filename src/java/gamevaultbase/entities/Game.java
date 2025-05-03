@@ -1,6 +1,5 @@
 package gamevaultbase.entities;
 
-
 import java.util.Date;
 
 public class Game {
@@ -11,6 +10,7 @@ public class Game {
     private String platform;
     private float price;
     private Date releaseDate;
+    private String imagePath; // New field for storing game image path
 
     public Game(String title, String description, String developer, String platform, float price, Date releaseDate) {
         this.title = title;
@@ -19,9 +19,11 @@ public class Game {
         this.platform = platform;
         this.price = price;
         this.releaseDate = releaseDate;
+        this.imagePath = null; // Default to null (no image)
     }
 
-    public Game(int gameId, String title, String description, String developer, String platform, float price, Date releaseDate) {
+    public Game(int gameId, String title, String description, String developer, String platform, float price,
+            Date releaseDate) {
         this.gameId = gameId;
         this.title = title;
         this.description = description;
@@ -29,6 +31,19 @@ public class Game {
         this.platform = platform;
         this.price = price;
         this.releaseDate = releaseDate;
+        this.imagePath = null; // Default to null (no image)
+    }
+
+    public Game(int gameId, String title, String description, String developer, String platform, float price,
+            Date releaseDate, String imagePath) {
+        this.gameId = gameId;
+        this.title = title;
+        this.description = description;
+        this.developer = developer;
+        this.platform = platform;
+        this.price = price;
+        this.releaseDate = releaseDate;
+        this.imagePath = imagePath;
     }
 
     public int getGameId() {
@@ -87,6 +102,19 @@ public class Game {
         this.releaseDate = releaseDate;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    // Helper method to get a default image path if none is set
+    public String getImagePathOrDefault() {
+        return (imagePath != null && !imagePath.isEmpty()) ? imagePath : "game_images/default_game.png";
+    }
+
     @Override
     public String toString() {
         return "Game{" +
@@ -97,6 +125,7 @@ public class Game {
                 ", platform='" + platform + '\'' +
                 ", price=" + price +
                 ", releaseDate=" + releaseDate +
+                ", imagePath='" + imagePath + '\'' +
                 '}';
     }
 }

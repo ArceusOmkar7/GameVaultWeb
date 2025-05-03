@@ -98,6 +98,33 @@
         <url-pattern>/game</url-pattern>
         <!-- e.g., /game?id=1 -->
     </servlet-mapping>
+    <!-- NEW Review Servlet -->
+    <servlet>
+        <servlet-name>ReviewServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.ReviewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReviewServlet</servlet-name>
+        <url-pattern>/reviews</url-pattern>
+    </servlet-mapping>
+    <!-- NEW Admin Dashboard Servlet -->
+    <servlet>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/admin/dashboard</url-pattern>
+    </servlet-mapping>
+    <!-- NEW Game Image Upload Servlet -->
+    <servlet>
+        <servlet-name>GameImageUploadServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.GameImageUploadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GameImageUploadServlet</servlet-name>
+        <url-pattern>/admin/upload-game-image</url-pattern>
+    </servlet-mapping>
     <!-- AddToCart (Keep as is) -->
     <servlet>
         <servlet-name>AddToCartServlet</servlet-name>

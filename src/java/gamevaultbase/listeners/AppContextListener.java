@@ -27,6 +27,7 @@ public class AppContextListener implements ServletContextListener {
             CartStorage cartStorage = new CartStorage(gameStorage);
             OrderStorage orderStorage = new OrderStorage();
             TransactionStorage transactionStorage = new TransactionStorage();
+            ReviewStorage reviewStorage = new ReviewStorage(); // Add ReviewStorage
 
             // --- Initialize Managements (No changes needed here) ---
             UserManagement userManagement = new UserManagement(userStorage);
@@ -34,6 +35,7 @@ public class AppContextListener implements ServletContextListener {
             CartManagement cartManagement = new CartManagement(cartStorage, gameStorage);
             TransactionManagement transactionManagement = new TransactionManagement(transactionStorage);
             OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage, transactionManagement);
+            ReviewManagement reviewManagement = new ReviewManagement(reviewStorage); // Add ReviewManagement
 
             // Create the main facade (Optional)
             GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement, transactionManagement);
@@ -44,6 +46,7 @@ public class AppContextListener implements ServletContextListener {
             context.setAttribute("cartManagement", cartManagement);
             context.setAttribute("orderManagement", orderManagement);
             context.setAttribute("transactionManagement", transactionManagement);
+            context.setAttribute("reviewManagement", reviewManagement); // Add ReviewManagement to context
             context.setAttribute("vaultManager", vaultManager);
 
             // --- Initialize Sample Data (Optional - runs after DB setup) ---
@@ -131,6 +134,7 @@ public class AppContextListener implements ServletContextListener {
         context.removeAttribute("cartManagement");
         context.removeAttribute("orderManagement");
         context.removeAttribute("transactionManagement");
+        context.removeAttribute("reviewManagement"); // Add this line to remove reviewManagement attribute
         context.removeAttribute("vaultManager");
         System.out.println("GameVaultWebApp destroyed.");
         // Deregister driver? Usually not necessary in modern containers, but can be done:

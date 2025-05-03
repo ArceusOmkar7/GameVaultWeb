@@ -49,15 +49,58 @@ public class ReviewManagement {
         reviewStorage.save(review);
     }
 
-    // Add other methods like deleteReview, updateReview if needed,
-    // making sure to handle permissions (e.g., only allow user to delete their own review).
-    /*
-    public void deleteReview(int reviewId, int currentUserId) throws Exception {
-        // 1. Fetch the review by reviewId (need findById in ReviewStorage)
-        // Review review = reviewStorage.findById(reviewId);
-        // 2. Check if review exists and if review.getUserId() matches currentUserId
-        // 3. If conditions met, call reviewStorage.delete(reviewId);
-        // 4. Handle exceptions (ReviewNotFound, NotAuthorized, SQLException)
+    /**
+     * Deletes a review if the current user is authorized (owner of the review).
+     * @param reviewId The ID of the review to delete
+     * @param currentUserId The ID of the user attempting to delete the review
+     * @throws UnauthorizedException If the current user is not authorized to delete this review
+     * @throws SQLException If a database error occurs
+     */
+    public void deleteReview(int reviewId, int currentUserId) throws IllegalArgumentException, SQLException {
+        // 1. Fetch the review by reviewId
+        Review review = reviewStorage.findById(reviewId);
+        
+        // 2. Check if review exists and if user is authorized
+        if (review == null) {
+            throw new IllegalArgumentException("Review with ID " + reviewId + " not found");
+        }
+        
+        if (review.getUserId() != currentUserId) {
+            throw new IllegalArgumentException("You are not authorized to delete this review");
+        }
+        
+        // 3. If authorized, delete the review
+        reviewStorage.delete(reviewId);
     }
-    */
+    
+    /**
+     * Updates an existing review if the current user is authorized (owner of the review).
+     * @param review The updated review object
+     * @param currentUserId The ID of the user attempting to update the review
+     * @throws IllegalArgumentException If review data is invalid or user is unauthorized
+     * @throws SQLException If a database error occurs
+     */
+    public void updateReview(Review review, int currentUserId) throws IllegalArgumentException, SQLException {
+        if (review == null || review.getReviewId() <= 0) {
+            throw new IllegalArgumentException("Invalid review data for update");
+        }
+        
+        // 1. Check that the current user owns this review
+        Review existingReview = reviewStorage.findById(review.getReviewId());
+        if (existingReview == null) {
+            throw new IllegalArgumentException("Review with ID " + review.getReviewId() + " not found");
+        }
+        
+        if (existingReview.getUserId() != currentUserId) {
+            throw new IllegalArgumentException("You are not authorized to update this review");
+        }
+        
+        // 2. Validate the updated data
+        if (review.getComment() == null || review.getComment().trim().isEmpty()) {
+            throw new IllegalArgumentException("Review comment cannot be empty");
+        }
+        
+        // 3. Update the review
+        reviewStorage.update(review);
+    }
 }
