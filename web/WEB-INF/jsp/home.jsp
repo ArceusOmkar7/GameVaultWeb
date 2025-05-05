@@ -42,12 +42,24 @@
                                  <ul>
                                      <c:forEach var="game" items="${gamesList}">
                                          <li class="mb-2 border-b last:border-b-0 pb-2">
-                                             <a href="${pageContext.request.contextPath}/game?id=${game.gameId}" class="text-blue-600 hover:underline">
-                                                 <c:out value="${game.title}" />
-                                             </a>
-                                             <span class="text-sm text-gray-500 block">
-                                                <fmt:formatNumber value="${game.price}" type="currency" currencySymbol="$" />
-                                            </span>
+                                             <div class="flex justify-between items-center">
+                                                 <div>
+                                                     <a href="${pageContext.request.contextPath}/game?id=${game.gameId}" class="text-blue-600 hover:underline">
+                                                         <c:out value="${game.title}" />
+                                                     </a>
+                                                     <span class="text-sm text-gray-500 block">
+                                                        <fmt:formatNumber value="${game.price}" type="currency" currencySymbol="$" />
+                                                    </span>
+                                                 </div>
+                                                 <c:if test="${not empty sessionScope.loggedInUser}">
+                                                     <form action="${pageContext.request.contextPath}/addToCart" method="post" class="ml-2">
+                                                         <input type="hidden" name="gameId" value="${game.gameId}" />
+                                                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-xs">
+                                                             Add
+                                                         </button>
+                                                     </form>
+                                                 </c:if>
+                                             </div>
                                          </li>
                                      </c:forEach>
                                  </ul>
@@ -111,9 +123,19 @@
                              </div>
                              <h3 class="text-xl font-semibold"><c:out value="${mainFeaturedGame.title}"/></h3>
                              <p class="text-gray-600 mt-1 mb-3"><c:out value="${mainFeaturedGame.description}"/></p>
-                             <a href="${pageContext.request.contextPath}/game?id=${mainFeaturedGame.gameId}" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                 View Details
-                             </a>
+                             <div class="flex space-x-2">
+                                 <a href="${pageContext.request.contextPath}/game?id=${mainFeaturedGame.gameId}" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                     View Details
+                                 </a>
+                                 <c:if test="${not empty sessionScope.loggedInUser}">
+                                     <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
+                                         <input type="hidden" name="gameId" value="${mainFeaturedGame.gameId}" />
+                                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                             Add to Cart
+                                         </button>
+                                     </form>
+                                 </c:if>
+                             </div>
                         </c:when>
                         <c:otherwise>
                             <p class="text-center text-gray-500 py-10">No featured game available.</p>
@@ -146,9 +168,19 @@
                                                 <c:out value="${featuredGame.title}"/>
                                              </a>
                                          </h4>
-                                         <p class="text-sm text-gray-600">
-                                             <fmt:formatNumber value="${featuredGame.price}" type="currency" currencySymbol="$" />
-                                         </p>
+                                         <div class="flex justify-between items-center">
+                                             <p class="text-sm text-gray-600">
+                                                 <fmt:formatNumber value="${featuredGame.price}" type="currency" currencySymbol="$" />
+                                             </p>
+                                             <c:if test="${not empty sessionScope.loggedInUser}">
+                                                 <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
+                                                     <input type="hidden" name="gameId" value="${featuredGame.gameId}" />
+                                                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">
+                                                         Add to Cart
+                                                     </button>
+                                                 </form>
+                                             </c:if>
+                                         </div>
                                      </div>
                                  </c:forEach>
                              </div>
