@@ -26,7 +26,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">Edit Profile</h1>
                 </div>
 
-                <form action="${pageContext.request.contextPath}/editProfile" method="post" class="space-y-6">
+                <form action="${pageContext.request.contextPath}/EditProfileServlet" method="post" class="space-y-6">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
                         <input type="text" id="username" name="username" required

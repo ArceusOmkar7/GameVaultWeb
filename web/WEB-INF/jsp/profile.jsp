@@ -25,7 +25,7 @@
             <div class="p-6">
                 <div class="flex justify-between items-start mb-6">
                     <h1 class="text-2xl font-bold text-gray-900">Profile</h1>
-                    <a href="${pageContext.request.contextPath}/editProfile" 
+                    <a href="${pageContext.request.contextPath}/EditProfileServlet" 
                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Edit Profile
                     </a>
