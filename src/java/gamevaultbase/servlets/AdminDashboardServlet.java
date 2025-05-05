@@ -31,6 +31,22 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
+        // Check for any message parameters from redirects
+        String message = request.getParameter("message");
+        String messageType = request.getParameter("messageType");
+
+        if (message != null && !message.isEmpty()) {
+            request.setAttribute("message", message);
+
+            // Set the message type (default to "info" if not specified)
+            if (messageType != null && (messageType.equals("success") || messageType.equals("error")
+                    || messageType.equals("warning"))) {
+                request.setAttribute("messageType", messageType);
+            } else {
+                request.setAttribute("messageType", "info");
+            }
+        }
+
         // Get game management from application context
         GameManagement gameManagement = (GameManagement) getServletContext().getAttribute("gameManagement");
         if (gameManagement == null) {

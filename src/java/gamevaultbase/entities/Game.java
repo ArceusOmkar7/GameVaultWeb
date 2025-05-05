@@ -11,6 +11,11 @@ public class Game {
     private float price;
     private Date releaseDate;
     private String imagePath; // New field for storing game image path
+    private String genre; // Added genre field
+
+    public Game() {
+        // Default empty constructor
+    }
 
     public Game(String title, String description, String developer, String platform, float price, Date releaseDate) {
         this.title = title;
@@ -44,6 +49,19 @@ public class Game {
         this.price = price;
         this.releaseDate = releaseDate;
         this.imagePath = imagePath;
+    }
+
+    public Game(int gameId, String title, String description, String developer, String platform, float price,
+            Date releaseDate, String imagePath, String genre) {
+        this.gameId = gameId;
+        this.title = title;
+        this.description = description;
+        this.developer = developer;
+        this.platform = platform;
+        this.price = price;
+        this.releaseDate = releaseDate;
+        this.imagePath = imagePath;
+        this.genre = genre;
     }
 
     public int getGameId() {
@@ -110,9 +128,30 @@ public class Game {
         this.imagePath = imagePath;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
     // Helper method to get a default image path if none is set
     public String getImagePathOrDefault() {
         return (imagePath != null && !imagePath.isEmpty()) ? imagePath : "game_images/default_game.png";
+    }
+
+    /**
+     * Adds an image path to this game.
+     * Currently replaces any existing image path, but could be modified to support
+     * multiple images.
+     * 
+     * @param imagePath the path to the image file
+     */
+    public void addImagePath(String imagePath) {
+        // For now, we just set the image path
+        // In a future version, this could be modified to store multiple images
+        this.imagePath = imagePath;
     }
 
     @Override
@@ -126,6 +165,7 @@ public class Game {
                 ", price=" + price +
                 ", releaseDate=" + releaseDate +
                 ", imagePath='" + imagePath + '\'' +
+                ", genre='" + genre + '\'' +
                 '}';
     }
 }

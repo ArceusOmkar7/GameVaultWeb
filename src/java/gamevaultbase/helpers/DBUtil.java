@@ -274,14 +274,15 @@ public class DBUtil {
         T handle(ResultSet rs) throws SQLException, IOException;
     }
 
-    // --- SQL Constants for Table Creation (Unchanged from previous version) ---
+    // --- SQL Constants for Table Creation (Updated with missing columns) ---
     private static final String SQL_CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS Users (" +
             "userId INT AUTO_INCREMENT PRIMARY KEY," +
             "email VARCHAR(255) NOT NULL UNIQUE," +
             "password VARCHAR(255) NOT NULL," +
             "username VARCHAR(255) NOT NULL UNIQUE," +
             "walletBalance FLOAT NOT NULL DEFAULT 0.0," +
-            "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+            "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+            "isAdmin BOOLEAN DEFAULT FALSE" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_GAMES_TABLE = "CREATE TABLE IF NOT EXISTS Games (" +
@@ -292,12 +293,14 @@ public class DBUtil {
             "platform VARCHAR(255)," +
             "price FLOAT NOT NULL," +
             "releaseDate DATE," +
-            "imagePath VARCHAR(255)" +
+            "imagePath VARCHAR(255)," +
+            "genre VARCHAR(100)" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_CARTS_TABLE = "CREATE TABLE IF NOT EXISTS Carts (" +
             "userId INT PRIMARY KEY," +
             "createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+            "updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
             "FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE" +
             ") ENGINE=InnoDB;";
 
@@ -306,7 +309,7 @@ public class DBUtil {
             "userId INT NOT NULL," +
             "gameId INT NOT NULL," +
             "addedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-            "FOREIGN KEY (userId) REFERENCES Carts(userId) ON DELETE CASCADE," +
+            "FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE," +
             "FOREIGN KEY (gameId) REFERENCES Games(gameId) ON DELETE CASCADE," +
             "UNIQUE KEY `unique_user_game` (`userId`,`gameId`)" +
             ") ENGINE=InnoDB;";
@@ -330,20 +333,20 @@ public class DBUtil {
 
     private static final String SQL_CREATE_TRANSACTIONS_TABLE = "CREATE TABLE IF NOT EXISTS Transactions (" +
             "transactionId INT AUTO_INCREMENT PRIMARY KEY," +
-            "orderId INT NULL," + // Allow NULL
+            "orderId INT NULL," +
             "userId INT NOT NULL," +
-            "transactionType VARCHAR(50) NOT NULL," +
+            "type VARCHAR(50) NOT NULL," +
             "amount FLOAT NOT NULL," +
             "transactionDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
             "FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE RESTRICT," +
-            "FOREIGN KEY (orderId) REFERENCES Orders(orderId) ON DELETE SET NULL" + // Set orderId to NULL if order
-                                                                                    // deleted
+            "FOREIGN KEY (orderId) REFERENCES Orders(orderId) ON DELETE SET NULL" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE IF NOT EXISTS Reviews (" +
             "reviewId INT AUTO_INCREMENT PRIMARY KEY," +
             "gameId INT NOT NULL," +
             "userId INT NOT NULL," +
+            "rating INT NOT NULL," +
             "comment TEXT NOT NULL," +
             "reviewDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
             "FOREIGN KEY (gameId) REFERENCES Games(gameId) ON DELETE CASCADE," +

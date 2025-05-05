@@ -17,7 +17,13 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold text-purple-800">Admin Dashboard</h1>
-          <div>
+          <div class="flex space-x-3">
+            <a
+              href="${pageContext.request.contextPath}/admin/generate-dummy-data"
+              class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded"
+            >
+              Generate Dummy Data
+            </a>
             <c:if
               test="${not empty sessionScope.loggedInUser && sessionScope.loggedInUser.admin}"
             >
@@ -31,12 +37,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         </div>
 
         <%-- Display messages --%>
-        <c:if test="${not empty param.message}">
+        <c:if test="${not empty message || not empty param.message}">
           <div
-            class="mb-4 p-4 rounded ${param.messageType eq 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}"
+            class="mb-4 p-4 rounded ${(messageType eq 'success' || param.messageType eq 'success') ? 'bg-green-100 border border-green-400 text-green-700' : (messageType eq 'error' || param.messageType eq 'error') ? 'bg-red-100 border border-red-400 text-red-700' : (messageType eq 'warning' || param.messageType eq 'warning') ? 'bg-yellow-100 border border-yellow-400 text-yellow-700' : 'bg-blue-100 border border-blue-400 text-blue-700'}"
             role="alert"
           >
-            <p><c:out value="${param.message}" /></p>
+            <p>
+              <c:out value="${not empty message ? message : param.message}" />
+            </p>
           </div>
         </c:if>
         <c:if test="${not empty errorMessage}">
@@ -83,7 +91,166 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
         <%-- Game Management Section --%>
         <div class="overflow-x-auto">
-          <h2 class="text-2xl font-semibold mb-4">Game Catalog</h2>
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold">Game Catalog</h2>
+            <button
+              id="addGameBtn"
+              class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
+            >
+              Add New Game
+            </button>
+          </div>
+
+          <%-- Add Game Form (Hidden by default) --%>
+          <div
+            id="addGameForm"
+            class="hidden mb-6 p-4 bg-gray-50 rounded border border-gray-300"
+          >
+            <h3 class="text-xl font-semibold mb-4">Add New Game</h3>
+            <form
+              action="${pageContext.request.contextPath}/admin/add-game"
+              method="post"
+              class="space-y-4"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="title"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Title *</label
+                  >
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="developer"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Developer *</label
+                  >
+                  <input
+                    type="text"
+                    id="developer"
+                    name="developer"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="platform"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Platform *</label
+                  >
+                  <select
+                    id="platform"
+                    name="platform"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Platform</option>
+                    <option value="PC">PC</option>
+                    <option value="PlayStation 5">PlayStation 5</option>
+                    <option value="PlayStation 4">PlayStation 4</option>
+                    <option value="Xbox Series X">Xbox Series X</option>
+                    <option value="Xbox One">Xbox One</option>
+                    <option value="Nintendo Switch">Nintendo Switch</option>
+                    <option value="Mobile">Mobile</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    for="price"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Price * ($)</label
+                  >
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    min="0"
+                    step="0.01"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="releaseDate"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Release Date *</label
+                  >
+                  <input
+                    type="date"
+                    id="releaseDate"
+                    name="releaseDate"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="genre"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Genre *</label
+                  >
+                  <select
+                    id="genre"
+                    name="genre"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Genre</option>
+                    <option value="Action">Action</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="RPG">RPG</option>
+                    <option value="Strategy">Strategy</option>
+                    <option value="Simulation">Simulation</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Racing">Racing</option>
+                    <option value="Puzzle">Puzzle</option>
+                    <option value="Fighting">Fighting</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Shooter">Shooter</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label
+                  for="description"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description *</label
+                >
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="4"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                ></textarea>
+              </div>
+              <div class="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  id="cancelAddGame"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
+                >
+                  Add Game
+                </button>
+              </div>
+            </form>
+          </div>
 
           <table class="min-w-full bg-white border border-gray-200">
             <thead class="bg-gray-100">
@@ -131,6 +298,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                     />
                   </td>
                   <td class="py-2 px-4 border-b">
+                    <fmt:formatDate
+                      value="${game.releaseDate}"
+                      pattern="MM/dd/yyyy"
+                    />
+                  </td>
+                  <td class="py-2 px-4 border-b">
                     <form
                       action="${pageContext.request.contextPath}/admin/upload-game-image"
                       method="post"
@@ -167,5 +340,20 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     </main>
 
     <jsp:include page="footer.jsp" />
+
+    <script>
+      // Toggle Add Game Form
+      document
+        .getElementById("addGameBtn")
+        .addEventListener("click", function () {
+          document.getElementById("addGameForm").classList.toggle("hidden");
+        });
+
+      document
+        .getElementById("cancelAddGame")
+        .addEventListener("click", function () {
+          document.getElementById("addGameForm").classList.add("hidden");
+        });
+    </script>
   </body>
 </html>
