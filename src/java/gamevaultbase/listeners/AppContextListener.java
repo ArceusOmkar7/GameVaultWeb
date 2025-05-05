@@ -100,7 +100,7 @@ public class AppContextListener implements ServletContextListener {
          // Check if games exist (basic check)
          boolean gamesExist = false;
          try {
-              gamesExist = gameManagement.getAllGames() != null && !gameManagement.getAllGames().isEmpty();
+                 gamesExist = gameManagement.getAllGames(null, null, null) != null && !gameManagement.getAllGames(null, null, null).isEmpty();
          } catch (Exception e) {
               System.err.println("WARN: Could not check existing games before adding samples: " + e.getMessage());
               // Proceed cautiously
@@ -109,10 +109,22 @@ public class AppContextListener implements ServletContextListener {
          if (!gamesExist) {
              System.out.println("Adding sample games...");
              try {
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Spider-Man Remastered", "Swing through NYC.", "Insomniac", "PC", 52.3f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("God of War", "Dad simulator.", "Santa Monica", "PS4", 49.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("The Last of Us Part II", "Emotional rollercoaster.", "Naughty Dog", "PS4", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Cyberpunk 2077", "Futuristic adventure.", "CDPR", "PC", 39.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Red Dead Redemption 2", "Epic western adventure.", "Rockstar Games", "PS4", 59.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("The Witcher 3: Wild Hunt", "Open-world RPG.", "CD Projekt Red", "PC", 29.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Minecraft", "Build and explore.", "Mojang", "PC", 26.95f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("FIFA 23", "Football simulation.", "EA Sports", "PS5", 69.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("The Legend of Zelda: Breath of the Wild", "Open-world adventure.", "Nintendo", "Switch", 59.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Super Mario Odyssey", "3D platformer.", "Nintendo", "Switch", 49.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Grand Theft Auto V", "Crime and chaos.", "Rockstar Games", "PC", 29.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Call of Duty: Modern Warfare II", "First-person shooter.", "Infinity Ward", "PS5", 69.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Animal Crossing: New Horizons", "Life simulation.", "Nintendo", "Switch", 59.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Assassin's Creed Valhalla", "Viking adventure.", "Ubisoft", "PC", 59.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Fortnite", "Battle royale.", "Epic Games", "PC", 0.00f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Among Us", "Social deduction.", "Innersloth", "PC", 4.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Cyberpunk 2077", "Futuristic RPG.", "CD Projekt Red", "PC", 59.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("God of War", "Mythological action.", "Santa Monica Studio", "PS4", 39.99f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("Spider-Man Remastered", "Web-slinging action.", "Insomniac Games", "PS5", 52.30f, new java.util.Date()));
+                 gameManagement.addGame(new gamevaultbase.entities.Game("The Last of Us Part II", "Post-apocalyptic drama.", "Naughty Dog", "PS4", 59.99f, new java.util.Date()));
                  System.out.println("Sample games added.");
               } catch (Exception e) {
                   System.err.println("ERROR adding sample games: " + e.getMessage());

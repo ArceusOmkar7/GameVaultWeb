@@ -56,7 +56,7 @@ public class AdminDashboardServlet extends HttpServlet {
         }
 
         // Get all games to display in the dashboard
-        List<Game> games = gameManagement.getAllGames();
+        List<Game> games = gameManagement.getAllGames(null, null, null);
         request.setAttribute("games", games);
 
         // Forward to admin dashboard JSP

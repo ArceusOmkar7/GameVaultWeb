@@ -22,8 +22,8 @@ public class GameManagement {
         return game;
     }
 
-    public List<Game> getAllGames() {
-        return gameStorage.findAll();
+    public List<Game> getAllGames(String searchQuery, String filterPlatform, String sortBy) {
+        return gameStorage.findAllWithFilters(searchQuery, filterPlatform, sortBy);
     }
 
     // Add this method

@@ -29,12 +29,46 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        String sql = "SELECT * FROM Games";
+        return findAllWithFilters(null, null, null);
+    }
+
+    public List<Game> findAllWithFilters(String searchQuery, String filterPlatform, String sortBy) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM Games WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            sql.append(" AND (title LIKE ? OR description LIKE ?)");
+            params.add("%" + searchQuery.trim() + "%");
+            params.add("%" + searchQuery.trim() + "%");
+        }
+
+        if (filterPlatform != null && !filterPlatform.trim().isEmpty()) {
+            sql.append(" AND platform = ?");
+            params.add(filterPlatform.trim());
+        }
+
+        if (sortBy != null && !sortBy.trim().isEmpty()) {
+            switch (sortBy) {
+                case "price_asc":
+                    sql.append(" ORDER BY price ASC");
+                    break;
+                case "price_desc":
+                    sql.append(" ORDER BY price DESC");
+                    break;
+                case "release_date":
+                    sql.append(" ORDER BY releaseDate DESC");
+                    break;
+                default:
+                    sql.append(" ORDER BY gameId ASC");
+            }
+        } else {
+            sql.append(" ORDER BY gameId ASC");
+        }
+
         try {
-            return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs));
+            return DBUtil.executeQuery(sql.toString(), rs -> mapResultSetToGame(rs), params.toArray());
         } catch (SQLException | IOException e) {
             System.err.println("Error finding all games: " + e.getMessage());
-            // Consider logging the stack trace e.printStackTrace();
             return new ArrayList<>(); // Return empty list on error
         }
     }

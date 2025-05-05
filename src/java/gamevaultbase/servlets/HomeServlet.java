@@ -38,7 +38,7 @@ public class HomeServlet extends HttpServlet {
         } else {
             try {
                  // TODO: Modify these calls to pass search/filter/sort parameters when implemented
-                games = gameManagement.getAllGames();
+                games = gameManagement.getAllGames(searchQuery, filterPlatform, sortBy);
                 featuredGames = gameManagement.getFeaturedGames();
 
                 if (featuredGames != null && !featuredGames.isEmpty()) {
