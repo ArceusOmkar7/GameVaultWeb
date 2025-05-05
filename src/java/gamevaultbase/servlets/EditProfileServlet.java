@@ -44,80 +44,71 @@ public class EditProfileServlet extends HttpServlet {
         // Get parameters from form
         String email = request.getParameter("email");
         String username = request.getParameter("username");
-        // Password changes would require current password validation - skipped for simplicity
-        // String currentPassword = request.getParameter("currentPassword");
-        // String newPassword = request.getParameter("newPassword");
-        // String confirmNewPassword = request.getParameter("confirmNewPassword");
-
         String errorMessage = null;
         String successMessage = null;
 
         UserManagement userManagement = (UserManagement) getServletContext().getAttribute("userManagement");
-         if (userManagement == null) {
-             System.err.println("FATAL: UserManagement not found in ServletContext!");
-             errorMessage = "Profile update service is currently unavailable.";
-             request.setAttribute("errorMessage", errorMessage);
-             request.setAttribute("user", currentUser); // Pass back original user data
-             request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
-             return;
-         }
 
+        if (userManagement == null) {
+            System.err.println("FATAL: UserManagement not found in ServletContext!");
+            errorMessage = "Profile update service is currently unavailable.";
+            request.setAttribute("errorMessage", errorMessage);
+            request.setAttribute("user", currentUser);
+            request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
+            return;
+        }
 
         try {
             // Basic Validation
-            if (email == null || email.trim().isEmpty() || username == null || username.trim().isEmpty()) {
-                throw new InvalidUserDataException("form", "Email and Username cannot be empty.");
+            if (email == null || email.trim().isEmpty()) {
+                throw new InvalidUserDataException("email", "Email cannot be empty.");
             }
+            if (username == null || username.trim().isEmpty()) {
+                throw new InvalidUserDataException("username", "Username cannot be empty.");
+            }
+            
             email = email.trim();
             username = username.trim();
 
-            // Create a temporary user object with updated details
-            // IMPORTANT: We keep the original password as we are not handling password change here
+            // Create updated user object
             User updatedUser = new User(
-                currentUser.getUserId(), // Keep the original ID
+                currentUser.getUserId(),
                 email,
-                currentUser.getPassword(), // Keep original plain text password
+                currentUser.getPassword(),
                 username,
-                currentUser.getWalletBalance(), // Keep original balance
-                currentUser.getCreatedAt() // Keep original creation date
+                currentUser.getWalletBalance(),
+                currentUser.getCreatedAt()
             );
+            updatedUser.setIsAdmin(currentUser.isAdmin());
 
-            // TODO: Implement actual update logic in UserManagement and UserStorage if needed
-            // For now, we simulate success but don't actually call the update method
-            // userManagement.updateUser(updatedUser); // <-- Call this when update is implemented
+            // Update user in database
+            userManagement.updateUser(updatedUser);
 
-            System.out.println("TODO: Profile update logic skipped for user: " + currentUser.getUserId()); // Log simulation
-
-            // Update user in session
+            // Update session
             session.setAttribute("loggedInUser", updatedUser);
             successMessage = "Profile updated successfully!";
 
             // Redirect back to profile page with success message
-            response.sendRedirect(request.getContextPath() + "/profile?message=" + java.net.URLEncoder.encode(successMessage, "UTF-8") + "&messageType=success");
-            return; // Stop processing after redirect
-
+            response.sendRedirect(request.getContextPath() + "/profile?message=" + 
+                java.net.URLEncoder.encode(successMessage, "UTF-8") + "&messageType=success");
+            return;
 
         } catch (InvalidUserDataException e) {
             errorMessage = e.getMessage();
-         }
-        // Uncomment if updateUser is implemented and can throw UserNotFoundException
-        // catch (UserNotFoundException e) {
-        //     errorMessage = "Could not find user profile to update.";
-        //     // Consider logging out the user if their profile disappeared
-        //     session.invalidate();
-        //     response.sendRedirect(request.getContextPath() + "/login?message=Error finding profile. Please login again.&messageType=error");
-        //     return;
-        // }
-        catch (Exception e) {
-             System.err.println("Error updating profile for user " + currentUser.getUserId() + ": " + e.getMessage());
-             e.printStackTrace();
-             errorMessage = "An unexpected error occurred while updating your profile.";
-         }
+        } catch (UserNotFoundException e) {
+            errorMessage = "Could not find user profile to update.";
+            session.invalidate();
+            response.sendRedirect(request.getContextPath() + "/login?message=Error finding profile. Please login again.&messageType=error");
+            return;
+        } catch (Exception e) {
+            System.err.println("Error updating profile for user " + currentUser.getUserId() + ": " + e.getMessage());
+            e.printStackTrace();
+            errorMessage = "An unexpected error occurred while updating your profile.";
+        }
 
-         // If error occurred, forward back to edit page
-         request.setAttribute("errorMessage", errorMessage);
-         // Pass back the potentially modified (but not saved) user object or original one
-         request.setAttribute("user", currentUser); // Or create a temp user with submitted values: new User(currentUser.getUserId(), email, currentUser.getPassword(), username, currentUser.getWalletBalance(), currentUser.getCreatedAt())
-         request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
+        // If error occurred, forward back to edit page
+        request.setAttribute("errorMessage", errorMessage);
+        request.setAttribute("user", currentUser);
+        request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
     }
 }

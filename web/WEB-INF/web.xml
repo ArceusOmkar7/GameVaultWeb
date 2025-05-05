@@ -179,6 +179,15 @@
         <servlet-name>ProfileServlet</servlet-name>
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
+    <!-- NEW Add Balance Servlet -->
+    <servlet>
+        <servlet-name>AddBalanceServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.AddBalanceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddBalanceServlet</servlet-name>
+        <url-pattern>/addBalance</url-pattern>
+    </servlet-mapping>
     <!-- Error Page Handling (Keep as is) -->
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
