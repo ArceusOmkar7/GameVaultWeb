@@ -1,0 +1,729 @@
+[
+  {
+    "title": "The Legend of Zelda: Tears of the Kingdom",
+    "description": "An open-world adventure where Link explores the vast lands and skies of Hyrule, utilizing new abilities to combat emerging threats.",
+    "developer": "Nintendo EPD",
+    "platform": ["Nintendo Switch"],
+    "price": 14.99,
+    "releaseDate": "2023-05-12",
+    "imagePath": "https://media.rawg.io/media/games/556/55684bfd048706f4266d331d70050b37.jpg",
+    "rating": 4.39,
+    "genre": ["Adventure", "Action"]
+  },
+  {
+    "title": "Elden Ring",
+    "description": "An expansive action RPG set in a dark fantasy world, offering players freedom to explore and challenging combat encounters.",
+    "developer": "FromSoftware",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X"
+    ],
+    "price": 49.99,
+    "releaseDate": "2022-02-25",
+    "imagePath": "https://media.rawg.io/media/games/b29/b294fdd866dcdb643e7bab370a552855.jpg",
+    "rating": 4.4,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "Baldur's Gate III",
+    "description": "A story-rich RPG that emphasizes player choice, set in the Dungeons & Dragons universe, allowing for diverse character interactions and outcomes.",
+    "developer": "Larian Studios",
+    "platform": ["PC", "PlayStation 5", "Xbox Series S/X", "macOS"],
+    "price": 59.99,
+    "releaseDate": "2023-08-03",
+    "imagePath": "https://media.rawg.io/media/games/699/69907ecf13f172e9e144069769c3be73.jpg",
+    "rating": 4.45,
+    "genre": ["Strategy", "Adventure", "RPG"]
+  },
+  {
+    "title": "Red Dead Redemption 2",
+    "description": "An epic tale of life in America's unforgiving heartland, blending storytelling with deep exploration and immersive gameplay.",
+    "developer": "Rockstar Games",
+    "platform": ["PC", "Xbox One", "PlayStation 4"],
+    "price": 44.99,
+    "releaseDate": "2018-10-26",
+    "imagePath": "https://media.rawg.io/media/games/511/5118aff5091cb3efec399c808f8c598f.jpg",
+    "rating": 4.59,
+    "genre": ["Action"]
+  },
+  {
+    "title": "The Witcher 3: Wild Hunt",
+    "description": "A narrative-driven RPG where Geralt of Rivia hunts monsters and navigates complex political landscapes in a richly detailed world.",
+    "developer": "CD Projekt Red",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch",
+      "macOS"
+    ],
+    "price": 29.99,
+    "releaseDate": "2015-05-18",
+    "imagePath": "https://media.rawg.io/media/games/618/618c2031a07bbff6b4f611f10b6bcdbc.jpg",
+    "rating": 4.64,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "God of War Ragnar\u00f6k",
+    "description": "Kratos and his son Atreus embark on a mythic journey through Norse realms, facing gods and monsters in a quest to prevent Ragnar\u00f6k.",
+    "developer": "Santa Monica Studio",
+    "platform": ["PC"],
+    "price": 59.99,
+    "releaseDate": null,
+    "imagePath": "https://media.rawg.io/media/screenshots/3c4/3c4c51b66741363d83b56ce66b1240ec.jpg",
+    "rating": 4.5,
+    "genre": ["Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "Cyberpunk 2077",
+    "description": "An open-world action-adventure set in Night City, a megalopolis obsessed with power, glamour, and body modification.",
+    "developer": "CD Projekt Red",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X"
+    ],
+    "price": 24.99,
+    "releaseDate": "2020-12-10",
+    "imagePath": "https://media.rawg.io/media/games/26d/26d4437715bee60138dab4a7c8c59c92.jpg",
+    "rating": 4.21,
+    "genre": ["Shooter", "Action", "RPG"]
+  },
+  {
+    "title": "Minecraft",
+    "description": "A sandbox game that allows players to build and explore infinite worlds, fostering creativity and survival skills.",
+    "developer": "Mojang Studios",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "iOS",
+      "Android",
+      "Nintendo 3DS",
+      "macOS",
+      "Linux",
+      "Xbox 360",
+      "PlayStation 3",
+      "PS Vita",
+      "Wii U"
+    ],
+    "price": 59.99,
+    "releaseDate": "2009-05-10",
+    "imagePath": "https://media.rawg.io/media/games/b4e/b4e4c73d5aa4ec66bbf75375c4847a2b.jpg",
+    "rating": 4.43,
+    "genre": [
+      "Action",
+      "Arcade",
+      "Simulation",
+      "Indie",
+      "Massively Multiplayer"
+    ]
+  },
+  {
+    "title": "Grand Theft Auto V",
+    "description": "An action-adventure game featuring three protagonists in a sprawling open world, combining storytelling with diverse missions.",
+    "developer": "Rockstar North",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Xbox 360",
+      "PlayStation 3"
+    ],
+    "price": 14.99,
+    "releaseDate": "2013-09-17",
+    "imagePath": "https://media.rawg.io/media/games/20a/20aa03a10cda45239fe22d035c0ebe64.jpg",
+    "rating": 4.47,
+    "genre": ["Action"]
+  },
+  {
+    "title": "Hades",
+    "description": "A rogue-like dungeon crawler where you defy the god of death as you hack and slash out of the Underworld of Greek myth.",
+    "developer": "Supergiant Games",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch"
+    ],
+    "price": 19.99,
+    "releaseDate": "2020-09-17",
+    "imagePath": "https://media.rawg.io/media/games/1f4/1f47a270b8f241e4676b14d39ec620f7.jpg",
+    "rating": 4.44,
+    "genre": ["Indie", "Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "Hollow Knight",
+    "description": "A challenging 2D action-adventure game set in a vast, interconnected world filled with secrets and powerful enemies.",
+    "developer": "Team Cherry",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "macOS",
+      "Linux"
+    ],
+    "price": 44.99,
+    "releaseDate": "2017-02-23",
+    "imagePath": "https://media.rawg.io/media/games/4cf/4cfc6b7f1850590a4634b08bfab308ab.jpg",
+    "rating": 4.4,
+    "genre": ["Platformer", "Indie", "Action"]
+  },
+  {
+    "title": "Sekiro: Shadows Die Twice",
+    "description": "A third-person action-adventure game with intense swordplay, set in a reimagined late 1500s Sengoku period Japan.",
+    "developer": "FromSoftware",
+    "platform": ["PC", "Xbox One", "PlayStation 4"],
+    "price": 14.99,
+    "releaseDate": "2019-03-22",
+    "imagePath": "https://media.rawg.io/media/games/67f/67f62d1f062a6164f57575e0604ee9f6.jpg",
+    "rating": 4.38,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "Dark Souls III",
+    "description": "An action RPG known for its challenging combat and deep lore, set in a dark, decaying world.",
+    "developer": "FromSoftware",
+    "platform": ["PC", "Xbox One", "PlayStation 4"],
+    "price": 9.99,
+    "releaseDate": "2016-04-11",
+    "imagePath": "https://media.rawg.io/media/games/da1/da1b267764d77221f07a4386b6548e5a.jpg",
+    "rating": 4.4,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "Bloodborne",
+    "description": "A gothic action RPG with fast-paced combat and a mysterious, atmospheric world.",
+    "developer": "FromSoftware",
+    "platform": ["PlayStation 4"],
+    "price": 44.99,
+    "releaseDate": "2015-03-24",
+    "imagePath": "https://media.rawg.io/media/games/214/214b29aeff13a0ae6a70fc4426e85991.jpg",
+    "rating": 4.41,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "Resident Evil 4",
+    "description": "A modernized version of the classic survival horror game, featuring updated graphics and gameplay mechanics.",
+    "developer": "Capcom",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "iOS"
+    ],
+    "price": 29.99,
+    "releaseDate": "2023-03-24",
+    "imagePath": "https://media.rawg.io/media/games/51a/51a404b9918a0b19fc704a3ca248c69f.jpg",
+    "rating": 4.62,
+    "genre": ["Adventure", "Action"]
+  },
+  {
+    "title": "Final Fantasy VII Rebirth",
+    "description": "The second installment in the Final Fantasy VII remake project, continuing the story with enhanced visuals and gameplay.",
+    "developer": "Square Enix",
+    "platform": ["PC", "PlayStation 5"],
+    "price": 29.99,
+    "releaseDate": "2024-02-29",
+    "imagePath": "https://media.rawg.io/media/games/511/511995d5dfcf18965dbb354d2ba9e176.jpg",
+    "rating": 4.46,
+    "genre": ["Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "Marvel's Spider-Man 2",
+    "description": "An action-adventure game where players swing through New York City as both Peter Parker and Miles Morales.",
+    "developer": "Insomniac Games",
+    "platform": ["PC", "PlayStation 5"],
+    "price": 44.99,
+    "releaseDate": "2023-10-20",
+    "imagePath": "https://media.rawg.io/media/games/7ae/7ae5a14cdb4ab222a134c15f4629e430.jpg",
+    "rating": 4.36,
+    "genre": ["Adventure", "Action"]
+  },
+  {
+    "title": "Persona 5 Royal",
+    "description": "An enhanced version of the original JRPG, adding new characters, storylines, and gameplay mechanics.",
+    "developer": "Atlus",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch"
+    ],
+    "price": 44.99,
+    "releaseDate": "2020-03-31",
+    "imagePath": "https://media.rawg.io/media/games/a9c/a9c789951de65da545d51f664b4f2ce0.jpg",
+    "rating": 4.75,
+    "genre": ["Adventure", "RPG"]
+  },
+  {
+    "title": "Stardew Valley",
+    "description": "A farming simulation game where players can grow crops, raise animals, and build relationships in a charming rural town.",
+    "developer": "ConcernedApe",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "iOS",
+      "Android",
+      "macOS",
+      "Linux",
+      "PS Vita"
+    ],
+    "price": 14.99,
+    "releaseDate": "2016-02-25",
+    "imagePath": "https://media.rawg.io/media/games/713/713269608dc8f2f40f5a670a14b2de94.jpg",
+    "rating": 4.4,
+    "genre": ["Indie", "RPG", "Simulation"]
+  },
+  {
+    "title": "Celeste",
+    "description": "A challenging platformer that tells a heartfelt story about overcoming personal struggles.",
+    "developer": "Matt Makes Games",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "macOS",
+      "Linux"
+    ],
+    "price": 49.99,
+    "releaseDate": "2018-01-25",
+    "imagePath": "https://media.rawg.io/media/games/594/59487800889ebac294c7c2c070d02356.jpg",
+    "rating": 4.38,
+    "genre": ["Platformer", "Indie"]
+  },
+  {
+    "title": "Disco Elysium: Final Cut",
+    "description": "A detective RPG featuring deep narrative choices and a unique skill system.",
+    "developer": "ZA/UM",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch",
+      "iOS",
+      "macOS"
+    ],
+    "price": 14.99,
+    "releaseDate": "2021-03-30",
+    "imagePath": "https://media.rawg.io/media/games/0af/0afe9e8ace196123d8c7cf22172cec63.jpg",
+    "rating": 4.66,
+    "genre": ["Adventure", "RPG"]
+  },
+  {
+    "title": "Death Stranding",
+    "description": "An open-world action game with a focus on delivering supplies across a fractured America.",
+    "developer": "Kojima Productions",
+    "platform": ["PC", "PlayStation 4"],
+    "price": 49.99,
+    "releaseDate": "2019-11-08",
+    "imagePath": "https://media.rawg.io/media/games/2ad/2ad87a4a69b1104f02435c14c5196095.jpg",
+    "rating": 4.32,
+    "genre": ["Adventure", "Action"]
+  },
+  {
+    "title": "Ghost of Tsushima",
+    "description": "An open-world action-adventure game set in feudal Japan, focusing on samurai combat and stealth.",
+    "developer": "Sucker Punch Productions",
+    "platform": ["PC", "PlayStation 5", "PlayStation 4"],
+    "price": 19.99,
+    "releaseDate": "2020-07-17",
+    "imagePath": "https://media.rawg.io/media/games/f24/f2493ea338fe7bd3c7d73750a85a0959.jpeg",
+    "rating": 4.41,
+    "genre": ["Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "The Last of Us Part II",
+    "description": "A narrative-driven action-adventure game exploring themes of revenge and redemption.",
+    "developer": "Naughty Dog",
+    "platform": ["PlayStation 5", "PlayStation 4"],
+    "price": 19.99,
+    "releaseDate": "2020-06-19",
+    "imagePath": "https://media.rawg.io/media/games/909/909974d1c7863c2027241e265fe7011f.jpg",
+    "rating": 4.42,
+    "genre": ["Shooter", "Adventure", "Action"]
+  },
+  {
+    "title": "Monster Hunter: World",
+    "description": "An action RPG where players hunt massive creatures in a living, breathing ecosystem.",
+    "developer": "Capcom",
+    "platform": ["PC", "Xbox One", "PlayStation 4"],
+    "price": 49.99,
+    "releaseDate": "2018-01-26",
+    "imagePath": "https://media.rawg.io/media/games/21c/21cc15d233117c6809ec86870559e105.jpg",
+    "rating": 4.01,
+    "genre": ["Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "DOOM Eternal",
+    "description": "A fast-paced first-person shooter that continues the story of the Doom Slayer battling demonic forces.",
+    "developer": "id Software",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch"
+    ],
+    "price": 29.99,
+    "releaseDate": "2020-03-20",
+    "imagePath": "https://media.rawg.io/media/games/3ea/3ea3c9bbd940b6cb7f2139e42d3d443f.jpg",
+    "rating": 4.38,
+    "genre": ["Shooter", "Action"]
+  },
+  {
+    "title": "Overwatch 2",
+    "description": "A team-based multiplayer first-person shooter with a diverse cast of heroes.",
+    "developer": "Blizzard Entertainment",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch"
+    ],
+    "price": 69.99,
+    "releaseDate": "2022-10-04",
+    "imagePath": "https://media.rawg.io/media/games/95a/95a10817d1fc648cff1153f3fa8ef6c5.jpg",
+    "rating": 3.11,
+    "genre": ["Shooter", "Massively Multiplayer", "Action"]
+  },
+  {
+    "title": "Apex Legends",
+    "description": "A free-to-play battle royale game set in the Titanfall universe.",
+    "developer": "Respawn Entertainment",
+    "platform": ["PC", "Xbox One", "PlayStation 4", "Nintendo Switch", "macOS"],
+    "price": 14.99,
+    "releaseDate": "2019-02-04",
+    "imagePath": "https://media.rawg.io/media/games/737/737ea5662211d2e0bbd6f5989189e4f1.jpg",
+    "rating": 3.64,
+    "genre": ["Shooter", "Action"]
+  },
+  {
+    "title": "Fortnite Battle Royale",
+    "description": "A battle royale game known for its building mechanics and frequent content updates.",
+    "developer": "Epic Games",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox One",
+      "Xbox Series S/X",
+      "Nintendo Switch",
+      "iOS",
+      "Android"
+    ],
+    "price": 59.99,
+    "releaseDate": "2017-09-26",
+    "imagePath": "https://media.rawg.io/media/games/dcb/dcbb67f371a9a28ea38ffd73ee0f53f3.jpg",
+    "rating": 3.27,
+    "genre": ["Shooter", "Action"]
+  },
+  {
+    "title": "Call of Duty: Warzone",
+    "description": "A free-to-play battle royale game set in the Call of Duty universe.",
+    "developer": "Infinity Ward",
+    "platform": ["PC", "Xbox One", "PlayStation 4"],
+    "price": 9.99,
+    "releaseDate": "2020-03-10",
+    "imagePath": "https://media.rawg.io/media/games/7e3/7e327a055bedb9b6d1be86593bef473d.jpg",
+    "rating": 3.62,
+    "genre": ["Shooter"]
+  },
+  {
+    "title": "League of Legends",
+    "description": "A multiplayer online battle arena game with a large roster of champions.",
+    "developer": "Riot Games",
+    "platform": ["PC", "macOS"],
+    "price": 49.99,
+    "releaseDate": "2009-10-27",
+    "imagePath": "https://media.rawg.io/media/games/78b/78bc81e247fc7e77af700cbd632a9297.jpg",
+    "rating": 3.65,
+    "genre": ["Strategy", "Action", "RPG"]
+  },
+  {
+    "title": "Valorant",
+    "description": "A tactical first-person shooter combining precise gunplay with unique agent abilities.",
+    "developer": "Riot Games",
+    "platform": ["PC", "PlayStation 5", "Xbox Series S/X"],
+    "price": 14.99,
+    "releaseDate": "2020-06-02",
+    "imagePath": "https://media.rawg.io/media/games/b11/b11127b9ee3c3701bd15b9af3286d20e.jpg",
+    "rating": 3.52,
+    "genre": ["Shooter", "Strategy", "Action"]
+  },
+  {
+    "title": "Counter-Strike 2",
+    "description": "The latest installment in the iconic tactical shooter series.",
+    "developer": "Valve",
+    "platform": ["PC", "Linux"],
+    "price": 49.99,
+    "releaseDate": "2023-09-27",
+    "imagePath": "https://media.rawg.io/media/games/ec4/ec4b02bdb3eb5c6212992c19bc05697e.jpg",
+    "rating": 3.59,
+    "genre": ["Shooter"]
+  },
+  {
+    "title": "Dota 2",
+    "description": "A multiplayer online battle arena game known for its deep strategic gameplay.",
+    "developer": "Valve",
+    "platform": ["PC", "macOS", "Linux"],
+    "price": 59.99,
+    "releaseDate": "2013-07-09",
+    "imagePath": "https://media.rawg.io/media/games/6fc/6fcf4cd3b17c288821388e6085bb0fc9.jpg",
+    "rating": 3.06,
+    "genre": ["Massively Multiplayer", "Action"]
+  },
+  {
+    "title": "Among Us",
+    "description": "A multiplayer party game where players work together to complete tasks while impostors attempt to sabotage them.",
+    "developer": "Innersloth",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox One",
+      "Nintendo Switch",
+      "iOS",
+      "Android"
+    ],
+    "price": 69.99,
+    "releaseDate": "2018-07-25",
+    "imagePath": "https://media.rawg.io/media/games/e74/e74458058b35e01c1ae3feeb39a3f724.jpg",
+    "rating": 3.84,
+    "genre": ["Casual", "Action", "Simulation"]
+  },
+  {
+    "title": "Genshin Impact",
+    "description": "An open-world action RPG with elemental combat and a gacha system.",
+    "developer": "miHoYo",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "iOS",
+      "Android"
+    ],
+    "price": 29.99,
+    "releaseDate": "2020-09-28",
+    "imagePath": "https://media.rawg.io/media/games/c38/c38bdb5da139005777176d33c463d70f.jpg",
+    "rating": 3.56,
+    "genre": ["Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "Animal Crossing: New Horizons",
+    "description": "A life simulation game where players build and manage their own island paradise.",
+    "developer": "Nintendo EPD",
+    "platform": ["Nintendo Switch"],
+    "price": 24.99,
+    "releaseDate": "2020-03-20",
+    "imagePath": "https://media.rawg.io/media/games/42f/42fe1abd4d7c11ca92d93a0fb0f8662b.jpg",
+    "rating": 4.31,
+    "genre": ["Simulation"]
+  },
+  {
+    "title": "Super Mario Odyssey",
+    "description": "A 3D platformer where Mario travels across various kingdoms to rescue Princess Peach.",
+    "developer": "Nintendo EPD",
+    "platform": ["Nintendo Switch"],
+    "price": 44.99,
+    "releaseDate": "2017-10-27",
+    "imagePath": "https://media.rawg.io/media/games/267/267bd0dbc496f52692487d07d014c061.jpg",
+    "rating": 4.42,
+    "genre": ["Platformer", "Arcade"]
+  },
+  {
+    "title": "Metroid Dread",
+    "description": "A side-scrolling action-adventure game continuing the story of bounty hunter Samus Aran.",
+    "developer": "MercurySteam",
+    "platform": ["Nintendo Switch"],
+    "price": 49.99,
+    "releaseDate": "2021-10-08",
+    "imagePath": "https://media.rawg.io/media/games/c26/c262f8b54b46edc72594c4a9bb8ee13e.jpg",
+    "rating": 4.37,
+    "genre": ["Platformer", "Action", "RPG"]
+  },
+  {
+    "title": "Fire Emblem: Three Houses",
+    "description": "A tactical RPG where players lead students through battles and school life.",
+    "developer": "Intelligent Systems",
+    "platform": ["Nintendo Switch"],
+    "price": 29.99,
+    "releaseDate": "2019-07-26",
+    "imagePath": "https://media.rawg.io/media/games/530/53081dbd5003f990fa5312404ac3d71a.jpg",
+    "rating": 4.36,
+    "genre": ["Strategy", "RPG"]
+  },
+  {
+    "title": "Bayonetta 3",
+    "description": "An action game featuring stylish combat and a charismatic witch protagonist.",
+    "developer": "PlatinumGames",
+    "platform": ["Nintendo Switch"],
+    "price": 39.99,
+    "releaseDate": "2022-10-28",
+    "imagePath": "https://media.rawg.io/media/games/c30/c30ac50cb13096f5402250bf666a321c.jpg",
+    "rating": 4.25,
+    "genre": ["Action"]
+  },
+  {
+    "title": "Cuphead",
+    "description": "A run-and-gun platformer known for its challenging gameplay and 1930s cartoon art style.",
+    "developer": "Studio MDHR",
+    "platform": ["PC", "Xbox One", "PlayStation 4", "Nintendo Switch", "macOS"],
+    "price": 24.99,
+    "releaseDate": "2017-09-29",
+    "imagePath": "https://media.rawg.io/media/games/226/2262cea0b385db6cf399f4be831603b0.jpg",
+    "rating": 4.37,
+    "genre": ["Platformer", "Indie", "Action"]
+  },
+  {
+    "title": "Dead Cells",
+    "description": "A rogue-lite, metroidvania-inspired action-platformer.",
+    "developer": "Motion Twin",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "iOS",
+      "macOS",
+      "Linux"
+    ],
+    "price": 69.99,
+    "releaseDate": "2018-08-07",
+    "imagePath": "https://media.rawg.io/media/games/f90/f90ee1a4239247a822771c40488e68c5.jpg",
+    "rating": 4.24,
+    "genre": ["Platformer", "Indie", "Action", "RPG"]
+  },
+  {
+    "title": "Slay the Spire",
+    "description": "A deck-building roguelike game combining card games and roguelike elements.",
+    "developer": "MegaCrit",
+    "platform": [
+      "PC",
+      "Xbox One",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "iOS",
+      "Android",
+      "macOS",
+      "Linux"
+    ],
+    "price": 69.99,
+    "releaseDate": "2019-01-22",
+    "imagePath": "https://media.rawg.io/media/games/f52/f5206d55f918edf8ee07803101106fa6.jpg",
+    "rating": 4.37,
+    "genre": ["Card", "Strategy", "Indie", "RPG"]
+  },
+  {
+    "title": "It Takes Two",
+    "description": "A cooperative action-adventure game designed for split-screen multiplayer.",
+    "developer": "Hazelight Studios",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch"
+    ],
+    "price": 29.99,
+    "releaseDate": "2021-03-26",
+    "imagePath": "https://media.rawg.io/media/games/d47/d479582ed0a46496ad34f65c7099d7e5.jpg",
+    "rating": 4.46,
+    "genre": ["Platformer", "Adventure", "Action"]
+  },
+  {
+    "title": "Sea of Thieves",
+    "description": "A multiplayer pirate adventure game with open-world exploration.",
+    "developer": "Rare",
+    "platform": ["PC", "PlayStation 5", "Xbox One", "Xbox Series S/X"],
+    "price": 39.99,
+    "releaseDate": "2018-03-20",
+    "imagePath": "https://media.rawg.io/media/games/5f6/5f61441e6338e9221f96a8f4c64c7bb8.jpg",
+    "rating": 3.68,
+    "genre": ["Massively Multiplayer", "Adventure", "Action"]
+  },
+  {
+    "title": "Hogwarts Legacy",
+    "description": "An open-world action RPG set in the Harry Potter universe.",
+    "developer": "Avalanche Software",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch"
+    ],
+    "price": 29.99,
+    "releaseDate": "2023-02-10",
+    "imagePath": "https://media.rawg.io/media/games/044/044b2ee023930ca138deda151f40c18c.jpg",
+    "rating": 3.96,
+    "genre": ["Action", "RPG"]
+  },
+  {
+    "title": "Starfield",
+    "description": "A space-themed RPG from the creators of The Elder Scrolls and Fallout series.",
+    "developer": "Bethesda Game Studios",
+    "platform": ["PC", "Xbox Series S/X"],
+    "price": 29.99,
+    "releaseDate": "2023-09-06",
+    "imagePath": "https://media.rawg.io/media/games/ba8/ba82c971336adfd290e4c0eab6504fcf.jpg",
+    "rating": 3.27,
+    "genre": ["Adventure", "RPG"]
+  },
+  {
+    "title": "Palworld",
+    "description": "An open-world survival game featuring creatures that can be captured and used in combat.",
+    "developer": "Pocketpair",
+    "platform": ["PC", "Xbox Series S/X"],
+    "price": 59.99,
+    "releaseDate": "2024-01-19",
+    "imagePath": "https://media.rawg.io/media/games/4e9/4e9c951414c732923fa72d5b1da49402.jpg",
+    "rating": 3.52,
+    "genre": ["Indie", "Adventure", "Action", "RPG"]
+  },
+  {
+    "title": "Warframe",
+    "description": "A free-to-play cooperative third-person shooter set in a sci-fi universe.",
+    "developer": "Digital Extremes",
+    "platform": [
+      "PC",
+      "PlayStation 5",
+      "Xbox One",
+      "PlayStation 4",
+      "Xbox Series S/X",
+      "Nintendo Switch",
+      "iOS"
+    ],
+    "price": 69.99,
+    "releaseDate": "2013-03-25",
+    "imagePath": "https://media.rawg.io/media/games/f87/f87457e8347484033cb34cde6101d08d.jpg",
+    "rating": 3.42,
+    "genre": ["Shooter", "Massively Multiplayer", "Action", "RPG"]
+  }
+]

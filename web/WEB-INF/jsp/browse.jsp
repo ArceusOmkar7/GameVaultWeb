@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +48,14 @@
                         <div class="bg-white p-4 rounded shadow flex flex-col">
                             <c:choose>
                                 <c:when test="${not empty game.imagePath}">
-                                    <img src="${pageContext.request.contextPath}/${game.imagePath}" alt="${game.title}" class="w-full h-48 object-cover rounded mb-2">
+                                    <c:choose>
+                                        <c:when test="${fn:startsWith(game.imagePath, 'http')}">
+                                            <img src="${game.imagePath}" alt="${game.title}" class="w-full h-48 object-cover rounded mb-2">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${pageContext.request.contextPath}/${game.imagePath}" alt="${game.title}" class="w-full h-48 object-cover rounded mb-2">
+                                        </c:otherwise>
+                                    </c:choose>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="bg-gray-200 h-48 rounded mb-2 flex items-center justify-center text-gray-400 text-sm">No Image</div>

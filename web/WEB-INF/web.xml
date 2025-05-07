@@ -197,6 +197,42 @@
         <servlet-name>BrowseServlet</servlet-name>
         <url-pattern>/browse</url-pattern>
     </servlet-mapping>
+    <!-- NEW Game JSON Loader Servlet -->
+    <servlet>
+        <servlet-name>GameJsonLoaderServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.GameJsonLoaderServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GameJsonLoaderServlet</servlet-name>
+        <url-pattern>/admin/load-json-data</url-pattern>
+    </servlet-mapping>
+    <!-- NEW Game Management Servlet -->
+    <servlet>
+        <servlet-name>GameManagementServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.GameManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GameManagementServlet</servlet-name>
+        <url-pattern>/admin/game-management</url-pattern>
+    </servlet-mapping>
+    <!-- NEW Add Game Servlet -->
+    <servlet>
+        <servlet-name>AddGameServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.AddGameServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddGameServlet</servlet-name>
+        <url-pattern>/admin/add-game</url-pattern>
+    </servlet-mapping>
+    <!-- NEW Delete Game Servlet -->
+    <servlet>
+        <servlet-name>DeleteGameServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.DeleteGameServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteGameServlet</servlet-name>
+        <url-pattern>/admin/delete-game</url-pattern>
+    </servlet-mapping>
     <!-- Error Page Handling (Keep as is) -->
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>

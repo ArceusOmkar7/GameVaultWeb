@@ -1,0 +1,6 @@
+{
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "c:\\Users\\Omkar\\Documents\\java jars\\javax.servlet-api-3.1.0.jar"
+  ]
+}

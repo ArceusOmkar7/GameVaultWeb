@@ -102,7 +102,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
     @Override
     public void save(Game game) {
-        String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         // Ensure releaseDate is not null before attempting to get time
         Date sqlReleaseDate = (game.getReleaseDate() != null) ? new Date(game.getReleaseDate().getTime()) : null;
         try {
@@ -114,7 +114,8 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                     game.getPrice(),
                     sqlReleaseDate, // Use java.sql.Date
                     game.getImagePath(),
-                    game.getGenre());
+                    game.getGenre(),
+                    game.getRating());
 
             if (generatedId != -1) {
                 game.setGameId(generatedId);
@@ -130,7 +131,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
     @Override
     public void update(Game game) {
-        String sql = "UPDATE Games SET title = ?, description = ?, developer = ?, platform = ?, price = ?, releaseDate = ?, imagePath = ?, genre = ? WHERE gameId = ?";
+        String sql = "UPDATE Games SET title = ?, description = ?, developer = ?, platform = ?, price = ?, releaseDate = ?, imagePath = ?, genre = ?, rating = ? WHERE gameId = ?";
         Date sqlReleaseDate = (game.getReleaseDate() != null) ? new Date(game.getReleaseDate().getTime()) : null;
         try {
             int rowsAffected = DBUtil.executeUpdate(sql,
@@ -142,6 +143,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                     sqlReleaseDate, // Use java.sql.Date
                     game.getImagePath(),
                     game.getGenre(),
+                    game.getRating(),
                     game.getGameId());
             if (rowsAffected == 0) {
                 System.err.println("WARN: Update affected 0 rows for gameId: " + game.getGameId());
@@ -183,6 +185,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                 rs.getFloat("price"),
                 rs.getDate("releaseDate"), // Retrieve as java.sql.Date, compatible with java.util.Date
                 rs.getString("imagePath"),
-                rs.getString("genre"));
+                rs.getString("genre"),
+                rs.getFloat("rating"));
     }
 }

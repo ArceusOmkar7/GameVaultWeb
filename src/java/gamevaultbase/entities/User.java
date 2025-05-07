@@ -20,6 +20,16 @@ public class User {
         this.isAdmin = false; // Default to regular user
     }
 
+    // New constructor that includes admin flag
+    public User(String email, String password, String username, float walletBalance, boolean isAdmin) {
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.walletBalance = walletBalance;
+        this.createdAt = new Date();
+        this.isAdmin = isAdmin;
+    }
+
     public User(int userId, String email, String password, String username, float walletBalance, Date createdAt) {
         this.userId = userId;
         this.email = email;
@@ -28,6 +38,18 @@ public class User {
         this.walletBalance = walletBalance;
         this.createdAt = createdAt;
         this.isAdmin = false; // Default to regular user
+    }
+
+    // Constructor that includes all fields including admin flag
+    public User(int userId, String email, String password, String username, float walletBalance, Date createdAt,
+            boolean isAdmin) {
+        this.userId = userId;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.walletBalance = walletBalance;
+        this.createdAt = createdAt;
+        this.isAdmin = isAdmin;
     }
 
     public int getUserId() {

@@ -1,6 +1,7 @@
 package gamevaultbase.listeners;
 
 import gamevaultbase.helpers.DBUtil;
+import gamevaultbase.helpers.DbInitializer;
 import gamevaultbase.management.*;
 import gamevaultbase.storage.*;
 import javax.servlet.ServletContext;
@@ -34,11 +35,13 @@ public class AppContextListener implements ServletContextListener {
             GameManagement gameManagement = new GameManagement(gameStorage);
             CartManagement cartManagement = new CartManagement(cartStorage, gameStorage);
             TransactionManagement transactionManagement = new TransactionManagement(transactionStorage);
-            OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage, transactionManagement);
+            OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage,
+                    transactionManagement);
             ReviewManagement reviewManagement = new ReviewManagement(reviewStorage); // Add ReviewManagement
 
             // Create the main facade (Optional)
-            GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement, transactionManagement);
+            GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement,
+                    transactionManagement);
 
             // --- Store management instances in ServletContext (No changes needed here) ---
             context.setAttribute("userManagement", userManagement);
@@ -49,16 +52,19 @@ public class AppContextListener implements ServletContextListener {
             context.setAttribute("reviewManagement", reviewManagement); // Add ReviewManagement to context
             context.setAttribute("vaultManager", vaultManager);
 
-            // --- Initialize Sample Data (Optional - runs after DB setup) ---
-            // WARNING: This will fail if data already exists (due to UNIQUE constraints)
-            initializeSampleData(userManagement, gameManagement);
+            // --- Initialize Data ---
+            // Initialize sample users (from the original code)
+            initializeSampleUsers(userManagement);
+
+            // Initialize games with our new DbInitializer
+            DbInitializer.initializeGames();
 
             System.out.println("GameVaultWebApp initialization complete (Direct JDBC).");
 
         } catch (ClassNotFoundException e) {
-             System.err.println("FATAL: JDBC Driver class not found during initialization!");
-             e.printStackTrace();
-             throw new RuntimeException("Application failed to initialize - JDBC Driver Missing", e);
+            System.err.println("FATAL: JDBC Driver class not found during initialization!");
+            e.printStackTrace();
+            throw new RuntimeException("Application failed to initialize - JDBC Driver Missing", e);
         } catch (SQLException e) {
             System.err.println("FATAL: SQL error during DBUtil initialization or schema setup!");
             e.printStackTrace();
@@ -67,78 +73,49 @@ public class AppContextListener implements ServletContextListener {
             // Catch any other unexpected errors during manager setup etc.
             System.err.println("FATAL: Unexpected error during application initialization!");
             e.printStackTrace();
-             throw new RuntimeException("Application failed to initialize", e);
+            throw new RuntimeException("Application failed to initialize", e);
         }
     }
 
-     // --- Sample Data Initialization (Same as before, but runs after DBUtil.initialize) ---
-     private void initializeSampleData(UserManagement userManagement, GameManagement gameManagement) {
-         System.out.println("Attempting to initialize sample data...");
-         // Check if users exist (basic check)
-         boolean usersExist = false;
-         try {
-             usersExist = userManagement.getAllUsers() != null && !userManagement.getAllUsers().isEmpty();
-         } catch (Exception e) {
-             System.err.println("WARN: Could not check existing users before adding samples: " + e.getMessage());
-             // Proceed cautiously
-         }
+    // --- Sample Users Initialization ---
+    private void initializeSampleUsers(UserManagement userManagement) {
+        System.out.println("Attempting to initialize sample users...");
+        // Check if users exist (basic check)
+        boolean usersExist = false;
+        try {
+            usersExist = userManagement.getAllUsers() != null && !userManagement.getAllUsers().isEmpty();
+        } catch (Exception e) {
+            System.err.println("WARN: Could not check existing users before adding samples: " + e.getMessage());
+            // Proceed cautiously
+        }
 
-         if (!usersExist) {
-             System.out.println("Adding sample users...");
-             try {
-                 userManagement.addUser(new gamevaultbase.entities.User("sasuke@example.com", "plainpassword1", "Sasuke", 50.0f));
-                 userManagement.addUser(new gamevaultbase.entities.User("naruto@example.com", "plainpassword2", "Naruto", 100.0f));
-                 userManagement.addUser(new gamevaultbase.entities.User("user@example.com", "password", "DefaultUser", 200.0f));
-                 System.out.println("Sample users added.");
-             } catch (Exception e) {
-                 System.err.println("ERROR adding sample users: " + e.getMessage());
-             }
-         } else {
-              System.out.println("Sample users seem to exist already. Skipping user creation.");
-         }
-
-         // Check if games exist (basic check)
-         boolean gamesExist = false;
-         try {
-                 gamesExist = gameManagement.getAllGames(null, null, null) != null && !gameManagement.getAllGames(null, null, null).isEmpty();
-         } catch (Exception e) {
-              System.err.println("WARN: Could not check existing games before adding samples: " + e.getMessage());
-              // Proceed cautiously
-         }
-
-         if (!gamesExist) {
-             System.out.println("Adding sample games...");
-             try {
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Red Dead Redemption 2", "Epic western adventure.", "Rockstar Games", "PS4", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("The Witcher 3: Wild Hunt", "Open-world RPG.", "CD Projekt Red", "PC", 29.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Minecraft", "Build and explore.", "Mojang", "PC", 26.95f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("FIFA 23", "Football simulation.", "EA Sports", "PS5", 69.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("The Legend of Zelda: Breath of the Wild", "Open-world adventure.", "Nintendo", "Switch", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Super Mario Odyssey", "3D platformer.", "Nintendo", "Switch", 49.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Grand Theft Auto V", "Crime and chaos.", "Rockstar Games", "PC", 29.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Call of Duty: Modern Warfare II", "First-person shooter.", "Infinity Ward", "PS5", 69.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Animal Crossing: New Horizons", "Life simulation.", "Nintendo", "Switch", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Assassin's Creed Valhalla", "Viking adventure.", "Ubisoft", "PC", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Fortnite", "Battle royale.", "Epic Games", "PC", 0.00f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Among Us", "Social deduction.", "Innersloth", "PC", 4.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Cyberpunk 2077", "Futuristic RPG.", "CD Projekt Red", "PC", 59.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("God of War", "Mythological action.", "Santa Monica Studio", "PS4", 39.99f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("Spider-Man Remastered", "Web-slinging action.", "Insomniac Games", "PS5", 52.30f, new java.util.Date()));
-                 gameManagement.addGame(new gamevaultbase.entities.Game("The Last of Us Part II", "Post-apocalyptic drama.", "Naughty Dog", "PS4", 59.99f, new java.util.Date()));
-                 System.out.println("Sample games added.");
-              } catch (Exception e) {
-                  System.err.println("ERROR adding sample games: " + e.getMessage());
-              }
-         } else {
-              System.out.println("Sample games seem to exist already. Skipping game creation.");
-         }
-          System.out.println("Sample data initialization attempt finished.");
-     }
+        if (!usersExist) {
+            System.out.println("Adding sample users...");
+            try {
+                userManagement.addUser(
+                        new gamevaultbase.entities.User("sasuke@example.com", "plainpassword1", "Sasuke", 50.0f));
+                userManagement.addUser(
+                        new gamevaultbase.entities.User("naruto@example.com", "plainpassword2", "Naruto", 100.0f));
+                userManagement.addUser(
+                        new gamevaultbase.entities.User("user@example.com", "password", "DefaultUser", 200.0f));
+                userManagement.addUser(
+                        new gamevaultbase.entities.User("admin@gamevault.com", "admin", "Admin", 1000.0f, true)); // Add
+                                                                                                                  // admin
+                                                                                                                  // user
+                System.out.println("Sample users added.");
+            } catch (Exception e) {
+                System.err.println("ERROR adding sample users: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Sample users seem to exist already. Skipping user creation.");
+        }
+    }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("GameVaultWebApp destroying (Direct JDBC)...");
-        // No specific JDBC cleanup needed here as connections are opened/closed per request cycle.
+        // No specific JDBC cleanup needed here as connections are opened/closed per
+        // request cycle.
         // Just clear context attributes
         ServletContext context = sce.getServletContext();
         context.removeAttribute("userManagement");
@@ -149,12 +126,14 @@ public class AppContextListener implements ServletContextListener {
         context.removeAttribute("reviewManagement"); // Add this line to remove reviewManagement attribute
         context.removeAttribute("vaultManager");
         System.out.println("GameVaultWebApp destroyed.");
-        // Deregister driver? Usually not necessary in modern containers, but can be done:
+        // Deregister driver? Usually not necessary in modern containers, but can be
+        // done:
         // try {
-        //     java.sql.Driver d = DriverManager.getDriver(dbUrl); // dbUrl needs to be accessible
-        //     DriverManager.deregisterDriver(d);
+        // java.sql.Driver d = DriverManager.getDriver(dbUrl); // dbUrl needs to be
+        // accessible
+        // DriverManager.deregisterDriver(d);
         // } catch (SQLException e) {
-        //     System.err.println("Error deregistering JDBC driver: " + e.getMessage());
+        // System.err.println("Error deregistering JDBC driver: " + e.getMessage());
         // }
     }
 }

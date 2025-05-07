@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> <%@ taglib
+uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,11 +44,22 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <div class="w-full md:w-1/3">
                 <c:choose>
                   <c:when test="${not empty game.imagePath}">
-                    <img
-                      src="${pageContext.request.contextPath}/${game.imagePath}"
-                      alt="${game.title}"
-                      class="w-full h-80 object-cover rounded shadow"
-                    />
+                    <c:choose>
+                      <c:when test="${fn:startsWith(game.imagePath, 'http')}">
+                        <img
+                          src="${game.imagePath}"
+                          alt="${game.title}"
+                          class="w-full h-80 object-cover rounded shadow"
+                        />
+                      </c:when>
+                      <c:otherwise>
+                        <img
+                          src="${pageContext.request.contextPath}/${game.imagePath}"
+                          alt="${game.title}"
+                          class="w-full h-80 object-cover rounded shadow"
+                        />
+                      </c:otherwise>
+                    </c:choose>
                   </c:when>
                   <c:otherwise>
                     <div

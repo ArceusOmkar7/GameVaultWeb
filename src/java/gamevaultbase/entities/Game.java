@@ -12,6 +12,7 @@ public class Game {
     private Date releaseDate;
     private String imagePath; // New field for storing game image path
     private String genre; // Added genre field
+    private float rating; // Added rating field
 
     public Game() {
         // Default empty constructor
@@ -62,6 +63,21 @@ public class Game {
         this.releaseDate = releaseDate;
         this.imagePath = imagePath;
         this.genre = genre;
+        this.rating = 0.0f; // Default rating
+    }
+
+    public Game(int gameId, String title, String description, String developer, String platform, float price,
+            Date releaseDate, String imagePath, String genre, float rating) {
+        this.gameId = gameId;
+        this.title = title;
+        this.description = description;
+        this.developer = developer;
+        this.platform = platform;
+        this.price = price;
+        this.releaseDate = releaseDate;
+        this.imagePath = imagePath;
+        this.genre = genre;
+        this.rating = rating;
     }
 
     public int getGameId() {
@@ -136,6 +152,14 @@ public class Game {
         this.genre = genre;
     }
 
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
     // Helper method to get a default image path if none is set
     public String getImagePathOrDefault() {
         return (imagePath != null && !imagePath.isEmpty()) ? imagePath : "game_images/default_game.png";
@@ -166,6 +190,7 @@ public class Game {
                 ", releaseDate=" + releaseDate +
                 ", imagePath='" + imagePath + '\'' +
                 ", genre='" + genre + '\'' +
+                ", rating=" + rating +
                 '}';
     }
 }

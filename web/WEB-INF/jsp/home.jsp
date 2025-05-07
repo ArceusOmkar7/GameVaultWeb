@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +70,14 @@
                           <a href="${pageContext.request.contextPath}/game?id=${featuredGame.gameId}">
                             <c:choose>
                               <c:when test="${not empty featuredGame.imagePath}">
-                                <img class="d-block w-100" src="${pageContext.request.contextPath}/${featuredGame.imagePath}" alt="${featuredGame.title}" style="height:480px;object-fit:cover;">
+                                <c:choose>
+                                  <c:when test="${fn:startsWith(featuredGame.imagePath, 'http')}">
+                                    <img class="d-block w-100" src="${featuredGame.imagePath}" alt="${featuredGame.title}" style="height:480px;object-fit:cover;">
+                                  </c:when>
+                                  <c:otherwise>
+                                    <img class="d-block w-100" src="${pageContext.request.contextPath}/${featuredGame.imagePath}" alt="${featuredGame.title}" style="height:480px;object-fit:cover;">
+                                  </c:otherwise>
+                                </c:choose>
                               </c:when>
                               <c:otherwise>
                                 <%-- Random image for missing game image --%>
@@ -110,9 +118,18 @@
                              <div class="mb-4">
                                  <c:choose>
                                      <c:when test="${not empty mainFeaturedGame.imagePath}">
-                                         <img src="${pageContext.request.contextPath}/${mainFeaturedGame.imagePath}" 
-                                             alt="${mainFeaturedGame.title}" 
-                                             class="w-full h-64 md:h-96 object-cover rounded shadow">
+                                         <c:choose>
+                                             <c:when test="${fn:startsWith(mainFeaturedGame.imagePath, 'http')}">
+                                                 <img src="${mainFeaturedGame.imagePath}" 
+                                                     alt="${mainFeaturedGame.title}" 
+                                                     class="w-full h-64 md:h-96 object-cover rounded shadow">
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <img src="${pageContext.request.contextPath}/${mainFeaturedGame.imagePath}" 
+                                                     alt="${mainFeaturedGame.title}" 
+                                                     class="w-full h-64 md:h-96 object-cover rounded shadow">
+                                             </c:otherwise>
+                                         </c:choose>
                                      </c:when>
                                      <c:otherwise>
                                          <div class="bg-gray-200 h-64 md:h-96 rounded flex items-center justify-center text-gray-500 text-2xl">
@@ -153,9 +170,18 @@
                                      <div class="border rounded p-3 hover:shadow-lg transition duration-200">
                                          <c:choose>
                                              <c:when test="${not empty featuredGame.imagePath}">
-                                                 <img src="${pageContext.request.contextPath}/${featuredGame.imagePath}" 
-                                                     alt="${featuredGame.title}" 
-                                                     class="w-full h-32 object-cover rounded mb-2">
+                                                 <c:choose>
+                                                     <c:when test="${fn:startsWith(featuredGame.imagePath, 'http')}">
+                                                         <img src="${featuredGame.imagePath}" 
+                                                             alt="${featuredGame.title}" 
+                                                             class="w-full h-32 object-cover rounded mb-2">
+                                                     </c:when>
+                                                     <c:otherwise>
+                                                         <img src="${pageContext.request.contextPath}/${featuredGame.imagePath}" 
+                                                             alt="${featuredGame.title}" 
+                                                             class="w-full h-32 object-cover rounded mb-2">
+                                                     </c:otherwise>
+                                                 </c:choose>
                                              </c:when>
                                              <c:otherwise>
                                                  <div class="bg-gray-200 h-32 rounded mb-2 flex items-center justify-center text-gray-400 text-sm">

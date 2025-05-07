@@ -294,7 +294,8 @@ public class DBUtil {
             "price FLOAT NOT NULL," +
             "releaseDate DATE," +
             "imagePath VARCHAR(255)," +
-            "genre VARCHAR(100)" +
+            "genre VARCHAR(100)," +
+            "rating FLOAT DEFAULT 0.0" + // Added rating field
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_CARTS_TABLE = "CREATE TABLE IF NOT EXISTS Carts (" +

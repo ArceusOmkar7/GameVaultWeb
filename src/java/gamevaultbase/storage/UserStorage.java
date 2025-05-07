@@ -48,16 +48,15 @@ public class UserStorage implements StorageInterface<User, Integer> {
 
     @Override
     public void save(User user) {
-        // CONFIRM: Storing plain text password directly
-        String sql = "INSERT INTO Users (email, password, username, walletBalance, createdAt) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (email, password, username, walletBalance, createdAt, isAdmin) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             int generatedId = DBUtil.executeInsertAndGetKey(sql,
                     user.getEmail(),
-                    user.getPassword(), // Should be the plain text password
+                    user.getPassword(),
                     user.getUsername(),
                     user.getWalletBalance(),
-                    new Timestamp(user.getCreatedAt().getTime())
-            );
+                    new Timestamp(user.getCreatedAt().getTime()),
+                    user.isAdmin());
             if (generatedId != -1) {
                 user.setUserId(generatedId);
             } else {
@@ -70,11 +69,15 @@ public class UserStorage implements StorageInterface<User, Integer> {
 
     @Override
     public void update(User user) {
-        // CONFIRM: Updating with plain text password directly
-        String sql = "UPDATE Users SET email = ?, password = ?, username = ?, walletBalance = ? WHERE userId = ?";
+        String sql = "UPDATE Users SET email = ?, password = ?, username = ?, walletBalance = ?, isAdmin = ? WHERE userId = ?";
         try {
-            // Passing user.getPassword() directly
-            DBUtil.executeUpdate(sql, user.getEmail(), user.getPassword(), user.getUsername(), user.getWalletBalance(), user.getUserId());
+            DBUtil.executeUpdate(sql,
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getUsername(),
+                    user.getWalletBalance(),
+                    user.isAdmin(),
+                    user.getUserId());
         } catch (SQLException | IOException e) {
             System.err.println("Error updating user: " + e.getMessage());
         }
@@ -97,7 +100,7 @@ public class UserStorage implements StorageInterface<User, Integer> {
                 rs.getString("password"),
                 rs.getString("username"),
                 rs.getFloat("walletBalance"),
-                rs.getTimestamp("createdAt")
-        );
+                rs.getTimestamp("createdAt"),
+                rs.getBoolean("isAdmin"));
     }
 }
