@@ -18,47 +18,47 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <jsp:include page="header.jsp" />
     <!-- Left Navbar -->
     <div class="flex">
-      <!-- Hamburger for mobile -->
-      <button id="hamburgerBtn" class="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow-lg focus:outline-none">
+      <!-- Hamburger for mobile & desktop -->
+      <button id="hamburgerBtn" class="fixed top-4 left-4 z-50 bg-white p-2 rounded shadow-lg focus:outline-none">
         <i class="bi bi-list text-2xl"></i>
       </button>
       <!-- Sidebar -->
-      <nav id="sidebar" class="flex flex-col justify-between min-h-screen bg-gray-900 text-gray-100 w-16 md:w-64 transition-all duration-300 overflow-hidden fixed top-0 left-0 z-40">
+      <nav id="sidebar" class="flex flex-col justify-between min-h-screen bg-gray-900 text-gray-100 w-16 transition-all duration-300 overflow-hidden fixed top-0 left-0 z-40">
         <!-- Top: Logo and Title -->
         <div>
           <div class="flex items-center gap-2 px-4 py-6 border-b border-gray-800">
             <i class="bi bi-bootstrap-fill text-3xl text-white"></i>
-            <span class="text-xl font-bold hidden md:inline">Sidebar</span>
+            <span class="text-xl font-bold sidebar-text hidden">GameVault</span>
           </div>
           <ul class="mt-4 flex-1 flex flex-col gap-1">
             <li>
               <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition font-medium bg-blue-700 text-white">
                 <i class="bi bi-house-door-fill text-lg"></i>
-                <span class="hidden md:inline">Home</span>
+                <span class="sidebar-text hidden">Dashboard</span>
               </a>
             </li>
             <li>
               <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
-                <i class="bi bi-speedometer2 text-lg"></i>
-                <span class="hidden md:inline">Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
-                <i class="bi bi-table text-lg"></i>
-                <span class="hidden md:inline">Orders</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
-                <i class="bi bi-grid text-lg"></i>
-                <span class="hidden md:inline">Products</span>
+                <i class="bi bi-controller text-lg"></i>
+                <span class="sidebar-text hidden">Game Management</span>
               </a>
             </li>
             <li>
               <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
                 <i class="bi bi-person text-lg"></i>
-                <span class="hidden md:inline">Customers</span>
+                <span class="sidebar-text hidden">User Management</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-cart text-lg"></i>
+                <span class="sidebar-text hidden">Order History</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-gear text-lg"></i>
+                <span class="sidebar-text hidden">Settings</span>
               </a>
             </li>
           </ul>
@@ -66,15 +66,15 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <!-- Bottom: User Profile -->
         <div class="px-4 py-4 border-t border-gray-800 flex items-center gap-3">
           <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-700" />
-          <div class="hidden md:block">
+          <div class="sidebar-text hidden">
             <div class="font-semibold">mdo</div>
             <div class="text-xs text-gray-400">Admin</div>
           </div>
-          <i class="bi bi-caret-down-fill ml-auto hidden md:block"></i>
+          <i class="bi bi-caret-down-fill ml-auto sidebar-text hidden"></i>
         </div>
       </nav>
       <!-- Main Content Wrapper (add left margin for sidebar) -->
-      <div class="md:ml-64 ml-16 flex-1">
+      <div class="ml-16 sidebar-main flex-1 transition-all duration-300">
         <div class="container mx-auto px-4 py-6">
           <!-- Summary Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -103,10 +103,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <div class="text-gray-500 mt-1">Total Revenue</div>
             </div>
           </div>
-          <!-- Charts Section -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Sales Overview -->
-            <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
+          <!-- Charts Row: All three charts side by side on desktop, stacked on mobile -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Sales Overview Chart -->
+            <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Sales Overview</h2>
                 <div class="flex space-x-2">
@@ -115,12 +115,38 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   <button class="bg-gray-200 px-3 py-1 rounded text-sm font-medium" id="monthBtn">Month</button>
                 </div>
               </div>
-              <canvas id="salesChart" height="120"></canvas>
+              <canvas id="salesChart" height="300" style="max-width:600px;margin:auto;"></canvas>
             </div>
-            <!-- Top Genres -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h2 class="text-xl font-semibold mb-4">Top Genres</h2>
-              <canvas id="genresChart" height="200"></canvas>
+            <!-- Top Selling Games Bar Chart -->
+            <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Top Selling Games</h2>
+              </div>
+              <canvas id="topGamesChart" height="300" style="max-width:600px;margin:auto;"></canvas>
+            </div>
+            <!-- User Growth Area Chart -->
+            <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">User Growth</h2>
+              </div>
+              <canvas id="userGrowthChart" height="300" style="max-width:600px;margin:auto;"></canvas>
+            </div>
+          </div>
+          <!-- Additional Charts Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Revenue Breakdown Pie Chart -->
+            <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Revenue Breakdown</h2>
+              </div>
+              <canvas id="revenuePieChart" height="300" style="max-width:600px;margin:auto;"></canvas>
+            </div>
+            <!-- Platform Distribution Doughnut Chart -->
+            <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Platform Distribution</h2>
+              </div>
+              <canvas id="platformDoughnutChart" height="300" style="max-width:600px;margin:auto;"></canvas>
             </div>
           </div>
         </div>
@@ -155,32 +181,109 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           }
         }
       });
-      // Top Genres Chart
-      const genresCtx = document.getElementById('genresChart').getContext('2d');
-      const genresChart = new Chart(genresCtx, {
-        type: 'doughnut',
+      // Top Selling Games Bar Chart
+      const topGamesCtx = document.getElementById('topGamesChart').getContext('2d');
+      const topGamesChart = new Chart(topGamesCtx, {
+        type: 'bar',
         data: {
-          labels: ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports'],
+          labels: ['Game A', 'Game B', 'Game C', 'Game D', 'Game E'],
           datasets: [{
-            data: [35, 20, 25, 10, 10],
+            label: 'Units Sold',
+            data: [120, 95, 80, 60, 45],
             backgroundColor: [
-              '#3b82f6',
-              '#f59e42',
-              '#22c55e',
-              '#f43f5e',
-              '#fbbf24'
+              '#6366f1', // indigo
+              '#22d3ee', // cyan
+              '#f59e42', // orange
+              '#84cc16', // lime
+              '#f43f5e'  // red
             ],
-            borderWidth: 2
+            borderRadius: 8,
+            maxBarThickness: 32
           }]
         },
         options: {
-          cutout: '70%',
+          responsive: true,
           plugins: {
-            legend: {
-              display: true,
-              position: 'bottom',
-              labels: { boxWidth: 16, font: { size: 14 } }
-            }
+            legend: { display: false },
+            title: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true }
+          }
+        }
+      });
+      // User Growth Area Chart
+      const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+      const userGrowthChart = new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+          labels: ['2025-01', '2025-02', '2025-03', '2025-04', '2025-05'],
+          datasets: [{
+            label: 'Users',
+            data: [1200, 1450, 1700, 2100, 2340],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#10b981',
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+      // Revenue Breakdown Pie Chart
+      const revenuePieCtx = document.getElementById('revenuePieChart').getContext('2d');
+      const revenuePieChart = new Chart(revenuePieCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Games', 'DLCs', 'Subscriptions', 'Other'],
+          datasets: [{
+            data: [12000, 3500, 2500, 900],
+            backgroundColor: [
+              '#3b82f6', // blue
+              '#f59e42', // orange
+              '#10b981', // green
+              '#6366f1'  // indigo
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+      // Platform Distribution Doughnut Chart
+      const platformDoughnutCtx = document.getElementById('platformDoughnutChart').getContext('2d');
+      const platformDoughnutChart = new Chart(platformDoughnutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['PC', 'PlayStation', 'Xbox', 'Switch'],
+          datasets: [{
+            data: [55, 25, 15, 5],
+            backgroundColor: [
+              '#6366f1', // indigo
+              '#f43f5e', // red
+              '#22d3ee', // cyan
+              '#f59e42'  // orange
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
           }
         }
       });
@@ -195,31 +298,37 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       document.getElementById('dayBtn').onclick = () => setActive('dayBtn');
       document.getElementById('weekBtn').onclick = () => setActive('weekBtn');
       document.getElementById('monthBtn').onclick = () => setActive('monthBtn');
-      // Hamburger toggle for mobile sidebar
+      // Hamburger toggle for sidebar
       const hamburgerBtn = document.getElementById('hamburgerBtn');
       const sidebar = document.getElementById('sidebar');
+      const sidebarTexts = document.querySelectorAll('.sidebar-text');
+      const sidebarMain = document.querySelector('.sidebar-main');
       let sidebarOpen = false;
-      hamburgerBtn.addEventListener('click', function() {
-        sidebarOpen = !sidebarOpen;
+      function setSidebar(open) {
+        sidebarOpen = open;
         if (sidebarOpen) {
           sidebar.classList.remove('w-16');
           sidebar.classList.add('w-64');
-          sidebar.querySelector('.p-6').classList.remove('hidden');
-          sidebar.querySelector('.p-2').classList.add('hidden');
+          sidebarTexts.forEach(el => el.classList.remove('hidden'));
+          sidebarMain.classList.remove('ml-16');
+          sidebarMain.classList.add('ml-64');
         } else {
           sidebar.classList.add('w-16');
           sidebar.classList.remove('w-64');
-          sidebar.querySelector('.p-6').classList.add('hidden');
-          sidebar.querySelector('.p-2').classList.remove('hidden');
+          sidebarTexts.forEach(el => el.classList.add('hidden'));
+          sidebarMain.classList.add('ml-16');
+          sidebarMain.classList.remove('ml-64');
         }
-      });
-      // On load, ensure sidebar is icons only on mobile
-      if (window.innerWidth < 768) {
-        sidebar.classList.add('w-16');
-        sidebar.classList.remove('w-64');
-        sidebar.querySelector('.p-6').classList.add('hidden');
-        sidebar.querySelector('.p-2').classList.remove('hidden');
       }
+      // Default: collapsed
+      setSidebar(false);
+      hamburgerBtn.addEventListener('click', function() {
+        setSidebar(!sidebarOpen);
+      });
+      // Responsive: collapse on small screens
+      window.addEventListener('resize', function() {
+        if (window.innerWidth < 768) setSidebar(false);
+      });
     </script>
   </body>
 </html>
