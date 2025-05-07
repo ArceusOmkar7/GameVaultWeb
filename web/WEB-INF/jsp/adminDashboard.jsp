@@ -21,9 +21,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         max-width: 220px;
         background: #1e293b;
         color: #fff;
-        height: 100vh;
+        height: calc(100vh - 64px); /* Adjusted for header height */
         position: fixed;
-        top: 0;
+        top: 64px; /* Start below header */
         left: 0;
         z-index: 40;
         overflow-x: hidden;
@@ -48,10 +48,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .sidebar-overlay {
           display: none;
           position: fixed;
-          top: 0;
+          top: 64px; /* Below header */
           left: 0;
           width: 100vw;
-          height: 100vh;
+          height: calc(100vh - 64px);
           background: rgba(0,0,0,0.4);
           z-index: 30;
         }
@@ -61,6 +61,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
       .main-content {
         margin-left: 64px;
+        margin-top: 64px; /* Add margin for header */
         transition: margin-left 0.3s;
       }
       .sidebar.expanded ~ .main-content {
@@ -96,11 +97,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         padding: 1rem 1rem 0.5rem 1rem;
         cursor: pointer;
         outline: none;
-        margin-top: 1.5rem; /* Added margin to move the menu button lower */
+        margin-top: 1.5rem;
       }
     </style>
   </head>
-  <body class="bg-gray-100 flex flex-col min-h-screen">
+  <body class="bg-gray-100" style="margin-top: 64px;">
     <jsp:include page="header.jsp" />
 
     <div class="flex flex-row flex-grow">
@@ -111,7 +112,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         </button>
         <nav class="mt-4">
           <a
-            href="#"
+            href="${pageContext.request.contextPath}/admin/dashboard"
             class="nav-link active"
             aria-current="page"
             ><i class="bi bi-house-door"></i
@@ -135,7 +136,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </a>
         </nav>
       </div>
-
       <main class="main-content flex-grow container mx-auto p-4">
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
           <div class="flex justify-between items-center mb-6">
@@ -180,37 +180,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </c:if>
 
           <%-- Admin Dashboard Tabs --%>
-          <div class="mb-6">
-            <ul
-              class="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200"
-            >
-              <li class="mr-2">
-                <a
-                  href="#"
-                  class="inline-block p-4 text-purple-600 bg-gray-100 rounded-t-lg active"
-                  aria-current="page"
-                >
-                  Game Management
-                </a>
-              </li>
-              <li class="mr-2">
-                <a
-                  href="#"
-                  class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50"
-                >
-                  User Management
-                </a>
-              </li>
-              <li class="mr-2">
-                <a
-                  href="#"
-                  class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50"
-                >
-                  Order History
-                </a>
-              </li>
-            </ul>
-          </div>
+          <%-- Removed tab navigation as requested --%>
 
           <%-- Game Management Section --%>
           <div class="overflow-x-auto">

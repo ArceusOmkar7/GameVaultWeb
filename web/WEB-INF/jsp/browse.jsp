@@ -37,6 +37,11 @@
         </c:if>
         <c:choose>
             <c:when test="${not empty gamesList}">
+                <!-- Clean section above the game grid -->
+                <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-1">Discover Your Next Favorite Game</h3>
+                    <p class="text-gray-700 text-sm">Browse our curated collection. Use the filters above to find games by platform, price, or release date.</p>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <c:forEach var="game" items="${gamesList}">
                         <div class="bg-white p-4 rounded shadow flex flex-col">

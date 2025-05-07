@@ -28,7 +28,7 @@
       }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 pt-20">
 
     <jsp:include page="header.jsp" /> <%-- Assumes header.jsp search form submits GET --%>
 
@@ -44,6 +44,12 @@
                 <p><strong>Error:</strong> <c:out value="${errorMessage}" /></p>
             </div>
         </c:if>
+
+        <!-- Clean welcome section above carousel -->
+        <div class="mb-8 p-6 bg-blue-50 border-l-4 border-blue-400 rounded text-center">
+            <h1 class="text-3xl font-bold text-blue-800 mb-2">Welcome to GameVault</h1>
+            <p class="text-gray-700 text-base">Discover, browse, and buy your favorite games. Enjoy curated collections and exclusive deals!</p>
+        </div>
 
         <div class="flex flex-col md:flex-row gap-6">
             <!-- Remove Left Column: Game List & Filter/Sort -->

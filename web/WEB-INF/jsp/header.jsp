@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%-- Simple Header with Navigation using Tailwind CSS --%>
-<nav class="bg-gray-800 shadow-lg">
+<nav class="bg-gray-800 shadow-lg fixed w-full top-0 left-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -88,6 +88,8 @@
             <c:if test="${not empty sessionScope.loggedInUser}">
                 <a href="${pageContext.request.contextPath}/viewCart" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Cart</a>
                 <a href="${pageContext.request.contextPath}/orders" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Orders</a>
+            </c:if>
+            <c:if test="${not empty sessionScope.loggedInUser}">
                 <a href="${pageContext.request.contextPath}/profile" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Profile</a>
                 <a href="${pageContext.request.contextPath}/logout" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Logout</a>
             </c:if>
