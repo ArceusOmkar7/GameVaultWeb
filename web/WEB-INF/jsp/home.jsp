@@ -33,9 +33,8 @@
     <jsp:include page="header.jsp" /> <%-- Assumes header.jsp search form submits GET --%>
 
     <div class="container mx-auto px-4 py-8">
-
         <%-- Messages (keep as is) --%>
-         <c:if test="${not empty message}">
+        <c:if test="${not empty message}">
             <div class="mb-4 p-4 rounded ${messageType eq 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}" role="alert">
                 <p><c:out value="${message}" /></p>
             </div>
@@ -46,80 +45,10 @@
             </div>
         </c:if>
 
-
         <div class="flex flex-col md:flex-row gap-6">
-
-            <!-- Left Column: Game List & Filter/Sort -->
-            <div class="w-full md:w-1/4">
-                <%-- Game List (keep as is) --%>
-                <div class="bg-white p-4 rounded shadow mb-4">
-                    <h3 class="text-lg font-semibold mb-3 border-b pb-2">Browse Games</h3>
-                    <div class="max-h-96 overflow-y-auto">
-                         <c:choose>
-                             <c:when test="${not empty gamesList}">
-                                 <ul>
-                                     <c:forEach var="game" items="${gamesList}">
-                                         <li class="mb-2 border-b last:border-b-0 pb-2">
-                                             <div class="flex justify-between items-center">
-                                                 <div>
-                                                     <a href="${pageContext.request.contextPath}/game?id=${game.gameId}" class="text-blue-600 hover:underline">
-                                                         <c:out value="${game.title}" />
-                                                     </a>
-                                                     <span class="text-sm text-gray-500 block">
-                                                        <fmt:formatNumber value="${game.price}" type="currency" currencySymbol="$" />
-                                                    </span>
-                                                 </div>
-                                                 <c:if test="${not empty sessionScope.loggedInUser}">
-                                                     <form action="${pageContext.request.contextPath}/addToCart" method="post" class="ml-2">
-                                                         <input type="hidden" name="gameId" value="${game.gameId}" />
-                                                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-xs">
-                                                             Add
-                                                         </button>
-                                                     </form>
-                                                 </c:if>
-                                             </div>
-                                         </li>
-                                     </c:forEach>
-                                 </ul>
-                             </c:when>
-                             <c:otherwise>
-                                 <p class="text-gray-500">No games found.</p>
-                             </c:otherwise>
-                         </c:choose>
-                    </div>
-                </div>
-
-                <%-- Filter/Sort Form --%>
-                <form action="${pageContext.request.contextPath}/home" method="get" class="bg-white p-4 rounded shadow">
-                    <input type="hidden" name="search" value="${searchQuery}"> <%-- Keep search query when filtering/sorting --%>
-                    <h3 class="text-lg font-semibold mb-3 border-b pb-2">Refine</h3>
-                    <div class="mb-3">
-                        <label for="filter" class="block text-sm font-medium text-gray-700">Filter By Platform:</label>
-                        <select id="filter" name="filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option value="" ${empty selectedPlatform ? 'selected' : ''}>All Platforms</option>
-                            <option value="PC" ${selectedPlatform == 'PC' ? 'selected' : ''}>PC</option>
-                            <option value="PS4" ${selectedPlatform == 'PS4' ? 'selected' : ''}>PS4</option>
-                            <option value="Xbox" ${selectedPlatform == 'Xbox' ? 'selected' : ''}>Xbox</option>
-                            <%-- TODO: Populate dynamically if needed --%>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="sort" class="block text-sm font-medium text-gray-700">Sort By:</label>
-                        <select id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option value="" ${empty selectedSort ? 'selected' : ''}>Relevance</option>
-                            <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Price: Low to High</option>
-                            <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Price: High to Low</option>
-                            <option value="release_date" ${selectedSort == 'release_date' ? 'selected' : ''}>Release Date</option>
-                        </select>
-                    </div>
-                     <button type="submit" class="mt-4 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                         Apply Filters/Sort
-                     </button>
-                </form>
-            </div>
-
-            <%-- Right Column (Keep as is) --%>
-            <div class="w-full md:w-3/4">
+            <!-- Remove Left Column: Game List & Filter/Sort -->
+            <!-- Only keep the right/featured games section -->
+            <div class="w-full">
                 <!-- Carousel Slider (Bootstrap) -->
                 <div id="carouselExampleIndicators" class="carousel slide mb-8" data-ride="carousel" data-interval="1000">
                   <c:if test="${not empty featuredGamesList}">

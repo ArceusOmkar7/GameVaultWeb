@@ -16,6 +16,7 @@
             <!-- Navigation Links -->
             <div class="hidden md:flex space-x-4 ml-8">
                 <a href="${pageContext.request.contextPath}/home" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                <a href="${pageContext.request.contextPath}/browse" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Browse Games</a>
                 <c:if test="${not empty sessionScope.loggedInUser}">
                     <a href="${pageContext.request.contextPath}/viewCart" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Cart</a>
                     <a href="${pageContext.request.contextPath}/orders" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">My Orders</a>
@@ -83,6 +84,7 @@
     <div class="md:hidden" id="mobile-menu">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a href="${pageContext.request.contextPath}/home" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
+            <a href="${pageContext.request.contextPath}/browse" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Browse Games</a>
             <c:if test="${not empty sessionScope.loggedInUser}">
                 <a href="${pageContext.request.contextPath}/viewCart" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Cart</a>
                 <a href="${pageContext.request.contextPath}/orders" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Orders</a>

@@ -188,6 +188,15 @@
         <servlet-name>AddBalanceServlet</servlet-name>
         <url-pattern>/addBalance</url-pattern>
     </servlet-mapping>
+    <!-- NEW Browse Servlet -->
+    <servlet>
+        <servlet-name>BrowseServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.BrowseServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BrowseServlet</servlet-name>
+        <url-pattern>/browse</url-pattern>
+    </servlet-mapping>
     <!-- Error Page Handling (Keep as is) -->
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>

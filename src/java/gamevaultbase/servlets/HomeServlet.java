@@ -17,18 +17,8 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // --- Get Parameters for Search/Filter/Sort ---
-        String searchQuery = request.getParameter("search");
-        String filterPlatform = request.getParameter("filter");
-        String sortBy = request.getParameter("sort");
-
-        // TODO: Use these parameters in GameManagement/GameStorage to filter/sort results
-        System.out.println("HomeServlet GET: Search='" + searchQuery + "', Filter='" + filterPlatform + "', Sort='" + sortBy + "'");
-
-
         GameManagement gameManagement = (GameManagement) getServletContext().getAttribute("gameManagement");
         String errorMessage = null;
-        List<Game> games = Collections.emptyList();
         List<Game> featuredGames = Collections.emptyList();
         Game mainFeaturedGame = null;
 
@@ -37,24 +27,18 @@ public class HomeServlet extends HttpServlet {
             errorMessage = "Application error: Game service not available.";
         } else {
             try {
-                 // TODO: Modify these calls to pass search/filter/sort parameters when implemented
-                games = gameManagement.getAllGames(searchQuery, filterPlatform, sortBy);
                 featuredGames = gameManagement.getFeaturedGames();
 
                 if (featuredGames != null && !featuredGames.isEmpty()) {
                     mainFeaturedGame = featuredGames.get(0);
-                } else if (games != null && !games.isEmpty()) {
-                     mainFeaturedGame = games.get(0);
                 }
 
-                if (games == null) games = Collections.emptyList();
                 if (featuredGames == null) featuredGames = Collections.emptyList();
 
             } catch (Exception e) {
                 System.err.println("Error retrieving games for home page: " + e.getMessage());
                 e.printStackTrace();
                 errorMessage = "An error occurred while retrieving games.";
-                games = Collections.emptyList();
                 featuredGames = Collections.emptyList();
             }
         }
@@ -67,13 +51,6 @@ public class HomeServlet extends HttpServlet {
              request.setAttribute("messageType", redirectMessageType);
         }
 
-        // Pass back search/filter/sort values to keep them selected in the form
-        request.setAttribute("searchQuery", searchQuery);
-        request.setAttribute("selectedPlatform", filterPlatform);
-        request.setAttribute("selectedSort", sortBy);
-
-
-        request.setAttribute("gamesList", games);
         request.setAttribute("featuredGamesList", featuredGames);
         request.setAttribute("mainFeaturedGame", mainFeaturedGame);
         request.setAttribute("errorMessage", errorMessage);
