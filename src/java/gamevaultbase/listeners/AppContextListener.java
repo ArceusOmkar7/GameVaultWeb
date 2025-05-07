@@ -1,7 +1,6 @@
 package gamevaultbase.listeners;
 
 import gamevaultbase.helpers.DBUtil;
-import gamevaultbase.helpers.DbInitializer;
 import gamevaultbase.management.*;
 import gamevaultbase.storage.*;
 import javax.servlet.ServletContext;
@@ -56,8 +55,8 @@ public class AppContextListener implements ServletContextListener {
             // Initialize sample users (from the original code)
             initializeSampleUsers(userManagement);
 
-            // Initialize games with our new DbInitializer
-            DbInitializer.initializeGames();
+            // Note: Games are now loaded from JSON using the admin interface
+            // at /admin/load-json-data instead of using DbInitializer
 
             System.out.println("GameVaultWebApp initialization complete (Direct JDBC).");
 

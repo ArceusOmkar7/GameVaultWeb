@@ -5,6 +5,7 @@ import gamevaultbase.exceptions.GameNotFoundException;
 import gamevaultbase.storage.GameStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameManagement {
 
@@ -26,9 +27,18 @@ public class GameManagement {
         return gameStorage.findAllWithFilters(searchQuery, filterPlatform, sortBy);
     }
 
-    // Add this method
+    // Existing method to get featured games
     public List<Game> getFeaturedGames() {
         return gameStorage.findFeaturedGames(); // Delegate to storage
+    }
+
+    // New overloaded method that takes a limit parameter
+    public List<Game> getFeaturedGames(int limit) {
+        List<Game> allFeatured = getFeaturedGames();
+        if (allFeatured != null && allFeatured.size() > limit) {
+            return allFeatured.stream().limit(limit).collect(Collectors.toList());
+        }
+        return allFeatured;
     }
 
     // Get games that a user owns (from completed orders)

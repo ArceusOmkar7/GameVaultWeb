@@ -1,0 +1,421 @@
+/**
+ * GameVault Core CSS
+ * Application-specific styles and Tailwind utilities
+ */
+
+:root {
+  /* Primary Colors */
+  --gv-primary: #1e40af; /* Dark blue */
+  --gv-primary-light: #3b82f6; /* Medium blue */
+  --gv-primary-dark: #1e3a8a; /* Deep blue */
+
+  /* Secondary Colors */
+  --gv-secondary: #6d28d9; /* Purple */
+  --gv-secondary-light: #a855f7; /* Light purple */
+
+  /* Neutral Colors */
+  --gv-dark: #111827; /* Near black */
+  --gv-dark-gray: #1f2937; /* Dark gray (for headers etc) */
+  --gv-medium-gray: #4b5563; /* Medium gray (for text) */
+  --gv-light-gray: #e5e7eb; /* Light gray (for backgrounds) */
+  --gv-white: #ffffff; /* White */
+
+  /* Status Colors */
+  --gv-success: #10b981; /* Green */
+  --gv-warning: #f59e0b; /* Amber */
+  --gv-error: #ef4444; /* Red */
+  --gv-info: #3b82f6; /* Blue */
+}
+
+/* Common Card Styling */
+.gv-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.gv-card-header {
+  padding: 1rem;
+  background-color: #1f2937;
+  color: white;
+}
+
+.gv-card-body {
+  padding: 1.25rem;
+}
+
+/* Button Styles */
+.gv-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-align: center;
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.gv-btn-primary {
+  background-color: var(--gv-primary);
+  color: white;
+}
+.gv-btn-primary:hover {
+  background-color: var(--gv-primary-dark);
+}
+.gv-btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.gv-btn-secondary {
+  background-color: var(--gv-secondary);
+  color: white;
+}
+.gv-btn-secondary:hover {
+  background-color: #5b21b6; /* Darker purple */
+}
+.gv-btn-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5);
+}
+
+.gv-btn-success {
+  background-color: var(--gv-success);
+  color: white;
+}
+.gv-btn-success:hover {
+  background-color: #059669; /* Darker green */
+}
+.gv-btn-success:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5);
+}
+
+.gv-btn-danger {
+  background-color: var(--gv-error);
+  color: white;
+}
+.gv-btn-danger:hover {
+  background-color: #dc2626; /* Darker red */
+}
+.gv-btn-danger:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+}
+
+.gv-btn-outline {
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background-color: white;
+}
+.gv-btn-outline:hover {
+  background-color: #f3f4f6;
+}
+.gv-btn-outline:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.5);
+}
+
+/* Form Controls */
+.gv-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.gv-input:focus {
+  outline: none;
+  border-color: var(--gv-primary-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.gv-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.gv-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.gv-select:focus {
+  outline: none;
+  border-color: var(--gv-primary-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Typography */
+.gv-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.gv-subtitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Alert Messages */
+.gv-alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+
+.gv-alert-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid var(--gv-success);
+}
+
+.gv-alert-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid var(--gv-error);
+}
+
+.gv-alert-warning {
+  background-color: #fff7ed;
+  color: #9a3412;
+  border-left: 4px solid var(--gv-warning);
+}
+
+.gv-alert-info {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-left: 4px solid var(--gv-info);
+}
+
+/* Table Styles */
+.gv-table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.gv-table thead {
+  background-color: #f9fafb;
+}
+
+.gv-table th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gv-table tbody {
+  background-color: white;
+}
+
+.gv-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gv-table td {
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Game Card */
+.gv-game-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition-property: box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+.gv-game-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.gv-game-image {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+}
+
+.gv-game-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gv-game-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gv-primary);
+}
+
+/* Badge */
+.gv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Admin Dashboard Styles */
+.gv-admin-section {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.gv-admin-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+/* Pagination */
+.gv-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.gv-pagination-item {
+  margin: 0 0.125rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  color: #4b5563;
+  transition-property: background-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.gv-pagination-item:hover {
+  background-color: #dbeafe;
+  color: var(--gv-primary);
+}
+
+.gv-pagination-active {
+  background-color: var(--gv-primary);
+  color: white;
+}
+.gv-pagination-active:hover {
+  background-color: var(--gv-primary-dark);
+  color: white;
+}
+
+/* Responsive Content Container */
+.gv-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .gv-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .gv-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 80rem;
+  }
+}
+
+/* Page Spacing - accounts for fixed header */
+.gv-page-content {
+  padding-top: 5rem;
+  padding-bottom: 2.5rem;
+}
+
+/* Admin Sidebar */
+.gv-admin-sidebar {
+  position: fixed;
+  top: 4rem;
+  left: 0;
+  width: 16rem;
+  height: calc(100vh - 4rem);
+  background-color: #1f2937;
+  overflow-y: auto;
+  z-index: 30;
+}
+
+.gv-admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: #9ca3af;
+  transition-property: background-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.gv-admin-sidebar-link:hover {
+  background-color: #111827;
+  color: white;
+}
+.gv-admin-sidebar-link.active {
+  background-color: #374151;
+  color: white;
+  border-left: 3px solid var(--gv-primary-light);
+}
+
+/* Statistics Card */
+.gv-stats-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.gv-stats-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.gv-stats-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 0.5rem;
+}
+
+.gv-stats-description {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
