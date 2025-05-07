@@ -9,6 +9,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameVault - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap CSS for Carousel -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      /* Force carousel and images to desired height */
+      #carouselExampleIndicators .carousel-inner,
+      #carouselExampleIndicators .carousel-item {
+        min-height: 480px !important;
+        height: 480px !important;
+      }
+      #carouselExampleIndicators .carousel-item img {
+        min-height: 480px !important;
+        height: 480px !important;
+        object-fit: cover;
+      }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -102,6 +120,53 @@
 
             <%-- Right Column (Keep as is) --%>
             <div class="w-full md:w-3/4">
+                <!-- Carousel Slider (Bootstrap) -->
+                <div id="carouselExampleIndicators" class="carousel slide mb-8" data-ride="carousel" data-interval="1000">
+                  <c:if test="${not empty featuredGamesList}">
+                    <ol class="carousel-indicators">
+                      <c:forEach var="featuredGame" items="${featuredGamesList}" varStatus="status">
+                        <li data-target="#carouselExampleIndicators" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
+                      </c:forEach>
+                    </ol>
+                    <div class="carousel-inner rounded shadow">
+                      <c:forEach var="featuredGame" items="${featuredGamesList}" varStatus="status">
+                        <div class="carousel-item ${status.first ? 'active' : ''}">
+                          <a href="${pageContext.request.contextPath}/game?id=${featuredGame.gameId}">
+                            <c:choose>
+                              <c:when test="${not empty featuredGame.imagePath}">
+                                <img class="d-block w-100" src="${pageContext.request.contextPath}/${featuredGame.imagePath}" alt="${featuredGame.title}" style="height:480px;object-fit:cover;">
+                              </c:when>
+                              <c:otherwise>
+                                <%-- Random image for missing game image --%>
+                                <%
+                                  String[] randomImages = {
+                                    "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
+                                    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+                                    "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80",
+                                    "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80"
+                                  };
+                                  int idx = (int) (Math.random() * randomImages.length);
+                                  String randomImg = randomImages[idx];
+                                %>
+                                <img class="d-block w-100" src="<%= randomImg %>" alt="Random Game" style="height:480px;object-fit:cover;">
+                              </c:otherwise>
+                            </c:choose>
+                          </a>
+                        </div>
+                      </c:forEach>
+                    </div>
+                  </c:if>
+                  <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+                <!-- End Carousel Slider -->
+
                 <!-- Main Featured Game Poster -->
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <h2 class="text-2xl font-bold mb-4">Featured Game</h2>
