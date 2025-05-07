@@ -18,6 +18,7 @@ Administrators can:
 - Process orders
 - Import game data from JSON
 - Upload game images
+- Check database status and generate dummy data
 
 ## Development Environment
 
@@ -39,6 +40,8 @@ The admin dashboard provides a central interface for administrators to manage th
 - **User Management**: View and manage user accounts
 - **Order Management**: Process and track customer orders
 - **JSON Data Loader**: Import game data from a JSON file
+- **Database Status**: Check the status of database tables and connections
+- **Dummy Data Generation**: Populate the database with sample data for testing
 
 ### Accessing the Admin Dashboard
 
@@ -87,6 +90,65 @@ Each game in the JSON file includes the following information:
 - No external libraries are used for JSON parsing
 - The application uses a custom `JSONUtil` class with Java's built-in features for parsing
 - Game data is stored in a MySQL database
+
+## Database Status Feature
+
+### Overview
+
+The Database Status feature allows administrators to verify the integrity of the database structure, ensuring that all required tables and connections are properly set up. This is useful for:
+
+- Diagnosing database connectivity issues
+- Verifying that all necessary tables exist
+- Checking database schema and structure
+- Ensuring the application can properly interact with the database
+
+### How It Works
+
+1. The application uses the `DatabaseCheckServlet` to establish a connection to the database
+2. It verifies that all required tables exist (Games, Users, Orders, etc.)
+3. The servlet generates a detailed report showing the status of each table
+4. Administrators can view this report through the admin dashboard
+
+### Using the Database Status Feature
+
+1. Log in with an admin account
+2. Navigate to `/admin/dashboard`
+3. Click on "Check Database Status" in the sidebar
+4. Review the detailed report showing table statuses and database connections
+
+## Dummy Data Generation
+
+### Overview
+
+The Dummy Data Generator allows administrators to populate the database with sample data for testing and demonstration purposes. This feature:
+
+- Creates sample user accounts with different roles
+- Adds games from the `games.json` file to the database
+- Generates sample orders and transactions
+- Creates dummy reviews for games
+
+### How It Works
+
+1. The system uses a configuration file (`dummy_data_config.txt`) to track data generation status
+2. When triggered, the `DummyDataServlet` reads game data from `games.json`
+3. It creates sample users, orders, and reviews based on parameters in the config file
+4. The system marks the data as loaded to prevent duplicate generation
+
+### Configuration Parameters
+
+The `dummy_data_config.txt` file contains the following settings:
+- `dummy_data.loaded`: Boolean flag indicating if data has been loaded
+- `games.count`: Number of games to generate
+- `orders.count`: Number of sample orders to create
+- `users.count`: Number of user accounts to generate
+- `last_load_date`: Timestamp of the last data load
+
+### Using the Dummy Data Generator
+
+1. Log in with an admin account
+2. Navigate to `/admin/dashboard`
+3. Click on "Generate Dummy Data" in the sidebar
+4. Review the status and click "Generate Data" to populate the database
 
 ## Implemented Features
 
@@ -256,6 +318,17 @@ If you need to change the format of the JSON file, update the parsing logic in `
 4. **Image Paths Not Working**
    - Ensure the image paths in the JSON file are accessible
    - Verify that the web server has permission to access the image locations
+
+5. **Database Status Button Not Working**
+   - Check that the `DatabaseCheckServlet` is properly mapped to `/admin/check-database`
+   - Verify that the server has permission to query database metadata
+   - Ensure the database user has privileges to view table information
+
+6. **Dummy Data Not Being Generated**
+   - Check the `dummy_data_config.txt` file to ensure `dummy_data.loaded` is set to `false`
+   - Verify that the `games.json` file contains valid game data
+   - Check that the `DummyDataServlet` is properly mapped to `/admin/generate-dummy-data`
+   - Ensure proper database write permissions for the application
 
 ## Note on Game Delivery
 This is a simulated game store created for educational purposes. No actual digital game delivery functionality is implemented. The application focuses on demonstrating e-commerce concepts, catalog management, and the user purchase journey without delivering actual digital products.

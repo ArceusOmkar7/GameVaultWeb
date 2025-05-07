@@ -29,17 +29,16 @@ public class DatabaseCheckServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
 
         // Check if user is logged in and is an admin
-        if (session.getAttribute("loggedInUser") == null ||
-                !(boolean) session.getAttribute("isAdmin")) {
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        if (session.getAttribute("loggedInUser") == null || isAdmin == null || !isAdmin) {
             response.sendRedirect(request.getContextPath() +
                     "/login?message=Admin access required&messageType=error");
             return;
         }
-
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
 
         // HTML header
         out.println("<!DOCTYPE html>");
