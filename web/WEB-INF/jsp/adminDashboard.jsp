@@ -13,448 +13,213 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
-    <style>
-      .sidebar {
-        transition: width 0.3s, left 0.3s;
-        width: 64px;
-        min-width: 64px;
-        max-width: 220px;
-        background: #1e293b;
-        color: #fff;
-        height: calc(100vh - 64px); /* Adjusted for header height */
-        position: fixed;
-        top: 64px; /* Start below header */
-        left: 0;
-        z-index: 40;
-        overflow-x: hidden;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
-      }
-      .sidebar.expanded {
-        width: 220px;
-        min-width: 220px;
-      }
-      @media (max-width: 768px) {
-        .sidebar {
-          left: -220px;
-          width: 220px;
-          min-width: 220px;
-        }
-        .sidebar.expanded {
-          left: 0;
-        }
-        .main-content {
-          margin-left: 0 !important;
-        }
-        .sidebar-overlay {
-          display: none;
-          position: fixed;
-          top: 64px; /* Below header */
-          left: 0;
-          width: 100vw;
-          height: calc(100vh - 64px);
-          background: rgba(0,0,0,0.4);
-          z-index: 30;
-        }
-        .sidebar.expanded ~ .sidebar-overlay {
-          display: block;
-        }
-      }
-      .main-content {
-        margin-left: 64px;
-        margin-top: 64px; /* Add margin for header */
-        transition: margin-left 0.3s;
-      }
-      .sidebar.expanded ~ .main-content {
-        margin-left: 220px;
-      }
-      .sidebar .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.75rem 1rem;
-        color: #fff;
-        text-decoration: none;
-        font-size: 1rem;
-        border-radius: 0.375rem;
-        transition: background 0.2s;
-      }
-      .sidebar .nav-link:hover {
-        background: #334155;
-      }
-      .sidebar .nav-link .nav-text {
-        display: none;
-      }
-      .sidebar.expanded .nav-link .nav-text {
-        display: inline;
-      }
-      .sidebar .sidebar-toggle {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 1.5rem;
-        width: 100%;
-        text-align: left;
-        padding: 1rem 1rem 0.5rem 1rem;
-        cursor: pointer;
-        outline: none;
-        margin-top: 1.5rem;
-      }
-    </style>
   </head>
   <body class="bg-gray-100" style="margin-top: 64px;">
     <jsp:include page="header.jsp" />
-
-    <div class="flex flex-row flex-grow">
-      <%-- Sidebar --%>
-      <div class="sidebar">
-        <button class="sidebar-toggle" id="sidebarToggle">
-          <i class="bi bi-list"></i>
-        </button>
-        <nav class="mt-4">
-          <a
-            href="${pageContext.request.contextPath}/admin/dashboard"
-            class="nav-link active"
-            aria-current="page"
-            ><i class="bi bi-house-door"></i
-            ><span class="nav-text">Dashboard</span>
-          </a>
-          <a href="#" class="nav-link">
-            <i class="bi bi-gamepad"></i>
-            <span class="nav-text">Game Management</span>
-          </a>
-          <a href="#" class="nav-link">
-            <i class="bi bi-person"></i>
-            <span class="nav-text">User Management</span>
-          </a>
-          <a href="#" class="nav-link">
-            <i class="bi bi-cart"></i>
-            <span class="nav-text">Order History</span>
-          </a>
-          <a href="#" class="nav-link">
-            <i class="bi bi-gear"></i>
-            <span class="nav-text">Settings</span>
-          </a>
-        </nav>
-      </div>
-      <main class="main-content flex-grow container mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-purple-800">Admin Dashboard</h1>
-            <div class="flex space-x-3">
-              <a
-                href="${pageContext.request.contextPath}/admin/generate-dummy-data"
-                class="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded"
-              >
-                Generate Dummy Data
+    <!-- Left Navbar -->
+    <div class="flex">
+      <!-- Hamburger for mobile -->
+      <button id="hamburgerBtn" class="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow-lg focus:outline-none">
+        <i class="bi bi-list text-2xl"></i>
+      </button>
+      <!-- Sidebar -->
+      <nav id="sidebar" class="flex flex-col justify-between min-h-screen bg-gray-900 text-gray-100 w-16 md:w-64 transition-all duration-300 overflow-hidden fixed top-0 left-0 z-40">
+        <!-- Top: Logo and Title -->
+        <div>
+          <div class="flex items-center gap-2 px-4 py-6 border-b border-gray-800">
+            <i class="bi bi-bootstrap-fill text-3xl text-white"></i>
+            <span class="text-xl font-bold hidden md:inline">Sidebar</span>
+          </div>
+          <ul class="mt-4 flex-1 flex flex-col gap-1">
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition font-medium bg-blue-700 text-white">
+                <i class="bi bi-house-door-fill text-lg"></i>
+                <span class="hidden md:inline">Home</span>
               </a>
-              <c:if
-                test="${not empty sessionScope.loggedInUser && sessionScope.loggedInUser.admin}"
-              >
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
-                >
-                  Admin: ${sessionScope.loggedInUser.username}
-                </span>
-              </c:if>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-speedometer2 text-lg"></i>
+                <span class="hidden md:inline">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-table text-lg"></i>
+                <span class="hidden md:inline">Orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-grid text-lg"></i>
+                <span class="hidden md:inline">Products</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-gray-800 hover:text-white">
+                <i class="bi bi-person text-lg"></i>
+                <span class="hidden md:inline">Customers</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- Bottom: User Profile -->
+        <div class="px-4 py-4 border-t border-gray-800 flex items-center gap-3">
+          <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-700" />
+          <div class="hidden md:block">
+            <div class="font-semibold">mdo</div>
+            <div class="text-xs text-gray-400">Admin</div>
+          </div>
+          <i class="bi bi-caret-down-fill ml-auto hidden md:block"></i>
+        </div>
+      </nav>
+      <!-- Main Content Wrapper (add left margin for sidebar) -->
+      <div class="md:ml-64 ml-16 flex-1">
+        <div class="container mx-auto px-4 py-6">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow flex flex-col items-center justify-center p-6">
+              <i class="bi bi-controller text-4xl text-blue-600 mb-2"></i>
+              <div class="text-3xl font-bold">120</div>
+              <div class="text-green-600 text-sm flex items-center"><span class="mr-1">↑ 4.2%</span></div>
+              <div class="text-gray-500 mt-1">Total Games</div>
+            </div>
+            <div class="bg-white rounded-lg shadow flex flex-col items-center justify-center p-6">
+              <i class="bi bi-person-lines-fill text-4xl text-green-600 mb-2"></i>
+              <div class="text-3xl font-bold">2,340</div>
+              <div class="text-green-600 text-sm flex items-center"><span class="mr-1">↑ 2.1%</span></div>
+              <div class="text-gray-500 mt-1">Total Users</div>
+            </div>
+            <div class="bg-white rounded-lg shadow flex flex-col items-center justify-center p-6">
+              <i class="bi bi-bag-check text-4xl text-blue-700 mb-2"></i>
+              <div class="text-3xl font-bold">410</div>
+              <div class="text-green-600 text-sm flex items-center"><span class="mr-1">↑ 6.7%</span></div>
+              <div class="text-gray-500 mt-1">Total Orders</div>
+            </div>
+            <div class="bg-white rounded-lg shadow flex flex-col items-center justify-center p-6">
+              <i class="bi bi-currency-dollar text-4xl text-yellow-500 mb-2"></i>
+              <div class="text-3xl font-bold">$18,900</div>
+              <div class="text-red-600 text-sm flex items-center"><span class="mr-1">↓ 1.3%</span></div>
+              <div class="text-gray-500 mt-1">Total Revenue</div>
             </div>
           </div>
-
-          <%-- Display messages --%>
-          <c:if test="${not empty message || not empty param.message}">
-            <div
-              class="mb-4 p-4 rounded ${(messageType eq 'success' || param.messageType eq 'success') ? 'bg-green-100 border border-green-400 text-green-700' : (messageType eq 'error' || param.messageType eq 'error') ? 'bg-red-100 border border-red-400 text-red-700' : (messageType eq 'warning' || param.messageType eq 'warning') ? 'bg-yellow-100 border border-yellow-400 text-yellow-700' : 'bg-blue-100 border border-blue-400 text-blue-700'}"
-              role="alert"
-            >
-              <p>
-                <c:out value="${not empty message ? message : param.message}" />
-              </p>
-            </div>
-          </c:if>
-          <c:if test="${not empty errorMessage}">
-            <div
-              class="mb-4 p-4 rounded bg-red-100 border border-red-400 text-red-700"
-              role="alert"
-            >
-              <p><strong>Error:</strong> <c:out value="${errorMessage}" /></p>
-            </div>
-          </c:if>
-
-          <%-- Admin Dashboard Tabs --%>
-          <%-- Removed tab navigation as requested --%>
-
-          <%-- Game Management Section --%>
-          <div class="overflow-x-auto">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-2xl font-semibold">Game Catalog</h2>
-              <button
-                id="addGameBtn"
-                class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
-              >
-                Add New Game
-              </button>
-            </div>
-
-            <%-- Add Game Form (Hidden by default) --%>
-            <div
-              id="addGameForm"
-              class="hidden mb-6 p-4 bg-gray-50 rounded border border-gray-300"
-            >
-              <h3 class="text-xl font-semibold mb-4">Add New Game</h3>
-              <form
-                action="${pageContext.request.contextPath}/admin/add-game"
-                method="post"
-                class="space-y-4"
-              >
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      for="title"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Title *</label
-                    >
-                    <input
-                      type="text"
-                      id="title"
-                      name="title"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="developer"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Developer *</label
-                    >
-                    <input
-                      type="text"
-                      id="developer"
-                      name="developer"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="platform"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Platform *</label
-                    >
-                    <select
-                      id="platform"
-                      name="platform"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="">Select Platform</option>
-                      <option value="PC">PC</option>
-                      <option value="PlayStation 5">PlayStation 5</option>
-                      <option value="PlayStation 4">PlayStation 4</option>
-                      <option value="Xbox Series X">Xbox Series X</option>
-                      <option value="Xbox One">Xbox One</option>
-                      <option value="Nintendo Switch">Nintendo Switch</option>
-                      <option value="Mobile">Mobile</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      for="price"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Price * ($)</label
-                    >
-                    <input
-                      type="number"
-                      id="price"
-                      name="price"
-                      min="0"
-                      step="0.01"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="releaseDate"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Release Date *</label
-                    >
-                    <input
-                      type="date"
-                      id="releaseDate"
-                      name="releaseDate"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="genre"
-                      class="block text-sm font-medium text-gray-700 mb-1"
-                      >Genre *</label
-                    >
-                    <select
-                      id="genre"
-                      name="genre"
-                      required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="">Select Genre</option>
-                      <option value="Action">Action</option>
-                      <option value="Adventure">Adventure</option>
-                      <option value="RPG">RPG</option>
-                      <option value="Strategy">Strategy</option>
-                      <option value="Simulation">Simulation</option>
-                      <option value="Sports">Sports</option>
-                      <option value="Racing">Racing</option>
-                      <option value="Puzzle">Puzzle</option>
-                      <option value="Fighting">Fighting</option>
-                      <option value="Horror">Horror</option>
-                      <option value="Shooter">Shooter</option>
-                    </select>
-                  </div>
+          <!-- Charts Section -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Sales Overview -->
+            <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Sales Overview</h2>
+                <div class="flex space-x-2">
+                  <button class="bg-gray-200 px-3 py-1 rounded text-sm font-medium" id="dayBtn">Day</button>
+                  <button class="bg-gray-200 px-3 py-1 rounded text-sm font-medium" id="weekBtn">Week</button>
+                  <button class="bg-gray-200 px-3 py-1 rounded text-sm font-medium" id="monthBtn">Month</button>
                 </div>
-                <div>
-                  <label
-                    for="description"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >Description *</label
-                  >
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows="4"
-                    required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  ></textarea>
-                </div>
-                <div class="flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    id="cancelAddGame"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
-                  >
-                    Add Game
-                  </button>
-                </div>
-              </form>
+              </div>
+              <canvas id="salesChart" height="120"></canvas>
             </div>
-
-            <table class="min-w-full bg-white border border-gray-200">
-              <thead class="bg-gray-100">
-                <tr>
-                  <th class="py-2 px-4 border-b text-left">ID</th>
-                  <th class="py-2 px-4 border-b text-left">Image</th>
-                  <th class="py-2 px-4 border-b text-left">Title</th>
-                  <th class="py-2 px-4 border-b text-left">Developer</th>
-                  <th class="py-2 px-4 border-b text-left">Platform</th>
-                  <th class="py-2 px-4 border-b text-left">Price</th>
-                  <th class="py-2 px-4 border-b text-left">Release Date</th>
-                  <th class="py-2 px-4 border-b text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <c:forEach var="game" items="${games}">
-                  <tr class="hover:bg-gray-50">
-                    <td class="py-2 px-4 border-b">${game.gameId}</td>
-                    <td class="py-2 px-4 border-b">
-                      <c:choose>
-                        <c:when test="${not empty game.imagePath}">
-                          <img
-                            src="${pageContext.request.contextPath}/${game.imagePath}"
-                            alt="${game.title}"
-                            class="w-20 h-20 object-cover rounded"
-                          />
-                        </c:when>
-                        <c:otherwise>
-                          <div
-                            class="w-20 h-20 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs"
-                          >
-                            No Image
-                          </div>
-                        </c:otherwise>
-                      </c:choose>
-                    </td>
-                    <td class="py-2 px-4 border-b">${game.title}</td>
-                    <td class="py-2 px-4 border-b">${game.developer}</td>
-                    <td class="py-2 px-4 border-b">${game.platform}</td>
-                    <td class="py-2 px-4 border-b">
-                      <fmt:formatNumber
-                        value="${game.price}"
-                        type="currency"
-                        currencySymbol="$"
-                      />
-                    </td>
-                    <td class="py-2 px-4 border-b">
-                      <fmt:formatDate
-                        value="${game.releaseDate}"
-                        pattern="MM/dd/yyyy"
-                      />
-                    </td>
-                    <td class="py-2 px-4 border-b">
-                      <form
-                        action="${pageContext.request.contextPath}/admin/upload-game-image"
-                        method="post"
-                        enctype="multipart/form-data"
-                        class="flex items-center space-x-2"
-                      >
-                        <input
-                          type="hidden"
-                          name="gameId"
-                          value="${game.gameId}"
-                        />
-                        <div class="flex-1">
-                          <input
-                            type="file"
-                            name="gameImage"
-                            accept="image/*"
-                            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm"
-                        >
-                          Upload
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                </c:forEach>
-              </tbody>
-            </table>
+            <!-- Top Genres -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h2 class="text-xl font-semibold mb-4">Top Genres</h2>
+              <canvas id="genresChart" height="200"></canvas>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-
     <jsp:include page="footer.jsp" />
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      // Toggle Add Game Form
-      document
-        .getElementById("addGameBtn")
-        .addEventListener("click", function () {
-          document.getElementById("addGameForm").classList.toggle("hidden");
+      // Sales Overview Chart
+      const salesCtx = document.getElementById('salesChart').getContext('2d');
+      const salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+          labels: ['2025-04-28', '2025-04-29', '2025-04-30', '2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04'],
+          datasets: [{
+            label: 'Sales',
+            data: [10, 25, 40, 60, 85, 115, 70],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#3b82f6',
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, max: 120 },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+      // Top Genres Chart
+      const genresCtx = document.getElementById('genresChart').getContext('2d');
+      const genresChart = new Chart(genresCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports'],
+          datasets: [{
+            data: [35, 20, 25, 10, 10],
+            backgroundColor: [
+              '#3b82f6',
+              '#f59e42',
+              '#22c55e',
+              '#f43f5e',
+              '#fbbf24'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { boxWidth: 16, font: { size: 14 } }
+            }
+          }
+        }
+      });
+      // Toggle active button for Day/Week/Month (UI only)
+      function setActive(btnId) {
+        ['dayBtn','weekBtn','monthBtn'].forEach(id => {
+          document.getElementById(id).classList.remove('bg-gray-300','font-bold');
         });
-
-      document
-        .getElementById("cancelAddGame")
-        .addEventListener("click", function () {
-          document.getElementById("addGameForm").classList.add("hidden");
-        });
-
-      // Toggle Sidebar
-      document
-        .getElementById("sidebarToggle")
-        .addEventListener("click", function () {
-          document.querySelector(".sidebar").classList.toggle("expanded");
-        });
+        document.getElementById(btnId).classList.add('bg-gray-300','font-bold');
+      }
+      setActive('dayBtn');
+      document.getElementById('dayBtn').onclick = () => setActive('dayBtn');
+      document.getElementById('weekBtn').onclick = () => setActive('weekBtn');
+      document.getElementById('monthBtn').onclick = () => setActive('monthBtn');
+      // Hamburger toggle for mobile sidebar
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const sidebar = document.getElementById('sidebar');
+      let sidebarOpen = false;
+      hamburgerBtn.addEventListener('click', function() {
+        sidebarOpen = !sidebarOpen;
+        if (sidebarOpen) {
+          sidebar.classList.remove('w-16');
+          sidebar.classList.add('w-64');
+          sidebar.querySelector('.p-6').classList.remove('hidden');
+          sidebar.querySelector('.p-2').classList.add('hidden');
+        } else {
+          sidebar.classList.add('w-16');
+          sidebar.classList.remove('w-64');
+          sidebar.querySelector('.p-6').classList.add('hidden');
+          sidebar.querySelector('.p-2').classList.remove('hidden');
+        }
+      });
+      // On load, ensure sidebar is icons only on mobile
+      if (window.innerWidth < 768) {
+        sidebar.classList.add('w-16');
+        sidebar.classList.remove('w-64');
+        sidebar.querySelector('.p-6').classList.add('hidden');
+        sidebar.querySelector('.p-2').classList.remove('hidden');
+      }
     </script>
   </body>
 </html>
