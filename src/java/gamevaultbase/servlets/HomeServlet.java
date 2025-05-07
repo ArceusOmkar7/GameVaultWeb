@@ -46,7 +46,7 @@ public class HomeServlet extends HttpServlet {
         // Pass redirect messages
         String redirectMessage = request.getParameter("message");
         String redirectMessageType = request.getParameter("messageType");
-        if (redirectMessage != null) {
+        if (redirectMessage != null) {  
              request.setAttribute("message", redirectMessage);
              request.setAttribute("messageType", redirectMessageType);
         }
