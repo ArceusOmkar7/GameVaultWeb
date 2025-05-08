@@ -60,6 +60,8 @@ public class LoginServlet extends PublicBaseServlet {
             // Login successful: Store user in session
             HttpSession session = request.getSession(); // Create session if not exists
             session.setAttribute("loggedInUser", user);
+            // Also set the isAdmin attribute directly for servlets that check it this way
+            session.setAttribute("isAdmin", user.isAdmin());
             session.setMaxInactiveInterval(60 * 60); // Set session timeout to 1 hour
 
             // Redirect to home or admin dashboard

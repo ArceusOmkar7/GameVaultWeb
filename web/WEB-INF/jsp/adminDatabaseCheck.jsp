@@ -131,6 +131,5 @@ ${result.sql}</pre
       </div>
     </div>
 
-    <jsp:include page="footer.jsp" />
-  </body>
-</html>
+    <!-- JDBC Connection Scripts -->
+    <script>

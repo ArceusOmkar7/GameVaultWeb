@@ -3,12 +3,12 @@ package gamevaultbase.servlets.admin;
 import gamevaultbase.config.DummyDataConfig;
 import gamevaultbase.entities.Game;
 import gamevaultbase.helpers.ServletUtil;
+import gamevaultbase.servlets.base.AdminBaseServlet;
 import gamevaultbase.services.DummyDataService;
 import gamevaultbase.storage.GameStorage;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,16 +24,11 @@ import java.util.List;
  * Access at /admin/generate-dummy-data
  */
 @WebServlet(name = "DummyDataServlet", urlPatterns = { "/admin/generate-dummy-data" })
-public class DummyDataServlet extends HttpServlet {
+public class DummyDataServlet extends AdminBaseServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processAdminGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Check if user is logged in and is an admin
-        if (!ServletUtil.checkAdminAccess(request, response)) {
-            return;
-        }
 
         // Create a list to store logs
         List<String> logs = new ArrayList<>();

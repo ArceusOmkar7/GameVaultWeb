@@ -2,10 +2,10 @@ package gamevaultbase.servlets.admin;
 
 import gamevaultbase.helpers.DBUtil;
 import gamevaultbase.helpers.ServletUtil;
+import gamevaultbase.servlets.base.AdminBaseServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,16 +22,11 @@ import java.util.Map;
  * Access at /admin/check-database
  */
 @WebServlet(name = "DatabaseCheckServlet", urlPatterns = { "/admin/check-database" })
-public class DatabaseCheckServlet extends HttpServlet {
+public class DatabaseCheckServlet extends AdminBaseServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processAdminGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Check if user is logged in and is an admin
-        if (!ServletUtil.checkAdminAccess(request, response)) {
-            return;
-        }
 
         List<String> requiredTables = Arrays.asList(
                 "Users", "Games", "Orders", "OrderItems", "Transactions", "Reviews", "Carts", "CartItems");

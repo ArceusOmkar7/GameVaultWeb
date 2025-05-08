@@ -317,9 +317,6 @@
         </div>
     </div>
 
-    <!-- Include the footer -->
-    <jsp:include page="footer.jsp" />
-
     <script>
         // Sidebar toggle logic
         const sidebar = document.getElementById('sidebar');

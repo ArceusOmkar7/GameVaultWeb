@@ -26,8 +26,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       <jsp:include page="components/adminDashboardCharts.jsp" />
     </div>
 
-    <jsp:include page="footer.jsp" />
-
     <!-- Scripts Section -->
     <jsp:include page="components/adminSidebarScripts.jsp" />
     <jsp:include page="components/adminChartsScripts.jsp" />

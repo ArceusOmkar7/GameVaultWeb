@@ -5,10 +5,10 @@ import gamevaultbase.helpers.JSONUtil;
 import gamevaultbase.storage.GameStorage;
 import gamevaultbase.helpers.DBUtil;
 import gamevaultbase.helpers.ServletUtil;
+import gamevaultbase.servlets.base.AdminBaseServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -33,20 +33,15 @@ import java.util.logging.Logger;
  * Access at /admin/load-json-data
  */
 @WebServlet(name = "GameJsonLoaderServlet", urlPatterns = { "/admin/load-json-data" })
-public class GameJsonLoaderServlet extends HttpServlet {
+public class GameJsonLoaderServlet extends AdminBaseServlet {
 
     private static final Logger LOGGER = Logger.getLogger(GameJsonLoaderServlet.class.getName());
     private static final String CONFIG_FILE_PATH = "/WEB-INF/dummy_data_config.txt";
     private static final String JSON_FILE_PATH = "/WEB-INF/games.json";
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processAdminGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Check if user is logged in and is an admin
-        if (!ServletUtil.checkAdminAccess(request, response)) {
-            return;
-        }
 
         // Create a list to store logs
         List<String> logs = new ArrayList<>();
