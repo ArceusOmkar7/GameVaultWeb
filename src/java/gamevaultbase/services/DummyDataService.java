@@ -249,7 +249,9 @@ public class DummyDataService {
         logs.add("Creating OrderStorage instance");
         OrderStorage orderStorage = null;
         try {
-            orderStorage = new OrderStorage();
+            // Create GameStorage first to properly initialize OrderStorage
+            GameStorage gameStorageInstance = new GameStorage();
+            orderStorage = new OrderStorage(gameStorageInstance);
         } catch (Exception e) {
             logs.add("ERROR: Failed to create OrderStorage: " + e.getMessage());
             return;
@@ -339,7 +341,7 @@ public class DummyDataService {
                 int orderId = order.getOrderId();
                 for (Game game : selectedGames) {
                     if (game != null) {
-                        String sqlInsertOrderItem = "INSERT INTO OrderItems (orderId, gameId, price) VALUES (?, ?, ?)";
+                        String sqlInsertOrderItem = "INSERT INTO OrderItems (orderId, gameId, priceAtPurchase) VALUES (?, ?, ?)";
                         DBUtil.executeUpdate(sqlInsertOrderItem, orderId, game.getGameId(), game.getPrice());
                     }
                 }
