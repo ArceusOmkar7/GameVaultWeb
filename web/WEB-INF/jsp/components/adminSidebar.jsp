@@ -51,6 +51,27 @@ navigation component to be included in all admin pages --%>
       </a>
 
       <a
+        href="${pageContext.request.contextPath}/admin/orders"
+        class="group flex items-center px-2 py-2 text-sm font-medium rounded-md ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/orders' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+      >
+        <svg
+          class="mr-3 h-6 w-6 ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/orders' ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'}"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+          />
+        </svg>
+        Order Management
+      </a>
+
+      <a
         href="${pageContext.request.contextPath}/admin/load-json-data"
         class="group flex items-center px-2 py-2 text-sm font-medium rounded-md ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/load-json-data' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
       >
