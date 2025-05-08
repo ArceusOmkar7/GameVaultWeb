@@ -4,7 +4,6 @@ import gamevaultbase.entities.Game;
 import gamevaultbase.interfaces.StorageInterface;
 import gamevaultbase.helpers.DBUtil;
 
-import java.io.IOException;
 import java.sql.Date; // Use java.sql.Date for PreparedStatement
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,16 +12,14 @@ import java.util.List;
 
 public class GameStorage implements StorageInterface<Game, Integer> {
 
-    // ... (findById, findAll, findOwnedGamesByUser remain the same) ...
     @Override
     public Game findById(Integer gameId) {
         String sql = "SELECT * FROM Games WHERE gameId = ?";
         try {
             List<Game> games = DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), gameId);
             return games.isEmpty() ? null : games.get(0);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error finding game by ID: " + gameId + " - " + e.getMessage());
-            // Consider logging the stack trace e.printStackTrace();
             return null;
         }
     }
@@ -67,7 +64,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
         try {
             return DBUtil.executeQuery(sql.toString(), rs -> mapResultSetToGame(rs), params.toArray());
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error finding all games: " + e.getMessage());
             return new ArrayList<>(); // Return empty list on error
         }
@@ -81,9 +78,8 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                 "WHERE o.userId = ?";
         try {
             return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), userId);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error finding owned games for user: " + userId + " - " + e.getMessage());
-            // Consider logging the stack trace e.printStackTrace();
             return new ArrayList<>(); // Return empty list on error
         }
     }
@@ -94,7 +90,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
         String sql = "SELECT * FROM Games ORDER BY gameId ASC LIMIT 3"; // Simple example: Get first 3 games
         try {
             return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs));
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error finding featured games: " + e.getMessage());
             return new ArrayList<>(); // Return empty list on error
         }
@@ -122,10 +118,9 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             } else {
                 System.err.println("WARN: Game insert did not return a generated ID for title: " + game.getTitle());
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error saving game: " + game.getTitle() + " - " + e.getMessage());
             // Consider rethrowing a custom exception
-            // throw new DataAccessException("Failed to save game", e);
         }
     }
 
@@ -149,7 +144,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                 System.err.println("WARN: Update affected 0 rows for gameId: " + game.getGameId());
                 // This could mean the gameId didn't exist
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             System.err.println("Error updating game: " + game.getGameId() + " - " + e.getMessage());
             // Consider rethrowing a custom exception
         }
@@ -166,7 +161,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             if (rowsAffected == 0) {
                 System.err.println("WARN: Delete affected 0 rows for gameId: " + gameId);
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             // Catch potential foreign key constraint violation errors specifically if
             // needed
             System.err.println("Error deleting game: " + gameId + " - " + e.getMessage());

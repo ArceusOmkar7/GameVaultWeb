@@ -54,7 +54,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </li>
             <li>
               <a
-                href="${pageContext.request.contextPath}/admin/games"
+                href="${pageContext.request.contextPath}/admin/game-management"
                 class="block py-2 px-4 hover:bg-gray-700 rounded ${param.activeMenu == 'games' ? 'bg-gray-700' : ''}"
               >
                 Game Management
@@ -62,7 +62,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </li>
             <li>
               <a
-                href="${pageContext.request.contextPath}/admin/database"
+                href="${pageContext.request.contextPath}/admin/check-database"
                 class="block py-2 px-4 hover:bg-gray-700 rounded ${param.activeMenu == 'database' ? 'bg-gray-700' : ''}"
               >
                 Database Check
@@ -70,7 +70,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </li>
             <li>
               <a
-                href="${pageContext.request.contextPath}/admin/dummy-data"
+                href="${pageContext.request.contextPath}/admin/generate-dummy-data"
                 class="block py-2 px-4 hover:bg-gray-700 rounded ${param.activeMenu == 'dummy-data' ? 'bg-gray-700' : ''}"
               >
                 Dummy Data
@@ -78,7 +78,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </li>
             <li>
               <a
-                href="${pageContext.request.contextPath}/admin/json-loader"
+                href="${pageContext.request.contextPath}/admin/load-json-data"
                 class="block py-2 px-4 hover:bg-gray-700 rounded ${param.activeMenu == 'json-loader' ? 'bg-gray-700' : ''}"
               >
                 JSON Loader

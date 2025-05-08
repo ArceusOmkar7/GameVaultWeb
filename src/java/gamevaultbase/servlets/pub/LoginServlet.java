@@ -4,11 +4,14 @@ import gamevaultbase.entities.User;
 import gamevaultbase.exceptions.UserNotFoundException;
 import gamevaultbase.management.UserManagement;
 import gamevaultbase.servlets.base.PublicBaseServlet;
+import gamevaultbase.helpers.DBUtil;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 // Mapped in web.xml as /login
 public class LoginServlet extends PublicBaseServlet {
@@ -37,6 +40,9 @@ public class LoginServlet extends PublicBaseServlet {
         }
 
         try {
+            // Ensure both demo users exist in the database
+            ensureDemoUsersExist();
+
             // Create a user based on the selected type
             User user = null;
             if ("admin".equals(userType)) {
@@ -70,5 +76,49 @@ public class LoginServlet extends PublicBaseServlet {
             setErrorMessage(request, "An internal error occurred. Please try again later.");
             forwardToJsp(request, response, "/WEB-INF/jsp/login.jsp");
         }
+    }
+
+    // Helper method to ensure both demo users exist in the database
+    private void ensureDemoUsersExist() throws SQLException {
+        // Create admin user (ID 1)
+        createOrUpdateDemoUser(1, "admin", "admin@gamevault.com", 1000.0f, true);
+
+        // Create regular user (ID 2)
+        createOrUpdateDemoUser(2, "user", "user@gamevault.com", 500.0f, false);
+    }
+
+    private void createOrUpdateDemoUser(int userId, String username, String email,
+            float balance, boolean isAdmin) throws SQLException {
+        // Check if user already exists by ID
+        String checkSql = "SELECT COUNT(*) AS userCount FROM Users WHERE userId = ?";
+        List<Integer> results = DBUtil.executeQuery(checkSql, rs -> rs.getInt("userCount"), userId);
+        if (!results.isEmpty() && results.get(0) > 0) {
+            // User already exists, update it to ensure correct data
+            String updateSql = "UPDATE Users SET username = ?, email = ?, " +
+                    "walletBalance = ?, isAdmin = ? WHERE userId = ?";
+            DBUtil.executeUpdate(updateSql, username, email, balance, isAdmin ? 1 : 0, userId);
+            System.out.println("Updated demo user: " + username + " with ID " + userId);
+            return;
+        }
+
+        // Check if user already exists by username (to avoid unique constraint
+        // violations)
+        checkSql = "SELECT COUNT(*) AS userCount FROM Users WHERE username = ?";
+        results = DBUtil.executeQuery(checkSql, rs -> rs.getInt("userCount"), username);
+        if (!results.isEmpty() && results.get(0) > 0) {
+            // User with this username already exists, but has a different ID
+            // Update the existing user's ID to match the expected ID
+            String updateSql = "UPDATE Users SET userId = ?, email = ?, " +
+                    "walletBalance = ?, isAdmin = ? WHERE username = ?";
+            DBUtil.executeUpdate(updateSql, userId, email, balance, isAdmin ? 1 : 0, username);
+            System.out.println("Updated existing user to use demo ID: " + username + " with ID " + userId);
+            return;
+        }
+
+        // Insert the demo user - note we must include password since it's NOT NULL
+        String sql = "INSERT INTO Users (userId, username, email, password, walletBalance, isAdmin) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        DBUtil.executeUpdate(sql, userId, username, email, username + "123", balance, isAdmin ? 1 : 0);
+        System.out.println("Created demo user: " + username + " with ID " + userId);
     }
 }

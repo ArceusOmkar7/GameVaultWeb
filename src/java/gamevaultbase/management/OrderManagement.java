@@ -123,7 +123,7 @@ public class OrderManagement {
             // 5. Clear the cart items *after* everything else succeeds
             cartStorage.clearCart(userId);
 
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
              System.err.println("Order processing failed: " + e.getMessage());
              e.printStackTrace(); // Log the full stack trace
 

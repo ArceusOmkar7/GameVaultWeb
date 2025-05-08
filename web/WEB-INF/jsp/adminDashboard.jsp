@@ -184,9 +184,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="text-gray-500 mt-1">Total Revenue</div>
         </div>
       </div>
-      <!-- Charts Row: All three charts side by side on desktop, stacked on mobile -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Sales Overview Chart -->
+      <!-- Charts Section -->
+      <!-- Sales Overview Chart - Full Width -->
+      <div class="mb-8">
         <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Sales Overview</h2>
@@ -211,12 +211,19 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </button>
             </div>
           </div>
-          <canvas
-            id="salesChart"
-            height="300"
-            style="max-width: 600px; margin: auto"
-          ></canvas>
+          <div class="w-full">
+            <canvas
+              id="salesChart"
+              height="300"
+              width="1000"
+              style="width: 100%; height: auto"
+            ></canvas>
+          </div>
         </div>
+      </div>
+
+      <!-- Top Selling Games and User Growth Charts - Two per row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <!-- Top Selling Games Bar Chart -->
         <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
           <div class="flex justify-between items-center mb-4">
@@ -225,7 +232,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <canvas
             id="topGamesChart"
             height="300"
-            style="max-width: 600px; margin: auto"
+            style="max-width: 100%; margin: auto"
           ></canvas>
         </div>
         <!-- User Growth Area Chart -->
@@ -236,11 +243,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <canvas
             id="userGrowthChart"
             height="300"
-            style="max-width: 600px; margin: auto"
+            style="max-width: 100%; margin: auto"
           ></canvas>
         </div>
       </div>
-      <!-- Additional Charts Row -->
+
+      <!-- Revenue Breakdown and Platform Distribution Charts - Two per row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <!-- Revenue Breakdown Pie Chart -->
         <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
@@ -250,7 +258,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <canvas
             id="revenuePieChart"
             height="300"
-            style="max-width: 600px; margin: auto"
+            style="max-width: 100%; margin: auto"
           ></canvas>
         </div>
         <!-- Platform Distribution Doughnut Chart -->
@@ -261,7 +269,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <canvas
             id="platformDoughnutChart"
             height="300"
-            style="max-width: 600px; margin: auto"
+            style="max-width: 100%; margin: auto"
           ></canvas>
         </div>
       </div>
@@ -358,10 +366,21 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+          },
           scales: {
             y: { beginAtZero: true, max: 120 },
             x: { grid: { display: false } },
+          },
+          layout: {
+            padding: {
+              left: 10,
+              right: 25,
+              top: 25,
+              bottom: 10,
+            },
           },
         },
       });

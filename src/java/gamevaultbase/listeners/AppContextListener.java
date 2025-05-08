@@ -21,34 +21,39 @@ public class AppContextListener implements ServletContextListener {
             // Initialize DBUtil: Loads driver, credentials, checks/creates schema
             DBUtil.initialize(context);
 
-            // --- Initialize Storages (No changes needed here) ---
+            // --- Initialize Storages with proper dependencies ---
+            // Create storage instances
             UserStorage userStorage = new UserStorage();
             GameStorage gameStorage = new GameStorage();
-            CartStorage cartStorage = new CartStorage(gameStorage);
+            CartStorage cartStorage = new CartStorage();
             OrderStorage orderStorage = new OrderStorage();
             TransactionStorage transactionStorage = new TransactionStorage();
-            ReviewStorage reviewStorage = new ReviewStorage(); // Add ReviewStorage
+            ReviewStorage reviewStorage = new ReviewStorage();
 
-            // --- Initialize Managements (No changes needed here) ---
+            // Set dependencies - ensure all necessary dependencies are properly set
+            cartStorage.setGameStorage(gameStorage);
+            orderStorage.setGameStorage(gameStorage);
+
+            // --- Initialize Managements with the storage instances ---
             UserManagement userManagement = new UserManagement(userStorage);
             GameManagement gameManagement = new GameManagement(gameStorage);
             CartManagement cartManagement = new CartManagement(cartStorage, gameStorage);
             TransactionManagement transactionManagement = new TransactionManagement(transactionStorage);
             OrderManagement orderManagement = new OrderManagement(orderStorage, cartStorage, userStorage,
                     transactionManagement);
-            ReviewManagement reviewManagement = new ReviewManagement(reviewStorage); // Add ReviewManagement
+            ReviewManagement reviewManagement = new ReviewManagement(reviewStorage);
 
             // Create the main facade (Optional)
             GameVaultManagement vaultManager = new GameVaultManagement(userManagement, gameManagement, orderManagement,
                     transactionManagement);
 
-            // --- Store management instances in ServletContext (No changes needed here) ---
+            // --- Store management instances in ServletContext ---
             context.setAttribute("userManagement", userManagement);
             context.setAttribute("gameManagement", gameManagement);
             context.setAttribute("cartManagement", cartManagement);
             context.setAttribute("orderManagement", orderManagement);
             context.setAttribute("transactionManagement", transactionManagement);
-            context.setAttribute("reviewManagement", reviewManagement); // Add ReviewManagement to context
+            context.setAttribute("reviewManagement", reviewManagement);
             context.setAttribute("vaultManager", vaultManager);
 
             // --- Initialize Data ---
@@ -60,10 +65,6 @@ public class AppContextListener implements ServletContextListener {
 
             System.out.println("GameVaultWebApp initialization complete (Direct JDBC).");
 
-        } catch (ClassNotFoundException e) {
-            System.err.println("FATAL: JDBC Driver class not found during initialization!");
-            e.printStackTrace();
-            throw new RuntimeException("Application failed to initialize - JDBC Driver Missing", e);
         } catch (SQLException e) {
             System.err.println("FATAL: SQL error during DBUtil initialization or schema setup!");
             e.printStackTrace();

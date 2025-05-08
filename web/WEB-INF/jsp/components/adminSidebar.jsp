@@ -51,11 +51,11 @@ navigation component to be included in all admin pages --%>
       </a>
 
       <a
-        href="${pageContext.request.contextPath}/admin/load-json"
-        class="group flex items-center px-2 py-2 text-sm font-medium rounded-md ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/load-json' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
+        href="${pageContext.request.contextPath}/admin/load-json-data"
+        class="group flex items-center px-2 py-2 text-sm font-medium rounded-md ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/load-json-data' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}"
       >
         <svg
-          class="mr-3 h-6 w-6 ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/load-json' ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'}"
+          class="mr-3 h-6 w-6 ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/load-json-data' ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300'}"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

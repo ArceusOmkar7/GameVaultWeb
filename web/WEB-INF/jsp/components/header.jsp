@@ -45,7 +45,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         </c:if>
         <c:if test="${sessionScope.loggedInUser.isAdmin}">
           <a
-            href="${pageContext.request.contextPath}/admin"
+            href="${pageContext.request.contextPath}/admin/dashboard"
             class="hover:text-blue-200 transition"
             >Admin Panel</a
           >
@@ -56,7 +56,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div class="flex items-center space-x-4">
         <!-- Cart Button -->
         <a
-          href="${pageContext.request.contextPath}/cart"
+          href="${pageContext.request.contextPath}/viewCart"
           class="relative hover:text-blue-200 transition"
         >
           <svg
@@ -196,7 +196,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           >
           <c:if test="${sessionScope.loggedInUser.isAdmin}">
             <a
-              href="${pageContext.request.contextPath}/admin"
+              href="${pageContext.request.contextPath}/admin/dashboard"
               class="hover:text-blue-200 transition"
               >Admin Panel</a
             >

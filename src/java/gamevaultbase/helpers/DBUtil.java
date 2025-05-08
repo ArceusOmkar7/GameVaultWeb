@@ -1,199 +1,65 @@
 package gamevaultbase.helpers;
 
+import gamevaultbase.entities.Game;
+import javax.servlet.ServletContext;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletContext;
-import java.io.IOException;
 
+/**
+ * Utility class for database CRUD operations
+ */
 public class DBUtil {
 
-    // Runtime connection details - loaded from web.xml via AppContextListener
-    private static String dbUrl; // Full URL including database name
-    private static String dbUser;
-    private static String dbPassword;
-    private static String dbDriver;
-
-    private static boolean driverLoaded = false;
-    private static boolean setupComplete = false; // Flag to ensure DB/Tables checked only once
+    // Flag to ensure DB/Tables checked only once
+    private static boolean setupComplete = false;
 
     /**
-     * Initializes DBUtil with runtime credentials and performs initial setup.
-     * Should be called once from AppContextListener.
+     * Initializes tables and loads sample data if needed
+     * Should be called once during application startup
      * 
-     * @param context ServletContext to read init parameters.
-     * @throws SQLException           if driver loading, DB connection, or schema
-     *                                setup fails.
-     * @throws ClassNotFoundException if the JDBC driver class is not found.
+     * @param context ServletContext to read resources
+     * @throws SQLException if database operations fail
      */
-    public static synchronized void initialize(ServletContext context) throws SQLException, ClassNotFoundException {
+    public static synchronized void initialize(ServletContext context) throws SQLException {
         if (setupComplete) {
             return; // Already initialized
         }
 
-        System.out.println("Initializing DBUtil with direct JDBC connection...");
+        System.out.println("Initializing database tables and sample data...");
 
-        // Load runtime credentials from web.xml context parameters
-        dbUrl = context.getInitParameter("db.url");
-        dbUser = context.getInitParameter("db.user");
-        dbPassword = context.getInitParameter("db.password");
-        dbDriver = context.getInitParameter("db.driver");
-
-        // Basic validation of parameters
-        if (dbDriver == null || dbDriver.trim().isEmpty()) {
-            throw new SQLException("Database driver class name ('db.driver') not configured in web.xml");
-        }
-        if (dbUrl == null || dbUrl.trim().isEmpty()) {
-            throw new SQLException("Database URL ('db.url') not configured in web.xml");
-        }
-        if (dbUser == null) { // User can be empty string? Maybe not. Check requirement.
-            System.err.println("WARN: Database user ('db.user') not configured in web.xml or is null.");
-            throw new SQLException("Database user ('db.user') not configured in web.xml");
-        }
-        if (dbPassword == null) {
-            System.out.println("INFO: Database password ('db.password') is null. Assuming empty password.");
-            dbPassword = ""; // Default to empty if null
-        }
-
-        System.out.println("DB Config: Driver=" + dbDriver + ", URL=" + dbUrl + ", User=" + dbUser);
-
-        // Load the JDBC driver class
-        if (!driverLoaded) {
-            try {
-                Class.forName(dbDriver);
-                driverLoaded = true;
-                System.out.println("JDBC Driver loaded successfully: " + dbDriver);
-            } catch (ClassNotFoundException e) {
-                System.err.println("FATAL: Could not load JDBC Driver: " + dbDriver);
-                throw e; // Re-throw
-            }
-        }
-
-        // --- Perform Database and Table Setup ---
-        // Extract base URL and DB name for creation check
-        String dbName = extractDbNameFromUrl(dbUrl);
-        String baseUrl = extractBaseUrl(dbUrl);
-
-        if (dbName == null || baseUrl == null) {
-            throw new SQLException("Could not parse database name and base URL from db.url: " + dbUrl);
-        }
-
-        // Create database if it doesn't exist
-        createDatabaseIfNotExist(baseUrl, dbName, dbUser, dbPassword);
-
-        // Create tables if they don't exist (connect to the specific database)
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = DBConnectionUtil.getConnection()) {
+            // Create tables if they don't exist
             createTablesIfNotExist(conn);
+
+            // Check if Games table is empty and load sample data if needed
+            if (isTableEmpty(conn, "Games")) {
+                System.out.println("Games table is empty. Loading sample data from JSON...");
+                try {
+                    loadSampleGamesFromJson(context, conn);
+                    System.out.println("Sample game data loaded successfully.");
+                } catch (Exception e) {
+                    System.err.println("WARNING: Failed to load sample game data: " + e.getMessage());
+                    // Continue initialization even if sample data loading fails
+                }
+            }
+
+            // Create default admin user if no admin exists
+            createDefaultAdminIfNeeded(conn);
+
         } catch (SQLException e) {
-            System.err.println("FATAL: Failed to connect to database '" + dbUrl + "' for table creation check.");
-            throw e; // Re-throw
+            System.err.println("FATAL: Failed to initialize database: " + e.getMessage());
+            throw e;
         }
 
-        System.out.println("DBUtil initialization and schema setup complete.");
+        System.out.println("Database initialization complete.");
         setupComplete = true;
     }
 
-    // Helper to extract DB name (simple implementation)
-    private static String extractDbNameFromUrl(String url) {
-        try {
-            int lastSlash = url.lastIndexOf('/');
-            int questionMark = url.indexOf('?', lastSlash);
-            if (lastSlash != -1 && lastSlash < url.length() - 1) {
-                return (questionMark == -1) ? url.substring(lastSlash + 1) : url.substring(lastSlash + 1, questionMark);
-            }
-        } catch (Exception e) {
-            /* ignore parsing error */ }
-        return null;
-    }
-
-    // Helper to extract Base URL (simple implementation)
-    private static String extractBaseUrl(String url) {
-        try {
-            int lastSlash = url.lastIndexOf('/');
-            if (lastSlash > 0) {
-                // Check if the character before the last slash is also a slash (like in
-                // jdbc:mysql://host/)
-                if (url.charAt(lastSlash - 1) == '/') {
-                    return url.substring(0, lastSlash + 1); // Keep trailing slash e.g., jdbc:mysql://localhost:3306/
-                } else {
-                    return url.substring(0, lastSlash); // e.g. jdbc:mysql://localhost:3306
-                }
-            }
-        } catch (Exception e) {
-            /* ignore parsing error */ }
-        return null;
-    }
-
-    // Method to get a direct connection
-    public static Connection getConnection() throws SQLException {
-        if (!driverLoaded || !setupComplete) {
-            // This shouldn't happen if initialize was called correctly by the listener
-            throw new SQLException("DBUtil not initialized. Ensure AppContextListener ran successfully.");
-        }
-        // Each call gets a new connection. Closing is handled by the calling
-        // try-with-resources block.
-        return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-    }
-
-    // --- Database and Table Creation Logic (using DriverManager) ---
-
-    // --- Database and Table Creation Logic (using DriverManager) ---
-
-    private static void createDatabaseIfNotExist(String baseUrl, String dbName, String user, String password)
-            throws SQLException {
-        System.out.println("Checking/Creating database: " + dbName);
-        // Need to connect to the server itself (base URL) without specifying the
-        // database
-
-        // Append sslMode=DISABLED to the base URL for this initial connection check
-        String paramToAdd = "sslMode=DISABLED";
-        String baseUrlForCheck;
-        if (baseUrl.contains("?")) {
-            // Base URL already has parameters, append with &
-            baseUrlForCheck = baseUrl + "&" + paramToAdd;
-        } else {
-            // No parameters yet in Base URL, append with ?
-            baseUrlForCheck = baseUrl + "?" + paramToAdd;
-        }
-
-        System.out.println("Connecting to base URL for DB check: " + baseUrlForCheck);
-
-        // Now use the modified baseUrlForCheck for the initial connection
-        try (Connection conn = DriverManager.getConnection(baseUrlForCheck, user, password)) {
-            // Check if DB exists using metadata
-            boolean dbExists = false;
-            try (ResultSet rs = conn.getMetaData().getCatalogs()) {
-                while (rs.next()) {
-                    if (rs.getString(1).equalsIgnoreCase(dbName)) {
-                        dbExists = true;
-                        break;
-                    }
-                }
-            } // ResultSet rs is closed here
-
-            // If database doesn't exist, create it
-            if (!dbExists) {
-                System.out.println("Database " + dbName + " not found. Creating...");
-                try (Statement stmt = conn.createStatement()) {
-                    // Use backticks for safety and specify character set/collation
-                    stmt.executeUpdate(
-                            "CREATE DATABASE `" + dbName + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                    System.out.println("Database " + dbName + " created successfully.");
-                } // Statement stmt is closed here
-            } else {
-                System.out.println("Database " + dbName + " already exists.");
-            }
-        } catch (SQLException e) {
-            // Provide more context in the error message
-            System.err.println("Error during database check/creation for '" + dbName + "' using base URL '"
-                    + baseUrlForCheck + "': " + e.getMessage());
-            // Log the specific SQLState and ErrorCode which can be very helpful
-            System.err.println("SQLState: " + e.getSQLState() + " ErrorCode: " + e.getErrorCode());
-            e.printStackTrace(); // Print the full stack trace to the server log
-            throw e; // Re-throw the exception so the initialization process fails clearly
-        } // Connection conn is closed here
-    }
-
+    /**
+     * Creates tables if they don't exist
+     */
     private static void createTablesIfNotExist(Connection conn) throws SQLException {
         System.out.println("Checking/Creating tables in database...");
         try (Statement statement = conn.createStatement()) {
@@ -212,69 +78,248 @@ public class DBUtil {
         }
     }
 
-    // --- Public execute Methods (Unchanged Internally - Use the new
-    // getConnection()) ---
+    /**
+     * Checks if a table is empty (has no rows)
+     */
+    private static boolean isTableEmpty(Connection conn, String tableName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + tableName;
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0;
+            }
+            return true; // Default to true if no result
+        }
+    }
 
+    /**
+     * Loads sample game data from the games.json file
+     */
+    private static void loadSampleGamesFromJson(ServletContext context, Connection conn)
+            throws Exception {
+        // Get the games.json file from the WEB-INF directory
+        try (InputStream inputStream = context.getResourceAsStream("/WEB-INF/games.json")) {
+            if (inputStream == null) {
+                throw new Exception("Sample games.json file not found in WEB-INF directory");
+            }
+
+            // Parse JSON data using JSONUtil
+            List<Game> games = JSONUtil.parseGamesFromJson(inputStream);
+
+            if (games.isEmpty()) {
+                System.out.println("No games found in JSON file.");
+                return;
+            }
+
+            // Insert games into the database
+            String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (Game game : games) {
+                    pstmt.setString(1, game.getTitle());
+                    pstmt.setString(2, game.getDescription());
+                    pstmt.setString(3, game.getDeveloper());
+                    pstmt.setString(4, game.getPlatform());
+                    pstmt.setFloat(5, game.getPrice());
+
+                    if (game.getReleaseDate() != null) {
+                        pstmt.setDate(6, new java.sql.Date(game.getReleaseDate().getTime()));
+                    } else {
+                        pstmt.setNull(6, Types.DATE);
+                    }
+
+                    pstmt.setString(7, game.getImagePath());
+                    pstmt.setString(8, game.getGenre());
+                    pstmt.setFloat(9, game.getRating());
+
+                    pstmt.addBatch();
+                }
+
+                int[] results = pstmt.executeBatch();
+                System.out.println("Inserted " + results.length + " games from JSON file.");
+            }
+        }
+    }
+
+    /**
+     * Creates a default admin user if no admin exists
+     */
+    private static void createDefaultAdminIfNeeded(Connection conn) throws SQLException {
+        String checkSql = "SELECT COUNT(*) FROM Users WHERE isAdmin = TRUE";
+
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(checkSql)) {
+
+            if (rs.next() && rs.getInt(1) == 0) {
+                // No admin exists, create one
+                System.out.println("No admin user found. Creating default admin account...");
+
+                String insertSql = "INSERT INTO Users (email, password, username, walletBalance, isAdmin) " +
+                        "VALUES ('admin@gamevault.com', 'admin123', 'admin', 1000.0, TRUE)";
+
+                try (Statement insertStmt = conn.createStatement()) {
+                    insertStmt.executeUpdate(insertSql);
+                    System.out.println("Default admin account created successfully.");
+                }
+            }
+        }
+    }
+
+    // --- Generic CRUD Operations ---
+
+    /**
+     * Execute a query and process results with a handler
+     * 
+     * @param sql     SQL query with ? placeholders for parameters
+     * @param handler Handler to process each row of results
+     * @param params  Parameters to substitute in the SQL
+     * @return List of objects produced by the handler
+     */
     public static <T> List<T> executeQuery(String sql, ResultSetHandler<T> handler, Object... params)
-            throws SQLException, IOException {
+            throws SQLException {
         List<T> results = new ArrayList<>();
-        try (Connection conn = getConnection(); // Gets a new direct connection
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnectionUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
+
+            // Set parameters if any
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    results.add(handler.handle(rs));
-                }
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                results.add(handler.handle(rs));
             }
-        } // conn and pstmt are closed here
+
+        } catch (SQLException e) {
+            System.err.println("Error executing query: " + e.getMessage());
+            throw e;
+        } finally {
+            // Close resources in reverse order
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    /* ignore */ }
+            if (pstmt != null)
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    /* ignore */ }
+            if (conn != null)
+                DBConnectionUtil.closeConnection(conn);
+        }
+
         return results;
     }
 
-    public static int executeUpdate(String sql, Object... params) throws SQLException, IOException {
-        try (Connection conn = getConnection(); // Gets a new direct connection
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    /**
+     * Execute an update (INSERT, UPDATE, DELETE) statement
+     * 
+     * @param sql    SQL statement with ? placeholders for parameters
+     * @param params Parameters to substitute in the SQL
+     * @return Number of rows affected
+     */
+    public static int executeUpdate(String sql, Object... params) throws SQLException {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DBConnectionUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
+
+            // Set parameters if any
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
+
             return pstmt.executeUpdate();
-        } // conn and pstmt are closed here
+
+        } catch (SQLException e) {
+            System.err.println("Error executing update: " + e.getMessage());
+            throw e;
+        } finally {
+            if (pstmt != null)
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    /* ignore */ }
+            if (conn != null)
+                DBConnectionUtil.closeConnection(conn);
+        }
     }
 
-    public static int executeInsertAndGetKey(String sql, Object... params) throws SQLException, IOException {
+    /**
+     * Execute an insert and return generated keys
+     * 
+     * @param sql    SQL INSERT statement with ? placeholders for parameters
+     * @param params Parameters to substitute in the SQL
+     * @return The generated key (usually primary key ID)
+     */
+    public static int executeInsertAndGetKey(String sql, Object... params) throws SQLException {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         int generatedKey = -1;
-        try (Connection conn = getConnection(); // Gets a new direct connection
-                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        try {
+            conn = DBConnectionUtil.getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            // Set parameters if any
             for (int i = 0; i < params.length; i++) {
-                // Handle potential null values passed for foreign keys etc.
                 if (params[i] == null) {
-                    // Infer SQL type or set explicitly if needed, often Types.NULL works
                     pstmt.setNull(i + 1, Types.NULL);
                 } else {
                     pstmt.setObject(i + 1, params[i]);
                 }
             }
+
             pstmt.executeUpdate();
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedKey = rs.getInt(1);
-                } else {
-                    System.err.println(
-                            "WARN: No generated key obtained after insert for SQL (might be expected): " + sql);
-                }
+
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                generatedKey = rs.getInt(1);
             }
-        } // conn and pstmt are closed here
+
+        } catch (SQLException e) {
+            System.err.println("Error executing insert: " + e.getMessage());
+            throw e;
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    /* ignore */ }
+            if (pstmt != null)
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    /* ignore */ }
+            if (conn != null)
+                DBConnectionUtil.closeConnection(conn);
+        }
+
         return generatedKey;
     }
 
-    // --- ResultSetHandler Interface (Unchanged) ---
+    /**
+     * ResultSet handler interface for processing query results
+     */
     @FunctionalInterface
     public interface ResultSetHandler<T> {
-        T handle(ResultSet rs) throws SQLException, IOException;
+        T handle(ResultSet rs) throws SQLException;
     }
 
-    // --- SQL Constants for Table Creation (Updated with missing columns) ---
+    // --- SQL Constants for Table Creation ---
     private static final String SQL_CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS Users (" +
             "userId INT AUTO_INCREMENT PRIMARY KEY," +
             "email VARCHAR(255) NOT NULL UNIQUE," +
@@ -295,7 +340,7 @@ public class DBUtil {
             "releaseDate DATE," +
             "imagePath VARCHAR(255)," +
             "genre VARCHAR(100)," +
-            "rating FLOAT DEFAULT 0.0" + // Added rating field
+            "rating FLOAT DEFAULT 0.0" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_CARTS_TABLE = "CREATE TABLE IF NOT EXISTS Carts (" +

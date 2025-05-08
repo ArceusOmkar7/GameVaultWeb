@@ -131,7 +131,7 @@
     
     <servlet>
         <servlet-name>AddToCartServlet</servlet-name>
-        <servlet-class>gamevaultbase.servlets.AddToCartServlet</servlet-class>
+        <servlet-class>gamevaultbase.servlets.user.AddToCartServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddToCartServlet</servlet-name>
@@ -177,7 +177,7 @@
     <!-- Admin Access Servlets -->
     <servlet>
         <servlet-name>AdminDashboardServlet</servlet-name>
-        <servlet-class>gamevaultbase.servlets.AdminDashboardServlet</servlet-class>
+        <servlet-class>gamevaultbase.servlets.admin.AdminDashboardServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AdminDashboardServlet</servlet-name>
