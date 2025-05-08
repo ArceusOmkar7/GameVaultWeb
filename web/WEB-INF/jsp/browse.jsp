@@ -17,19 +17,47 @@
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Browse Games</h2>
         <form action="${pageContext.request.contextPath}/browse" method="get" class="mb-6 flex flex-wrap gap-4 items-end">
             <input type="text" name="search" placeholder="Search games..." value="<c:out value='${searchQuery}'/>" class="border p-2 rounded w-64" />
-            <select name="filter" class="border p-2 rounded">
-                <option value="" ${empty selectedPlatform ? 'selected' : ''}>All Platforms</option>
-                <option value="PC" ${selectedPlatform == 'PC' ? 'selected' : ''}>PC</option>
-                <option value="PS4" ${selectedPlatform == 'PS4' ? 'selected' : ''}>PS4</option>
-                <option value="Xbox" ${selectedPlatform == 'Xbox' ? 'selected' : ''}>Xbox</option>
-            </select>
-            <select name="sort" class="border p-2 rounded">
-                <option value="" ${empty selectedSort ? 'selected' : ''}>Relevance</option>
-                <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Price: Low to High</option>
-                <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Price: High to Low</option>
-                <option value="release_date" ${selectedSort == 'release_date' ? 'selected' : ''}>Release Date</option>
-            </select>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Apply</button>
+            
+            <div>
+                <label for="filter-platform" class="block text-sm font-medium text-gray-700 mb-1">Platform</label>
+                <select name="filter-platform" id="filter-platform" class="border p-2 rounded">
+                    <option value="" ${empty selectedPlatform ? 'selected' : ''}>All Platforms</option>
+                    <c:forEach var="platform" items="${platforms}">
+                        <option value="${platform.name}" ${selectedPlatform == platform.name ? 'selected' : ''}>
+                            <c:out value="${platform.name}"/>
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+            
+            <div>
+                <label for="filter-genre" class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                <select name="filter-genre" id="filter-genre" class="border p-2 rounded">
+                    <option value="" ${empty selectedGenre ? 'selected' : ''}>All Genres</option>
+                    <c:forEach var="genre" items="${genres}">
+                        <option value="${genre.name}" ${selectedGenre == genre.name ? 'selected' : ''}>
+                            <c:out value="${genre.name}"/>
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
+            
+            <div>
+                <label for="sort" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select name="sort" id="sort" class="border p-2 rounded">
+                    <option value="" ${empty selectedSort ? 'selected' : ''}>Relevance</option>
+                    <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Price: Low to High</option>
+                    <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Price: High to Low</option>
+                    <option value="release_date" ${selectedSort == 'release_date' ? 'selected' : ''}>Release Date</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                </svg>
+                Apply Filters
+            </button>
         </form>
         <c:if test="${not empty errorMessage}">
             <div class="mb-4 p-4 rounded bg-red-100 border border-red-400 text-red-700">

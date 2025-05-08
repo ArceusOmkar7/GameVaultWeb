@@ -1,6 +1,8 @@
 package gamevaultbase.servlets.admin;
 
 import gamevaultbase.entities.Game;
+import gamevaultbase.entities.Genre;
+import gamevaultbase.entities.Platform;
 import gamevaultbase.servlets.base.AdminBaseServlet;
 
 import javax.servlet.ServletException;
@@ -23,19 +25,27 @@ public class GameManagementServlet extends AdminBaseServlet {
         // Get filter parameters
         String searchQuery = request.getParameter("searchQuery");
         String platformFilter = request.getParameter("platformFilter");
+        String genreFilter = request.getParameter("genreFilter");
         String sortBy = request.getParameter("sortBy");
 
+        // Get all platforms and genres for the filter dropdowns
+        List<Platform> platforms = getGameManagement().getAllPlatforms();
+        List<Genre> genres = getGameManagement().getAllGenres();
+
         // Get games with filters applied
-        List<Game> games = getGameManagement().getAllGames(searchQuery, platformFilter, sortBy);
+        List<Game> games = getGameManagement().getAllGames(searchQuery, platformFilter, genreFilter, sortBy);
 
         // Count total games for pagination
         int totalGames = games.size();
 
         // Set attributes for the JSP
         request.setAttribute("games", games);
+        request.setAttribute("platforms", platforms);
+        request.setAttribute("genres", genres);
         request.setAttribute("totalGames", totalGames);
         request.setAttribute("searchQuery", searchQuery);
         request.setAttribute("platformFilter", platformFilter);
+        request.setAttribute("genreFilter", genreFilter);
         request.setAttribute("sortBy", sortBy);
 
         // Forward to the game management JSP

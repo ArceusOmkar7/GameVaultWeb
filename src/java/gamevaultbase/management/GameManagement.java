@@ -1,6 +1,8 @@
 package gamevaultbase.management;
 
 import gamevaultbase.entities.Game;
+import gamevaultbase.entities.Genre;
+import gamevaultbase.entities.Platform;
 import gamevaultbase.exceptions.GameNotFoundException;
 import gamevaultbase.storage.GameStorage;
 
@@ -23,8 +25,23 @@ public class GameManagement {
         return game;
     }
 
+    public List<Game> getAllGames(String searchQuery, String filterPlatform, String filterGenre, String sortBy) {
+        return gameStorage.findAllWithFilters(searchQuery, filterPlatform, filterGenre, sortBy);
+    }
+
+    // Legacy method for backward compatibility
     public List<Game> getAllGames(String searchQuery, String filterPlatform, String sortBy) {
-        return gameStorage.findAllWithFilters(searchQuery, filterPlatform, sortBy);
+        return gameStorage.findAllWithFilters(searchQuery, filterPlatform, null, sortBy);
+    }
+
+    // Get all available platforms for filtering
+    public List<Platform> getAllPlatforms() {
+        return gameStorage.findAllPlatforms();
+    }
+
+    // Get all available genres for filtering
+    public List<Genre> getAllGenres() {
+        return gameStorage.findAllGenres();
     }
 
     // Existing method to get featured games

@@ -29,47 +29,132 @@ public class GameStorage implements StorageInterface<Game, Integer> {
 
     @Override
     public List<Game> findAll() {
-        return findAllWithFilters(null, null, null);
+        return findAllWithFilters(null, null, null, null);
     }
 
-    public List<Game> findAllWithFilters(String searchQuery, String filterPlatform, String sortBy) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM Games WHERE 1=1");
+    public List<Game> findAllWithFilters(String searchQuery, String filterPlatform, String filterGenre, String sortBy) {
+        StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
 
+        // Base query with joins for platforms and genres
+        sql.append("SELECT DISTINCT g.* FROM Games g ");
+
+        // Add joins only if we need them for filtering
+        boolean needPlatformJoin = filterPlatform != null && !filterPlatform.trim().isEmpty();
+        boolean needGenreJoin = filterGenre != null && !filterGenre.trim().isEmpty();
+
+        if (needPlatformJoin) {
+            sql.append("LEFT JOIN GamePlatforms gp ON g.gameId = gp.gameId ");
+            sql.append("LEFT JOIN Platforms p ON gp.platformId = p.platformId ");
+        }
+
+        if (needGenreJoin) {
+            sql.append("LEFT JOIN GameGenres gg ON g.gameId = gg.gameId ");
+            sql.append("LEFT JOIN Genres gnr ON gg.genreId = gnr.genreId ");
+        }
+
+        sql.append("WHERE 1=1 ");
+
+        // Search by title or description
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            sql.append(" AND (title LIKE ? OR description LIKE ?)");
+            sql.append("AND (g.title LIKE ? OR g.description LIKE ?) ");
             params.add("%" + searchQuery.trim() + "%");
             params.add("%" + searchQuery.trim() + "%");
         }
 
-        if (filterPlatform != null && !filterPlatform.trim().isEmpty()) {
-            sql.append(" AND platform = ?");
+        // Filter by platform - check both the normalized table and legacy field
+        if (needPlatformJoin) {
+            sql.append("AND (p.name = ? OR g.platform LIKE ?) ");
             params.add(filterPlatform.trim());
+            params.add("%" + filterPlatform.trim() + "%");
         }
 
+        // Filter by genre - check both the normalized table and legacy field
+        if (needGenreJoin) {
+            sql.append("AND (gnr.name = ? OR g.genre LIKE ?) ");
+            params.add(filterGenre.trim());
+            params.add("%" + filterGenre.trim() + "%");
+        }
+
+        // Sort results
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             switch (sortBy) {
+                case "title_asc":
+                    sql.append("ORDER BY g.title ASC");
+                    break;
+                case "title_desc":
+                    sql.append("ORDER BY g.title DESC");
+                    break;
                 case "price_asc":
-                    sql.append(" ORDER BY price ASC");
+                    sql.append("ORDER BY g.price ASC");
                     break;
                 case "price_desc":
-                    sql.append(" ORDER BY price DESC");
+                    sql.append("ORDER BY g.price DESC");
+                    break;
+                case "rating_desc":
+                    sql.append("ORDER BY g.rating DESC");
                     break;
                 case "release_date":
-                    sql.append(" ORDER BY releaseDate DESC");
+                    sql.append("ORDER BY g.releaseDate DESC");
                     break;
                 default:
-                    sql.append(" ORDER BY gameId ASC");
+                    sql.append("ORDER BY g.gameId ASC");
             }
         } else {
-            sql.append(" ORDER BY gameId ASC");
+            sql.append("ORDER BY g.gameId ASC");
         }
 
         try {
-            return DBUtil.executeQuery(sql.toString(), rs -> mapResultSetToGame(rs), params.toArray());
+            List<Game> games = DBUtil.executeQuery(sql.toString(), rs -> mapResultSetToGame(rs), params.toArray());
+
+            // For each game, load its platforms and genres relationships
+            for (Game game : games) {
+                loadGameRelationships(game);
+            }
+
+            return games;
         } catch (SQLException e) {
-            System.err.println("Error finding all games: " + e.getMessage());
+            System.err.println("Error finding games with filters: " + e.getMessage());
             return new ArrayList<>(); // Return empty list on error
+        }
+    }
+
+    /**
+     * Load platforms and genres for a game
+     */
+    private void loadGameRelationships(Game game) {
+        try {
+            // Load platforms
+            String platformSql = "SELECT p.* FROM Platforms p " +
+                    "JOIN GamePlatforms gp ON p.platformId = gp.platformId " +
+                    "WHERE gp.gameId = ?";
+            List<Platform> platforms = DBUtil.executeQuery(platformSql, rs -> {
+                Platform platform = new Platform();
+                platform.setPlatformId(rs.getInt("platformId"));
+                platform.setName(rs.getString("name"));
+                return platform;
+            }, game.getGameId());
+
+            game.setPlatforms(platforms);
+
+            // Load genres
+            String genreSql = "SELECT g.* FROM Genres g " +
+                    "JOIN GameGenres gg ON g.genreId = gg.genreId " +
+                    "WHERE gg.gameId = ?";
+            List<Genre> genres = DBUtil.executeQuery(genreSql, rs -> {
+                Genre genre = new Genre();
+                genre.setGenreId(rs.getInt("genreId"));
+                genre.setName(rs.getString("name"));
+                return genre;
+            }, game.getGameId());
+
+            game.setGenres(genres);
+
+            // Update legacy fields for backward compatibility
+            game.updateLegacyFields();
+
+        } catch (SQLException e) {
+            System.err.println("Error loading relationships for game " + game.getGameId() + ": " + e.getMessage());
         }
     }
 
@@ -80,7 +165,14 @@ public class GameStorage implements StorageInterface<Game, Integer> {
                 "JOIN Orders o ON oi.orderId = o.orderId " +
                 "WHERE o.userId = ?";
         try {
-            return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), userId);
+            List<Game> games = DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), userId);
+
+            // Load relationships for each game
+            for (Game game : games) {
+                loadGameRelationships(game);
+            }
+
+            return games;
         } catch (SQLException e) {
             System.err.println("Error finding owned games for user: " + userId + " - " + e.getMessage());
             return new ArrayList<>(); // Return empty list on error
@@ -88,14 +180,52 @@ public class GameStorage implements StorageInterface<Game, Integer> {
     }
 
     // Method to get a few featured games (e.g., first 3 added)
-    // TODO: Implement a proper "featured" flag or logic if needed
     public List<Game> findFeaturedGames() {
         String sql = "SELECT * FROM Games ORDER BY gameId ASC LIMIT 3"; // Simple example: Get first 3 games
         try {
-            return DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs));
+            List<Game> games = DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs));
+
+            // Load relationships for each game
+            for (Game game : games) {
+                loadGameRelationships(game);
+            }
+
+            return games;
         } catch (SQLException e) {
             System.err.println("Error finding featured games: " + e.getMessage());
             return new ArrayList<>(); // Return empty list on error
+        }
+    }
+
+    // Method to get all available platforms
+    public List<Platform> findAllPlatforms() {
+        String sql = "SELECT DISTINCT * FROM Platforms ORDER BY name";
+        try {
+            return DBUtil.executeQuery(sql, rs -> {
+                Platform platform = new Platform();
+                platform.setPlatformId(rs.getInt("platformId"));
+                platform.setName(rs.getString("name"));
+                return platform;
+            });
+        } catch (SQLException e) {
+            System.err.println("Error finding all platforms: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // Method to get all available genres
+    public List<Genre> findAllGenres() {
+        String sql = "SELECT DISTINCT * FROM Genres ORDER BY name";
+        try {
+            return DBUtil.executeQuery(sql, rs -> {
+                Genre genre = new Genre();
+                genre.setGenreId(rs.getInt("genreId"));
+                genre.setName(rs.getString("name"));
+                return genre;
+            });
+        } catch (SQLException e) {
+            System.err.println("Error finding all genres: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
