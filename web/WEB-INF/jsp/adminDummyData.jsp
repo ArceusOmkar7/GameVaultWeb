@@ -131,5 +131,7 @@ ${stackTrace}</pre
         </div>
       </div>
     </div>
+    <!-- Sidebar Scripts -->
+    <jsp:include page="components/adminSidebarScripts.jsp" />
   </body>
 </html>

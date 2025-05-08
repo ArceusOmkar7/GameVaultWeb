@@ -323,5 +323,8 @@
             }
         });
     </script>
+
+    <!-- Sidebar Scripts -->
+    <jsp:include page="components/adminSidebarScripts.jsp" />
 </body>
 </html>
