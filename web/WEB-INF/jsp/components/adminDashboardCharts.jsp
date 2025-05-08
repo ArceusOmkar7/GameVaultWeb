@@ -26,9 +26,27 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         >
           Month
         </button>
+        <button
+          class="bg-gray-200 px-3 py-1 rounded text-sm font-medium"
+          id="yearBtn"
+        >
+          Year
+        </button>
       </div>
     </div>
-    <div class="w-full">
+    <div class="w-full relative">
+      <!-- Loading indicator overlay -->
+      <div
+        id="salesChartLoader"
+        class="hidden absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10"
+      >
+        <div class="flex flex-col items-center">
+          <div
+            class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"
+          ></div>
+          <p class="mt-2 text-gray-700">Loading data...</p>
+        </div>
+      </div>
       <canvas
         id="salesChart"
         height="300"
