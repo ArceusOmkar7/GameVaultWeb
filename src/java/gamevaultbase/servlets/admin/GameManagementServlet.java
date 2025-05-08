@@ -3,6 +3,7 @@ package gamevaultbase.servlets.admin;
 import gamevaultbase.entities.Game;
 import gamevaultbase.entities.Genre;
 import gamevaultbase.entities.Platform;
+import gamevaultbase.helpers.AppUtil;
 import gamevaultbase.servlets.base.AdminBaseServlet;
 
 import javax.servlet.ServletException;
@@ -19,6 +20,8 @@ import java.util.List;
 @WebServlet(name = "GameManagementServlet", urlPatterns = { "/admin/game-management" })
 public class GameManagementServlet extends AdminBaseServlet {
 
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     @Override
     protected void processAdminGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,13 +36,29 @@ public class GameManagementServlet extends AdminBaseServlet {
         List<Genre> genres = getGameManagement().getAllGenres();
 
         // Get games with filters applied
-        List<Game> games = getGameManagement().getAllGames(searchQuery, platformFilter, genreFilter, sortBy);
+        List<Game> allGames = getGameManagement().getAllGames(searchQuery, platformFilter, genreFilter, sortBy);
 
         // Count total games for pagination
-        int totalGames = games.size();
+        int totalGames = allGames.size();
+
+        // Handle pagination
+        int pageSize = AppUtil.getPageSize(request, DEFAULT_PAGE_SIZE);
+        int currentPage = handlePaginationRequest(request, totalGames, pageSize);
+
+        // Calculate start and end indices for the current page
+        int startIndex = (currentPage - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalGames);
+
+        // Get subset of games for the current page
+        List<Game> pagedGames;
+        if (startIndex < totalGames) {
+            pagedGames = allGames.subList(startIndex, endIndex);
+        } else {
+            pagedGames = allGames.subList(0, Math.min(pageSize, totalGames));
+        }
 
         // Set attributes for the JSP
-        request.setAttribute("games", games);
+        request.setAttribute("games", pagedGames);
         request.setAttribute("platforms", platforms);
         request.setAttribute("genres", genres);
         request.setAttribute("totalGames", totalGames);
@@ -47,6 +66,12 @@ public class GameManagementServlet extends AdminBaseServlet {
         request.setAttribute("platformFilter", platformFilter);
         request.setAttribute("genreFilter", genreFilter);
         request.setAttribute("sortBy", sortBy);
+
+        // Calculate displayed game range for the current page
+        int firstGame = totalGames > 0 ? startIndex + 1 : 0;
+        int lastGame = Math.min(endIndex, totalGames);
+        request.setAttribute("firstGame", firstGame);
+        request.setAttribute("lastGame", lastGame);
 
         // Forward to the game management JSP
         forwardToJsp(request, response, "/WEB-INF/jsp/adminGameManagement.jsp");
