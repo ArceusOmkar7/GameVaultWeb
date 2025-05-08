@@ -1,11 +1,16 @@
 package gamevaultbase.helpers;
 
 import gamevaultbase.entities.Game;
+import gamevaultbase.entities.Genre;
+import gamevaultbase.entities.Platform;
+
 import javax.servlet.ServletContext;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Utility class for database CRUD operations
@@ -65,6 +70,10 @@ public class DBUtil {
         try (Statement statement = conn.createStatement()) {
             statement.executeUpdate(SQL_CREATE_USERS_TABLE);
             statement.executeUpdate(SQL_CREATE_GAMES_TABLE);
+            statement.executeUpdate(SQL_CREATE_GENRES_TABLE);
+            statement.executeUpdate(SQL_CREATE_PLATFORMS_TABLE);
+            statement.executeUpdate(SQL_CREATE_GAME_GENRES_TABLE);
+            statement.executeUpdate(SQL_CREATE_GAME_PLATFORMS_TABLE);
             statement.executeUpdate(SQL_CREATE_CARTS_TABLE);
             statement.executeUpdate(SQL_CREATE_CART_ITEMS_TABLE);
             statement.executeUpdate(SQL_CREATE_ORDERS_TABLE);
@@ -112,35 +121,180 @@ public class DBUtil {
                 return;
             }
 
-            // Insert games into the database
-            String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            conn.setAutoCommit(false); // Start transaction
 
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                for (Game game : games) {
-                    pstmt.setString(1, game.getTitle());
-                    pstmt.setString(2, game.getDescription());
-                    pstmt.setString(3, game.getDeveloper());
-                    pstmt.setString(4, game.getPlatform());
-                    pstmt.setFloat(5, game.getPrice());
+            try {
+                // Create maps to track existing genres and platforms to avoid duplicates
+                Map<String, Integer> genreMap = new HashMap<>();
+                Map<String, Integer> platformMap = new HashMap<>();
 
-                    if (game.getReleaseDate() != null) {
-                        pstmt.setDate(6, new java.sql.Date(game.getReleaseDate().getTime()));
-                    } else {
-                        pstmt.setNull(6, Types.DATE);
+                // Insert games into the database
+                String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating) "
+                        +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                int gamesInserted = 0;
+                try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    for (Game game : games) {
+                        pstmt.setString(1, game.getTitle());
+                        pstmt.setString(2, game.getDescription());
+                        pstmt.setString(3, game.getDeveloper());
+                        pstmt.setString(4, game.getPlatform());
+                        pstmt.setFloat(5, game.getPrice());
+
+                        if (game.getReleaseDate() != null) {
+                            pstmt.setDate(6, new java.sql.Date(game.getReleaseDate().getTime()));
+                        } else {
+                            pstmt.setNull(6, Types.DATE);
+                        }
+
+                        pstmt.setString(7, game.getImagePath());
+                        pstmt.setString(8, game.getGenre());
+                        pstmt.setFloat(9, game.getRating());
+
+                        pstmt.addBatch();
+                        gamesInserted++;
                     }
 
-                    pstmt.setString(7, game.getImagePath());
-                    pstmt.setString(8, game.getGenre());
-                    pstmt.setFloat(9, game.getRating());
+                    pstmt.executeBatch();
+                    System.out.println("Inserted " + gamesInserted + " games from JSON file.");
 
-                    pstmt.addBatch();
+                    // Get generated game IDs
+                    ResultSet rs = pstmt.getGeneratedKeys();
+                    int gameIndex = 0;
+                    while (rs.next() && gameIndex < games.size()) {
+                        games.get(gameIndex).setGameId(rs.getInt(1));
+                        gameIndex++;
+                    }
                 }
 
-                int[] results = pstmt.executeBatch();
-                System.out.println("Inserted " + results.length + " games from JSON file.");
+                // Process genres
+                for (Game game : games) {
+                    List<String> genreList = game.getGenreList();
+                    for (String genreName : genreList) {
+                        // Check if we've already processed this genre
+                        if (!genreMap.containsKey(genreName)) {
+                            // Insert new genre
+                            int genreId = insertGenre(conn, genreName);
+                            genreMap.put(genreName, genreId);
+                        }
+
+                        // Create game-genre relationship
+                        int genreId = genreMap.get(genreName);
+                        linkGameGenre(conn, game.getGameId(), genreId);
+                    }
+                }
+
+                // Process platforms
+                for (Game game : games) {
+                    List<String> platformList = game.getPlatformList();
+                    for (String platformName : platformList) {
+                        // Check if we've already processed this platform
+                        if (!platformMap.containsKey(platformName)) {
+                            // Insert new platform
+                            int platformId = insertPlatform(conn, platformName);
+                            platformMap.put(platformName, platformId);
+                        }
+
+                        // Create game-platform relationship
+                        int platformId = platformMap.get(platformName);
+                        linkGamePlatform(conn, game.getGameId(), platformId);
+                    }
+                }
+
+                conn.commit(); // Commit transaction
+            } catch (SQLException e) {
+                conn.rollback(); // Rollback on error
+                throw e;
+            } finally {
+                conn.setAutoCommit(true); // Reset auto-commit
             }
+        }
+    }
+
+    /**
+     * Inserts a new genre into the database if it doesn't exist
+     * 
+     * @return The genre ID
+     */
+    private static int insertGenre(Connection conn, String genreName) throws SQLException {
+        // First check if the genre already exists
+        String checkSql = "SELECT genreId FROM Genres WHERE name = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+            checkStmt.setString(1, genreName);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("genreId");
+            }
+        }
+
+        // Genre doesn't exist, insert it
+        String insertSql = "INSERT INTO Genres (name) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            insertStmt.setString(1, genreName);
+            insertStmt.executeUpdate();
+
+            ResultSet rs = insertStmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        throw new SQLException("Failed to insert genre: " + genreName);
+    }
+
+    /**
+     * Inserts a new platform into the database if it doesn't exist
+     * 
+     * @return The platform ID
+     */
+    private static int insertPlatform(Connection conn, String platformName) throws SQLException {
+        // First check if the platform already exists
+        String checkSql = "SELECT platformId FROM Platforms WHERE name = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+            checkStmt.setString(1, platformName);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("platformId");
+            }
+        }
+
+        // Platform doesn't exist, insert it
+        String insertSql = "INSERT INTO Platforms (name) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            insertStmt.setString(1, platformName);
+            insertStmt.executeUpdate();
+
+            ResultSet rs = insertStmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        throw new SQLException("Failed to insert platform: " + platformName);
+    }
+
+    /**
+     * Links a game to a genre
+     */
+    private static void linkGameGenre(Connection conn, int gameId, int genreId) throws SQLException {
+        String sql = "INSERT IGNORE INTO GameGenres (gameId, genreId) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, gameId);
+            stmt.setInt(2, genreId);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Links a game to a platform
+     */
+    private static void linkGamePlatform(Connection conn, int gameId, int platformId) throws SQLException {
+        String sql = "INSERT IGNORE INTO GamePlatforms (gameId, platformId) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, gameId);
+            stmt.setInt(2, platformId);
+            stmt.executeUpdate();
         }
     }
 
@@ -312,6 +466,103 @@ public class DBUtil {
     }
 
     /**
+     * Load a game with its genres and platforms
+     * 
+     * @param gameId The ID of the game to load
+     * @return The Game object with populated genres and platforms lists
+     */
+    public static Game getGameWithRelations(int gameId) throws SQLException {
+        Game game = null;
+
+        // Get the basic game information
+        String gameSql = "SELECT * FROM Games WHERE gameId = ?";
+        List<Game> games = executeQuery(gameSql, rs -> {
+            Game g = new Game();
+            g.setGameId(rs.getInt("gameId"));
+            g.setTitle(rs.getString("title"));
+            g.setDescription(rs.getString("description"));
+            g.setDeveloper(rs.getString("developer"));
+            g.setPlatform(rs.getString("platform"));
+            g.setGenre(rs.getString("genre"));
+            g.setPrice(rs.getFloat("price"));
+            g.setRating(rs.getFloat("rating"));
+            g.setImagePath(rs.getString("imagePath"));
+
+            Date releaseDate = rs.getDate("releaseDate");
+            if (releaseDate != null) {
+                g.setReleaseDate(new Date(releaseDate.getTime()));
+            }
+
+            return g;
+        }, gameId);
+
+        if (games.isEmpty()) {
+            return null;
+        }
+
+        game = games.get(0);
+
+        // Get genres for this game
+        String genreSql = "SELECT g.* FROM Genres g " +
+                "JOIN GameGenres gg ON g.genreId = gg.genreId " +
+                "WHERE gg.gameId = ?";
+
+        List<Genre> genres = executeQuery(genreSql, rs -> {
+            Genre genre = new Genre();
+            genre.setGenreId(rs.getInt("genreId"));
+            genre.setName(rs.getString("name"));
+            return genre;
+        }, gameId);
+
+        game.setGenres(genres);
+
+        // Get platforms for this game
+        String platformSql = "SELECT p.* FROM Platforms p " +
+                "JOIN GamePlatforms gp ON p.platformId = gp.platformId " +
+                "WHERE gp.gameId = ?";
+
+        List<Platform> platforms = executeQuery(platformSql, rs -> {
+            Platform platform = new Platform();
+            platform.setPlatformId(rs.getInt("platformId"));
+            platform.setName(rs.getString("name"));
+            return platform;
+        }, gameId);
+
+        game.setPlatforms(platforms);
+
+        // Update legacy string fields for backward compatibility
+        game.updateLegacyFields();
+
+        return game;
+    }
+
+    /**
+     * Get all genres from the database
+     */
+    public static List<Genre> getAllGenres() throws SQLException {
+        String sql = "SELECT * FROM Genres ORDER BY name";
+        return executeQuery(sql, rs -> {
+            Genre genre = new Genre();
+            genre.setGenreId(rs.getInt("genreId"));
+            genre.setName(rs.getString("name"));
+            return genre;
+        });
+    }
+
+    /**
+     * Get all platforms from the database
+     */
+    public static List<Platform> getAllPlatforms() throws SQLException {
+        String sql = "SELECT * FROM Platforms ORDER BY name";
+        return executeQuery(sql, rs -> {
+            Platform platform = new Platform();
+            platform.setPlatformId(rs.getInt("platformId"));
+            platform.setName(rs.getString("name"));
+            return platform;
+        });
+    }
+
+    /**
      * ResultSet handler interface for processing query results
      */
     @FunctionalInterface
@@ -341,6 +592,32 @@ public class DBUtil {
             "imagePath VARCHAR(255)," +
             "genre VARCHAR(100)," +
             "rating FLOAT DEFAULT 0.0" +
+            ") ENGINE=InnoDB;";
+
+    private static final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE IF NOT EXISTS Genres (" +
+            "genreId INT AUTO_INCREMENT PRIMARY KEY," +
+            "name VARCHAR(100) NOT NULL UNIQUE" +
+            ") ENGINE=InnoDB;";
+
+    private static final String SQL_CREATE_PLATFORMS_TABLE = "CREATE TABLE IF NOT EXISTS Platforms (" +
+            "platformId INT AUTO_INCREMENT PRIMARY KEY," +
+            "name VARCHAR(100) NOT NULL UNIQUE" +
+            ") ENGINE=InnoDB;";
+
+    private static final String SQL_CREATE_GAME_GENRES_TABLE = "CREATE TABLE IF NOT EXISTS GameGenres (" +
+            "gameId INT NOT NULL," +
+            "genreId INT NOT NULL," +
+            "PRIMARY KEY (gameId, genreId)," +
+            "FOREIGN KEY (gameId) REFERENCES Games(gameId) ON DELETE CASCADE," +
+            "FOREIGN KEY (genreId) REFERENCES Genres(genreId) ON DELETE CASCADE" +
+            ") ENGINE=InnoDB;";
+
+    private static final String SQL_CREATE_GAME_PLATFORMS_TABLE = "CREATE TABLE IF NOT EXISTS GamePlatforms (" +
+            "gameId INT NOT NULL," +
+            "platformId INT NOT NULL," +
+            "PRIMARY KEY (gameId, platformId)," +
+            "FOREIGN KEY (gameId) REFERENCES Games(gameId) ON DELETE CASCADE," +
+            "FOREIGN KEY (platformId) REFERENCES Platforms(platformId) ON DELETE CASCADE" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_CARTS_TABLE = "CREATE TABLE IF NOT EXISTS Carts (" +

@@ -95,11 +95,32 @@ public class GameJsonLoaderServlet extends HttpServlet {
                     if (forceReload && existingGameCount > 0) {
                         logs.add("Force reload requested. Clearing existing game data...");
                         try {
+                            // First need to clear the junction tables to respect foreign keys
+                            logs.add("Clearing game relationships first...");
+                            String sqlClearGameGenres = "DELETE FROM GameGenres";
+                            int deletedGenreLinks = DBUtil.executeUpdate(sqlClearGameGenres);
+                            logs.add("Deleted " + deletedGenreLinks + " game-genre relationships");
+
+                            String sqlClearGamePlatforms = "DELETE FROM GamePlatforms";
+                            int deletedPlatformLinks = DBUtil.executeUpdate(sqlClearGamePlatforms);
+                            logs.add("Deleted " + deletedPlatformLinks + " game-platform relationships");
+
+                            // Now clear the games
                             String sqlClearGames = "DELETE FROM Games";
-                            int deleted = DBUtil.executeUpdate(sqlClearGames);
-                            logs.add("Deleted " + deleted + " existing games");
+                            int deletedGames = DBUtil.executeUpdate(sqlClearGames);
+                            logs.add("Deleted " + deletedGames + " existing games");
+
+                            // Optionally clear genres and platforms too
+                            logs.add("Clearing genres and platforms...");
+                            String sqlClearGenres = "DELETE FROM Genres";
+                            int deletedGenres = DBUtil.executeUpdate(sqlClearGenres);
+                            logs.add("Deleted " + deletedGenres + " genres");
+
+                            String sqlClearPlatforms = "DELETE FROM Platforms";
+                            int deletedPlatforms = DBUtil.executeUpdate(sqlClearPlatforms);
+                            logs.add("Deleted " + deletedPlatforms + " platforms");
                         } catch (SQLException e) {
-                            logs.add("ERROR: Could not clear existing games: " + e.getMessage());
+                            logs.add("ERROR: Could not clear existing data: " + e.getMessage());
                             logs.add(
                                     "This might be due to foreign key constraints. You may need to clear related tables first.");
                         }

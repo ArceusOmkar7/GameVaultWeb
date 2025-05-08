@@ -49,6 +49,18 @@ The project has been fully modularized to improve maintainability, reduce code d
 - Standardized layouts with header, footer, and sidebar components
 - Created specialized admin layout with sidebar navigation
 
+#### 5. Automated JSON Data Loading
+- Enhanced `JSONUtil.java` to use the javax.json API for more robust JSON parsing
+- Implemented automatic game data loading from JSON when database is empty
+- Added proper handling of array-based JSON fields (platforms, genres) by converting to comma-separated strings
+- Added helper methods to Game entity for working with platforms and genres as lists
+
+#### 6. Normalized Database Schema
+- Implemented separate tables for genres and platforms
+- Created many-to-many relationships between games and genres/platforms
+- Maintained backward compatibility with string-based approach
+- Enhanced database operations to handle the relational data model
+
 ## Core Features
 
 ### User Features
@@ -73,6 +85,7 @@ The project has been fully modularized to improve maintainability, reduce code d
 - MySQL Database
 - Tailwind CSS (via CDN)
 - JSON for data storage and transfer
+- javax.json API for JSON processing
 
 ### Application Architecture
 - **Storage Layer**: Database access via Storage classes implementing the StorageInterface
@@ -80,6 +93,28 @@ The project has been fully modularized to improve maintainability, reduce code d
 - **Management Layer**: Business logic encapsulation
 - **Servlet Layer**: HTTP request handling
 - **JSP Layer**: View rendering with component-based structure
+
+### Database Schema
+The application uses a normalized relational database schema:
+
+- **Games**: Core game information (title, description, price, etc.)
+- **Users**: User account information
+- **Orders/OrderItems**: Purchase history
+- **Carts/CartItems**: Shopping cart contents
+- **Genres**: Game genre categories
+- **Platforms**: Gaming platforms
+- **GameGenres**: Many-to-many mapping between games and genres
+- **GamePlatforms**: Many-to-many mapping between games and platforms
+- **Reviews**: User reviews for games
+- **Transactions**: Financial transaction records
+
+### Entity Relationships
+
+#### Games and Genres/Platforms
+- Each game can have multiple genres (RPG, Action, Strategy, etc.)
+- Each game can be available on multiple platforms (PC, Xbox, PlayStation, etc.)
+- The relationships are managed through junction tables (GameGenres, GamePlatforms)
+- Legacy string fields maintained for backward compatibility
 
 ## Setup and Development
 
@@ -92,11 +127,11 @@ The project has been fully modularized to improve maintainability, reduce code d
 ### Database Setup
 1. Create a MySQL database named `gamevault`
 2. Update database connection settings in `DBUtil.java` if needed
-3. Run the application which will create the necessary tables
+3. Run the application which will automatically create the necessary tables and load game data from JSON
 
 ### Development Workflow
 1. Use the `/admin/check-database` endpoint to verify database structure
-2. Load sample data using `/admin/load-json-data`
+2. Game data will be automatically loaded from JSON on first startup if the database is empty
 3. Admin credentials: username: `admin@gamevault.com`, password: `admin123`
 
 ## Completed Tasks
@@ -115,6 +150,15 @@ The project has been fully modularized to improve maintainability, reduce code d
 - ✅ Refactored initial servlets to use the new modular structure
 - ✅ Completed refactoring of all servlets to use new modular structure
 - ✅ Removed servlet mapping conflicts in web.xml
+- ✅ Implemented automatic JSON data loading on application startup
+- ✅ Upgraded JSON parsing to use javax.json API
+- ✅ Added robust handling of JSON arrays for platforms and genres
+- ✅ Enhanced Game entity with helper methods for working with platform and genre lists
+- ✅ Normalized database schema with separate tables for genres and platforms
+- ✅ Implemented many-to-many relationships for games-genres and games-platforms
+- ✅ Updated GameStorage to handle the new entity relationships
+- ✅ Modified JSON loading process to populate the related tables
+- ✅ Maintained backward compatibility with string-based approach
 
 ## Tasks Remaining
 - ⏳ Update all JSP files to use new layout system
