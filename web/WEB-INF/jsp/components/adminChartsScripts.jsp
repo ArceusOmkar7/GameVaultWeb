@@ -9,7 +9,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
   let userGrowthChart;
   let revenuePieChart;
   let platformDoughnutChart;
-  let currentTimeRange = "day";
 
   // Initialize all charts on page load
   document.addEventListener("DOMContentLoaded", function () {
@@ -18,16 +17,12 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     initializeUserGrowthChart();
     initializeRevenueBreakdownChart();
     initializePlatformDistributionChart();
-
-    // Set up time range filter buttons
-    setupTimeRangeButtons();
   });
-
   // Function to fetch chart data via AJAX
-  async function fetchChartData(chartType, timeRange = "day") {
+  async function fetchChartData(chartType) {
     try {
       const response = await fetch(
-        `${pageContext.request.contextPath}/admin/api/dashboard-data?chart=${chartType}&range=${timeRange}`
+        `${pageContext.request.contextPath}/admin/api/dashboard-data?chart=${chartType}`
       );
       if (!response.ok) {
         const errorData = await response.json();
@@ -40,7 +35,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       return null;
     }
   }
-
   // Initialize Sales Overview Chart
   function initializeSalesChart() {
     const salesCtx = document.getElementById("salesChart").getContext("2d");
@@ -104,22 +98,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         },
       },
     });
-  }
-
-  // Update Sales Chart with new data
-  async function updateSalesChart(timeRange) {
-    // Show loading indicator
-    document.getElementById("salesChartLoader").classList.remove("hidden");
-
-    const data = await fetchChartData("sales", timeRange);
-    if (data) {
-      salesChart.data.labels = data.dates;
-      salesChart.data.datasets[0].data = data.sales;
-      salesChart.update();
-    }
-
-    // Hide loading indicator
-    document.getElementById("salesChartLoader").classList.add("hidden");
   }
 
   // Initialize Top Selling Games Chart
@@ -338,61 +316,5 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         },
       },
     });
-  }
-
-  // Set up time range filter buttons
-  function setupTimeRangeButtons() {
-    // Add event listeners to time range buttons
-    document.getElementById("dayBtn").addEventListener("click", () => {
-      setActive("dayBtn");
-      if (currentTimeRange !== "day") {
-        currentTimeRange = "day";
-        updateSalesChart("day");
-      }
-    });
-
-    document.getElementById("weekBtn").addEventListener("click", () => {
-      setActive("weekBtn");
-      if (currentTimeRange !== "week") {
-        currentTimeRange = "week";
-        updateSalesChart("week");
-      }
-    });
-
-    document.getElementById("monthBtn").addEventListener("click", () => {
-      setActive("monthBtn");
-      if (currentTimeRange !== "month") {
-        currentTimeRange = "month";
-        updateSalesChart("month");
-      }
-    });
-
-    // Add year button if it exists
-    const yearBtn = document.getElementById("yearBtn");
-    if (yearBtn) {
-      yearBtn.addEventListener("click", () => {
-        setActive("yearBtn");
-        if (currentTimeRange !== "year") {
-          currentTimeRange = "year";
-          updateSalesChart("year");
-        }
-      });
-    }
-
-    // Set initial active button
-    setActive("dayBtn");
-  }
-
-  // Helper function to set active button style
-  function setActive(btnId) {
-    ["dayBtn", "weekBtn", "monthBtn", "yearBtn"].forEach((id) => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.classList.remove("bg-gray-300", "font-bold");
-        btn.classList.add("bg-gray-200");
-      }
-    });
-    document.getElementById(btnId).classList.remove("bg-gray-200");
-    document.getElementById(btnId).classList.add("bg-gray-300", "font-bold");
   }
 </script>

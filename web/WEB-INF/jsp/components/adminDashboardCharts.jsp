@@ -7,32 +7,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
   <div class="bg-white rounded-lg shadow p-6 w-full flex flex-col">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold">Sales Overview</h2>
-      <div class="flex space-x-2">
-        <button
-          class="bg-gray-200 px-3 py-1 rounded text-sm font-medium"
-          id="dayBtn"
-        >
-          Day
-        </button>
-        <button
-          class="bg-gray-200 px-3 py-1 rounded text-sm font-medium"
-          id="weekBtn"
-        >
-          Week
-        </button>
-        <button
-          class="bg-gray-200 px-3 py-1 rounded text-sm font-medium"
-          id="monthBtn"
-        >
-          Month
-        </button>
-        <button
-          class="bg-gray-200 px-3 py-1 rounded text-sm font-medium"
-          id="yearBtn"
-        >
-          Year
-        </button>
-      </div>
     </div>
     <div class="w-full relative">
       <!-- Loading indicator overlay -->
