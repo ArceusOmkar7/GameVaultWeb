@@ -1,46 +1,53 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> <%-- Simple Header with
-Navigation using Tailwind CSS --%>
-<nav class="bg-gray-800 shadow-lg w-full z-40">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> <%-- Modern Header with
+Navigation matching content styling --%>
+<nav
+  class="fixed top-0 w-full z-50 bg-opacity-90 backdrop-filter backdrop-blur-lg"
+  style="
+    background: linear-gradient(
+      90deg,
+      rgba(45, 27, 105, 0.95) 0%,
+      rgba(26, 28, 46, 0.95) 100%
+    );
+  "
+>
+  <div class="gv-container px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
       <div class="flex-shrink-0 flex items-center">
         <a
           href="${pageContext.request.contextPath}/home"
-          class="text-white text-2xl font-bold"
+          class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-2xl font-bold neon-text"
         >
           GameVault
         </a>
       </div>
-
       <!-- Navigation Links -->
       <div class="hidden md:flex space-x-4 ml-8">
         <a
           href="${pageContext.request.contextPath}/home"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+          class="text-gray-300 hover:text-white hover:border-indigo-400 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-all"
           >Home</a
         >
         <a
           href="${pageContext.request.contextPath}/browse"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+          class="text-gray-300 hover:text-white hover:border-indigo-400 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-all"
           >Browse Games</a
         >
         <c:if test="${not empty sessionScope.loggedInUser}">
           <a
             href="${pageContext.request.contextPath}/viewCart"
-            class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            class="text-gray-300 hover:text-white hover:border-indigo-400 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-all"
             >Cart</a
           >
           <a
             href="${pageContext.request.contextPath}/orders"
-            class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            class="text-gray-300 hover:text-white hover:border-indigo-400 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-all"
             >My Orders</a
           >
         </c:if>
       </div>
-
       <!-- Profile & Wallet -->
       <div class="flex items-center space-x-4">
         <c:choose>
@@ -48,7 +55,7 @@ Navigation using Tailwind CSS --%>
             <div class="relative" id="profileDropdownWrapper">
               <button
                 id="profileDropdownBtn"
-                class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition"
+                class="flex items-center space-x-2 bg-opacity-50 bg-indigo-900 hover:bg-indigo-800 border border-purple-500/30 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 transition"
               >
                 <svg
                   class="h-7 w-7 text-gray-200"
@@ -75,16 +82,16 @@ Navigation using Tailwind CSS --%>
               <!-- Dropdown -->
               <div
                 id="profileDropdownMenu"
-                class="absolute right-0 mt-2 w-44 bg-white rounded-md shadow-lg py-2 z-50 hidden"
+                class="absolute right-0 mt-2 w-44 bg-gray-900/95 border border-purple-500/30 backdrop-filter backdrop-blur-lg rounded-md shadow-lg py-2 z-50 hidden"
               >
                 <a
                   href="${pageContext.request.contextPath}/profile"
-                  class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  class="block px-4 py-2 text-gray-300 hover:bg-indigo-900/50 hover:text-white transition-all"
                   >Profile</a
                 >
                 <a
                   href="${pageContext.request.contextPath}/logout"
-                  class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  class="block px-4 py-2 text-gray-300 hover:bg-indigo-900/50 hover:text-white transition-all"
                   >Logout</a
                 >
               </div>
@@ -93,23 +100,22 @@ Navigation using Tailwind CSS --%>
           <c:otherwise>
             <a
               href="${pageContext.request.contextPath}/login"
-              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              class="text-gray-300 hover:text-white px-4 py-2 border-transparent hover:border-indigo-500 border rounded-md text-sm font-medium transition-all"
               >Login</a
             >
             <a
               href="${pageContext.request.contextPath}/register"
-              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all"
               >Register</a
             >
           </c:otherwise>
         </c:choose>
       </div>
-
       <!-- Mobile menu button -->
       <div class="-mr-2 flex md:hidden">
         <button
           type="button"
-          class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+          class="bg-indigo-900/50 inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
@@ -148,53 +154,55 @@ Navigation using Tailwind CSS --%>
       </div>
     </div>
   </div>
-
   <!-- Mobile menu, show/hide based on menu state. -->
-  <div class="md:hidden" id="mobile-menu">
-    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+  <div
+    class="md:hidden backdrop-filter backdrop-blur-lg bg-gray-900/90"
+    id="mobile-menu"
+  >
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-purple-500/20">
       <a
         href="${pageContext.request.contextPath}/home"
-        class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+        class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
         >Home</a
       >
       <a
         href="${pageContext.request.contextPath}/browse"
-        class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+        class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
         >Browse Games</a
       >
       <c:if test="${not empty sessionScope.loggedInUser}">
         <a
           href="${pageContext.request.contextPath}/viewCart"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
           >Cart</a
         >
         <a
           href="${pageContext.request.contextPath}/orders"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
           >My Orders</a
         >
       </c:if>
       <c:if test="${not empty sessionScope.loggedInUser}">
         <a
           href="${pageContext.request.contextPath}/profile"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
           >Profile</a
         >
         <a
           href="${pageContext.request.contextPath}/logout"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
           >Logout</a
         >
       </c:if>
       <c:if test="${empty sessionScope.loggedInUser}">
         <a
           href="${pageContext.request.contextPath}/login"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="text-gray-300 hover:bg-indigo-900/50 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
           >Login</a
         >
         <a
           href="${pageContext.request.contextPath}/register"
-          class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white block px-3 py-2 my-2 rounded-md text-base font-medium"
           >Register</a
         >
       </c:if>

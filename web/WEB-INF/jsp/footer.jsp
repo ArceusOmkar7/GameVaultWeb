@@ -1,10 +1,23 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%-- Footer
 with enhanced styling matching our GameVault theme --%>
-<footer class="bg-gray-800 text-white mt-auto">
+<footer
+  class="text-white mt-auto border-t border-purple-500/20"
+  style="
+    background: linear-gradient(
+      90deg,
+      rgba(26, 28, 46, 0.95) 0%,
+      rgba(45, 27, 105, 0.95) 100%
+    );
+  "
+>
   <div class="gv-container py-8">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div>
-        <h3 class="text-xl font-bold mb-4">GameVault</h3>
+        <h3
+          class="text-xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 neon-text"
+        >
+          GameVault
+        </h3>
         <p class="text-gray-300">
           Your one-stop destination for gaming. Browse, buy, and build your
           digital game collection.
