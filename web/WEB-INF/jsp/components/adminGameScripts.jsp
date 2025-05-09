@@ -192,117 +192,36 @@
   async function loadGameForEdit(gameId) {
     try {
       const response = await fetch(
-        `${pageContext.request.contextPath}/admin/edit-game?id=${gameId}&ajax=true`
+        `${pageContext.request.contextPath}/admin/edit-game?id=${gameId}&ajax=true`,
+        {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        }
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
       const data = await response.json();
-      const game = data.game || data; // Backwards compatibility for older format
-      const platforms = data.platforms || [];
-      const genres = data.genres || [];
+      const game = data.game || data;
 
-      // Populate form fields
-      document.getElementById("editGameId").value = game.gameId;
-      document.getElementById("editTitle").value = game.title || "";
-      document.getElementById("editDescription").value = game.description || "";
-      document.getElementById("editDeveloper").value = game.developer || "";
-      document.getElementById("editPrice").value = game.price || ""; // Populate platform dropdown
-      const platformSelect = document.getElementById("editPlatform");
-      // First clear existing options
-      while (platformSelect.options.length > 0) {
-        platformSelect.remove(0);
-      }
-
-      // Parse platforms from game (could be comma-separated)
-      const gamePlatforms = game.platform ? game.platform.split(", ") : [];
-
-      // Add new options
-      platforms.forEach((platform) => {
-        const option = document.createElement("option");
-        option.value = platform.name;
-        option.textContent = platform.name;
-        // Check if this platform is in the game's platforms
-        if (gamePlatforms.includes(platform.name)) {
-          option.selected = true;
-        }
-        platformSelect.appendChild(option);
-      });
-
-      // If we have platform values but no matching options, add them
-      gamePlatforms.forEach((platformName) => {
-        if (
-          !Array.from(platformSelect.options).some(
-            (opt) => opt.value === platformName
-          )
-        ) {
-          const option = document.createElement("option");
-          option.value = platformName;
-          option.textContent = platformName;
-          option.selected = true;
-          platformSelect.appendChild(option);
-        }
-      });
-
-      // Populate genre dropdown
-      const genreSelect = document.getElementById("editGenre");
-      // First clear existing options
-      while (genreSelect.options.length > 0) {
-        genreSelect.remove(0);
-      }
-
-      // Parse genres from game (could be comma-separated)
-      const gameGenres = game.genre ? game.genre.split(", ") : [];
-
-      // Add new options
-      genres.forEach((genre) => {
-        const option = document.createElement("option");
-        option.value = genre.name;
-        option.textContent = genre.name;
-        // Check if this genre is in the game's genres
-        if (gameGenres.includes(genre.name)) {
-          option.selected = true;
-        }
-        genreSelect.appendChild(option);
-      });
-
-      // If we have genre values but no matching options, add them
-      gameGenres.forEach((genreName) => {
-        if (
-          !Array.from(genreSelect.options).some(
-            (opt) => opt.value === genreName
-          )
-        ) {
-          const option = document.createElement("option");
-          option.value = genreName;
-          option.textContent = genreName;
-          option.selected = true;
-          genreSelect.appendChild(option);
-        }
-      });
-
-      // Set rating slider and display value
+      // Only set the fields that exist in the modal
+      document.getElementById("editGameId").value = game.gameId || "";
+      console.log("Loaded gameId for edit:", game.gameId);
+      document.getElementById("editPrice").value = game.price || "";
       const editRating = document.getElementById("editRating");
       editRating.value = game.rating || 0;
       document.getElementById("editRatingValue").textContent = editRating.value;
-
       document.getElementById("editImagePath").value = game.imagePath || "";
-
-      // Handle release date (convert to YYYY-MM-DD)
-      document.getElementById("editReleaseDate").value = formatDateForInput(
-        game.releaseDate
-      );
 
       // Display current image if available
       const currentImageContainer = document.getElementById(
         "currentImageContainer"
       );
       const currentGameImage = document.getElementById("currentGameImage");
-
       if (game.imagePath) {
         currentGameImage.src = game.imagePath;
-        currentGameImage.alt = game.title;
+        currentGameImage.alt = game.title || "";
         currentImageContainer.classList.remove("hidden");
       } else {
         currentImageContainer.classList.add("hidden");
@@ -341,67 +260,30 @@
     .addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      // Basic validation
-      const title = document.getElementById("editTitle").value.trim();
-      const description = document
-        .getElementById("editDescription")
-        .value.trim();
-      const developer = document.getElementById("editDeveloper").value.trim();
+      // Only validate and submit the fields that exist in the modal
       const price = document.getElementById("editPrice").value.trim();
-      const releaseDate = document
-        .getElementById("editReleaseDate")
-        .value.trim();
-
-      // Get the selected platforms and genres
-      const platformSelect = document.getElementById("editPlatform");
-      const genreSelect = document.getElementById("editGenre");
-
-      const selectedPlatforms = Array.from(platformSelect.selectedOptions).map(
-        (option) => option.value
-      );
-      const selectedGenres = Array.from(genreSelect.selectedOptions).map(
-        (option) => option.value
-      );
+      const rating = document.getElementById("editRating").value;
+      const imagePath = document.getElementById("editImagePath").value.trim();
+      const gameId = document.getElementById("editGameId").value;
+      console.log("Submitting gameId:", gameId);
 
       let isValid = true;
       let errorMessages = [];
 
-      // Validate required fields
-      if (!title) {
-        errorMessages.push("Title is required");
+      if (!price || isNaN(price) || Number(price) < 0) {
+        errorMessages.push("Valid price is required");
         isValid = false;
       }
-
-      if (!description) {
-        errorMessages.push("Description is required");
+      if (
+        rating === undefined ||
+        rating === null ||
+        isNaN(rating) ||
+        Number(rating) < 0 ||
+        Number(rating) > 5
+      ) {
+        errorMessages.push("Valid rating (0-5) is required");
         isValid = false;
       }
-
-      if (!developer) {
-        errorMessages.push("Developer is required");
-        isValid = false;
-      }
-
-      if (!price) {
-        errorMessages.push("Price is required");
-        isValid = false;
-      }
-
-      if (!releaseDate) {
-        errorMessages.push("Release date is required");
-        isValid = false;
-      }
-
-      if (selectedPlatforms.length === 0) {
-        errorMessages.push("Please select at least one platform");
-        isValid = false;
-      }
-
-      if (selectedGenres.length === 0) {
-        errorMessages.push("Please select at least one genre");
-        isValid = false;
-      }
-
       if (!isValid) {
         alert(
           "Please correct the following errors:\n" + errorMessages.join("\n")
@@ -410,20 +292,11 @@
       }
 
       // Create FormData from the form
-      const formData = new FormData(this);
-
-      // Clear the existing platform and genre inputs
-      formData.delete("platform");
-      formData.delete("genre");
-
-      // Add the selected platforms and genres as separate values
-      selectedPlatforms.forEach((platform) => {
-        formData.append("platform", platform);
-      });
-
-      selectedGenres.forEach((genre) => {
-        formData.append("genre", genre);
-      });
+      const formData = new FormData();
+      formData.append("gameId", gameId);
+      formData.append("price", price);
+      formData.append("rating", rating);
+      formData.append("imagePath", imagePath);
 
       try {
         const response = await fetch(this.action, {

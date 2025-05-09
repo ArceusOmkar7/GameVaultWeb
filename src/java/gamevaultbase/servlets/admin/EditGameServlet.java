@@ -1,6 +1,8 @@
 package gamevaultbase.servlets.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import gamevaultbase.entities.Game;
 import gamevaultbase.entities.Genre;
 import gamevaultbase.entities.Platform;
@@ -28,6 +30,10 @@ import java.util.Map;
 public class EditGameServlet extends AdminBaseServlet {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    {
+        // Ensure all fields (even private) are serialized for Game and related entities
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+    }
 
     @Override
     protected void processAdminGetRequest(HttpServletRequest request, HttpServletResponse response)
