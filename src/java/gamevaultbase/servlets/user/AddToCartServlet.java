@@ -80,19 +80,25 @@ public class AddToCartServlet extends UserBaseServlet {
 
         // Check if this is an AJAX request
         boolean isAjaxRequest = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+        String buyNow = request.getParameter("buyNow");
+        boolean isBuyNow = "true".equalsIgnoreCase(buyNow);
 
         if (isAjaxRequest) {
-            // Send JSON response for AJAX requests
             sendJsonResponse(response, success, message);
         } else {
-            // For non-AJAX requests, use the redirect with message approach (backwards
-            // compatibility)
-            String referer = request.getHeader("Referer");
-            if (referer != null && !referer.isEmpty()) {
-                redirectWithMessage(request, response, referer, message, messageType);
+            String redirectUrl;
+            if (isBuyNow && success) {
+                // Go to cart page after buy now
+                redirectUrl = request.getContextPath() + "/viewCart";
             } else {
-                redirectWithMessage(request, response, "/viewCart", message, messageType);
+                String referer = request.getHeader("Referer");
+                if (referer != null && !referer.isEmpty()) {
+                    redirectUrl = referer;
+                } else {
+                    redirectUrl = request.getContextPath() + "/viewCart";
+                }
             }
+            redirectWithMessage(request, response, redirectUrl, message, messageType);
         }
     }
 

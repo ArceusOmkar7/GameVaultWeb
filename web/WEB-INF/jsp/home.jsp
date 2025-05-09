@@ -78,7 +78,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white pt-20">
+<body class="bg-gray-900 text-white">
 
     <jsp:include page="header.jsp" />
     
@@ -93,7 +93,7 @@
             </div>
         </c:if>
         <c:if test="${not empty errorMessage}">
-            <div class="mb-4 p-4 rounded bg-red-100 border border-red-400 text-red-700" role="alert">
+            <div class="mb-4 p-4 rounded bg-green-100 border border-green-400 text-green-700" role="alert">
                 <p><strong>Error:</strong> <c:out value="${errorMessage}" /></p>
             </div>
         </c:if>

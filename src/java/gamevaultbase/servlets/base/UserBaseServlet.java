@@ -102,7 +102,19 @@ public abstract class UserBaseServlet extends HttpServlet {
     protected void redirectWithMessage(HttpServletRequest request, HttpServletResponse response, String path,
             String message, String messageType) throws IOException {
         String encodedMessage = java.net.URLEncoder.encode(message, "UTF-8");
-        response.sendRedirect(
-                request.getContextPath() + path + "?message=" + encodedMessage + "&messageType=" + messageType);
+        String redirectUrl;
+        if (path.startsWith("http")) {
+            // Absolute URL (referer)
+            if (path.contains("?")) {
+                redirectUrl = path + "&message=" + encodedMessage + "&messageType=" + messageType;
+            } else {
+                redirectUrl = path + "?message=" + encodedMessage + "&messageType=" + messageType;
+            }
+        } else {
+            // Relative path
+            redirectUrl = request.getContextPath() + path +
+                    "?message=" + encodedMessage + "&messageType=" + messageType;
+        }
+        response.sendRedirect(redirectUrl);
     }
 }

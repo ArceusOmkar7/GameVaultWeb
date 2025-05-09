@@ -60,7 +60,7 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
       <%-- Display messages --%>
       <c:if test="${not empty message}">
         <div
-          class="mb-4 p-4 rounded ${messageType eq 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}"
+          class="mb-4 p-4 rounded ${messageType eq 'success' || (message != null && message.toLowerCase().contains('already own')) ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}"
           role="alert"
         >
           <p><c:out value="${message}" /></p>
