@@ -192,10 +192,9 @@
         <servlet-name>GameManagementServlet</servlet-name>
         <url-pattern>/admin/game-management</url-pattern>
     </servlet-mapping>
-    
-    <servlet>
+      <servlet>
         <servlet-name>AddGameServlet</servlet-name>
-        <servlet-class>gamevaultbase.servlets.AddGameServlet</servlet-class>
+        <servlet-class>gamevaultbase.servlets.admin.AddGameServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddGameServlet</servlet-name>
@@ -219,14 +218,22 @@
         <servlet-name>GameImageUploadServlet</servlet-name>
         <url-pattern>/admin/upload-game-image</url-pattern>
     </servlet-mapping>
-    
-    <servlet>
+      <servlet>
         <servlet-name>GameJsonLoaderServlet</servlet-name>
         <servlet-class>gamevaultbase.servlets.admin.GameJsonLoaderServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>GameJsonLoaderServlet</servlet-name>
         <url-pattern>/admin/load-json-data</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>EditGameServlet</servlet-name>
+        <servlet-class>gamevaultbase.servlets.admin.EditGameServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditGameServlet</servlet-name>
+        <url-pattern>/admin/edit-game</url-pattern>
     </servlet-mapping>
     
     <!-- Error Page Handling -->

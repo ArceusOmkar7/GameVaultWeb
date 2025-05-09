@@ -2,6 +2,7 @@ package gamevaultbase.helpers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -87,11 +88,26 @@ public class DBConnectionUtil {
             // Connect directly to the gamevault database
             String url = "jdbc:mysql://localhost:3306/" + DB_NAME
                     + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true";
+
+            System.out.println("Connecting to database with URL: " + url);
+            System.out.println("Using credentials - User: " + JDBC_USER + ", Password: [HIDDEN]");
+
             Connection conn = DriverManager.getConnection(url, JDBC_USER, JDBC_PASSWORD);
             System.out.println("Connected to database '" + DB_NAME + "' successfully");
+
+            // Test the connection
+            try (Statement stmt = conn.createStatement()) {
+                ResultSet rs = stmt.executeQuery("SELECT 1");
+                if (!rs.next()) {
+                    throw new SQLException("Failed to validate database connection");
+                }
+                System.out.println("Database connection test query succeeded");
+            }
+
             return conn;
         } catch (SQLException e) {
             System.err.println("Failed to connect to database '" + DB_NAME + "': " + e.getMessage());
+            e.printStackTrace();
             throw e;
         }
     }

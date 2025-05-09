@@ -52,6 +52,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               id="editDescription"
               rows="3"
               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              required
             ></textarea>
           </div>
 
@@ -66,6 +67,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               name="developer"
               id="editDeveloper"
               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              required
             />
           </div>
 
@@ -93,20 +95,27 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               />
             </div>
           </div>
-
           <div>
             <label
               for="editPlatform"
               class="block text-sm font-medium text-gray-700"
               >Platform</label
             >
-            <input
-              type="text"
+            <select
               name="platform"
               id="editPlatform"
               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              placeholder="PC, PlayStation 5, Xbox Series X/S"
-            />
+              multiple
+              required
+              size="4"
+            >
+              <c:forEach var="platform" items="${platforms}">
+                <option value="${platform.name}">${platform.name}</option>
+              </c:forEach>
+            </select>
+            <p class="mt-1 text-xs text-gray-500">
+              Hold Ctrl/Cmd to select multiple platforms
+            </p>
           </div>
 
           <div>
@@ -115,13 +124,21 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               class="block text-sm font-medium text-gray-700"
               >Genre</label
             >
-            <input
-              type="text"
+            <select
               name="genre"
               id="editGenre"
               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              placeholder="Action, Adventure, RPG"
-            />
+              multiple
+              required
+              size="4"
+            >
+              <c:forEach var="genre" items="${genres}">
+                <option value="${genre.name}">${genre.name}</option>
+              </c:forEach>
+            </select>
+            <p class="mt-1 text-xs text-gray-500">
+              Hold Ctrl/Cmd to select multiple genres
+            </p>
           </div>
 
           <div>
@@ -135,25 +152,31 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               name="releaseDate"
               id="editReleaseDate"
               class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              required
             />
           </div>
-
           <div>
             <label
               for="editRating"
               class="block text-sm font-medium text-gray-700"
               >Rating</label
             >
-            <input
-              type="number"
-              step="0.1"
-              min="0"
-              max="5"
-              name="rating"
-              id="editRating"
-              class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              placeholder="0.0-5.0"
-            />
+            <div class="flex items-center gap-3">
+              <input
+                type="range"
+                step="0.5"
+                min="0"
+                max="5"
+                name="rating"
+                id="editRating"
+                class="mt-1 w-full"
+                oninput="document.getElementById('editRatingValue').textContent = this.value"
+              />
+              <span id="editRatingValue" class="text-sm font-medium">0</span>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">
+              Rate from 0 to 5 (in 0.5 increments)
+            </p>
           </div>
 
           <div class="col-span-2">

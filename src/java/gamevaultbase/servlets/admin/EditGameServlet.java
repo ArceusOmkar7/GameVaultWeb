@@ -51,26 +51,30 @@ public class EditGameServlet extends AdminBaseServlet {
                 redirectWithMessage(request, response, "/admin/game-management",
                         "Game not found", "error");
                 return;
-            }
-
-            // Check if this is an AJAX request
+            } // Check if this is an AJAX request
             boolean isAjax = "true".equals(request.getParameter("ajax"));
 
+            // Get all platforms and genres for the dropdown menus
+            List<Platform> platforms = gameStorage.findAllPlatforms();
+            List<Genre> genres = gameStorage.findAllGenres();
+
             if (isAjax) {
-                // Return game data as JSON
+                // Create a response object with game data, platforms, and genres
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("game", game);
+                responseData.put("platforms", platforms);
+                responseData.put("genres", genres);
+
+                // Return data as JSON
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter out = response.getWriter();
-                out.print(objectMapper.writeValueAsString(game));
+                out.print(objectMapper.writeValueAsString(responseData));
                 out.flush();
                 return;
             }
 
             // For regular requests (non-AJAX), continue with the original implementation
-            // Get all platforms and genres for the dropdown menus
-            List<Platform> platforms = gameStorage.findAllPlatforms();
-            List<Genre> genres = gameStorage.findAllGenres();
-
             // Set attributes for the JSP
             request.setAttribute("game", game);
             request.setAttribute("platforms", platforms);
@@ -111,13 +115,59 @@ public class EditGameServlet extends AdminBaseServlet {
             if (game == null) {
                 sendJsonResponse(response, false, "Game not found");
                 return;
-            }
-
-            // Update game with form data
+            } // Update game with form data
             game.setTitle(request.getParameter("title"));
             game.setDescription(request.getParameter("description"));
-            game.setDeveloper(request.getParameter("developer"));
-            game.setPlatform(request.getParameter("platform"));
+            game.setDeveloper(request.getParameter("developer")); // Handle multiple platforms
+            String[] platformValues = request.getParameterValues("platform");
+            System.out.println(
+                    "Edit - Platform values received: " + (platformValues != null ? platformValues.length : "null"));
+
+            // Clear existing platforms
+            game.setPlatforms(new java.util.ArrayList<>());
+
+            if (platformValues != null && platformValues.length > 0) {
+                // Join multiple platforms with comma
+                for (String platform : platformValues) {
+                    System.out.println("Edit - Platform value: " + platform);
+                }
+                game.setPlatform(String.join(", ", platformValues));
+                System.out.println("Edit - Joined platform string: " + game.getPlatform());
+
+                // Also add as Platform objects for proper relationship handling
+                for (String platformName : platformValues) {
+                    Platform platform = new Platform(platformName.trim());
+                    game.addPlatform(platform);
+                }
+            } else {
+                System.out.println("Edit - No platform values received");
+                game.setPlatform("");
+            }
+
+            // Handle multiple genres
+            String[] genreValues = request.getParameterValues("genre");
+            System.out.println("Edit - Genre values received: " + (genreValues != null ? genreValues.length : "null"));
+
+            // Clear existing genres
+            game.setGenres(new java.util.ArrayList<>());
+
+            if (genreValues != null && genreValues.length > 0) {
+                // Join multiple genres with comma
+                for (String genre : genreValues) {
+                    System.out.println("Edit - Genre value: " + genre);
+                }
+                game.setGenre(String.join(", ", genreValues));
+                System.out.println("Edit - Joined genre string: " + game.getGenre());
+
+                // Also add as Genre objects for proper relationship handling
+                for (String genreName : genreValues) {
+                    Genre genre = new Genre(genreName.trim());
+                    game.addGenre(genre);
+                }
+            } else {
+                System.out.println("Edit - No genre values received");
+                game.setGenre("");
+            }
 
             String priceStr = request.getParameter("price");
             if (priceStr != null && !priceStr.isEmpty()) {
@@ -143,7 +193,6 @@ public class EditGameServlet extends AdminBaseServlet {
             }
 
             game.setImagePath(request.getParameter("imagePath"));
-            game.setGenre(request.getParameter("genre"));
 
             String ratingStr = request.getParameter("rating");
             if (ratingStr != null && !ratingStr.isEmpty()) {
@@ -153,24 +202,43 @@ public class EditGameServlet extends AdminBaseServlet {
                     // If conversion fails, retain existing rating
                     System.err.println("Invalid rating format: " + ratingStr);
                 }
-            }
+            } // Update the game
+            System.out.println("===== GAME DATA BEFORE UPDATE =====");
+            System.out.println("Title: " + game.getTitle());
+            System.out.println("Description: " + game.getDescription());
+            System.out.println("Developer: " + game.getDeveloper());
+            System.out.println("Platform: " + game.getPlatform());
+            System.out.println("Genre: " + game.getGenre());
+            System.out.println("Price: " + game.getPrice());
+            System.out.println("Rating: " + game.getRating());
+            System.out.println("ImagePath: " + game.getImagePath());
+            System.out.println("ReleaseDate: " + game.getReleaseDate());
+            System.out
+                    .println("Platforms size: " + (game.getPlatforms() != null ? game.getPlatforms().size() : "null"));
+            System.out.println("Genres size: " + (game.getGenres() != null ? game.getGenres().size() : "null"));
 
-            // Update the game
-            gameStorage.update(game);
+            try {
+                gameStorage.update(game);
+                System.out.println("Game updated successfully with ID: " + game.getGameId());
 
-            // Check if request expects JSON response (from AJAX)
-            String contentType = request.getContentType();
-            boolean expectsJson = contentType != null &&
-                    (contentType.contains("application/json") ||
-                            request.getHeader("X-Requested-With") != null ||
-                            "XMLHttpRequest".equals(request.getHeader("X-Requested-With")));
+                // Check if request expects JSON response (from AJAX)
+                String contentType = request.getContentType();
+                boolean expectsJson = contentType != null &&
+                        (contentType.contains("application/json") ||
+                                request.getHeader("X-Requested-With") != null ||
+                                "XMLHttpRequest".equals(request.getHeader("X-Requested-With")));
 
-            if (expectsJson) {
-                sendJsonResponse(response, true, "Game updated successfully");
-            } else {
-                // Redirect back to game management with success message for regular form posts
-                redirectWithMessage(request, response, "/admin/game-management",
-                        "Game updated successfully", "success");
+                if (expectsJson) {
+                    sendJsonResponse(response, true, "Game updated successfully");
+                } else {
+                    // Redirect back to game management with success message for regular form posts
+                    redirectWithMessage(request, response, "/admin/game-management",
+                            "Game updated successfully", "success");
+                }
+            } catch (Exception e) {
+                System.err.println("Error updating game: " + e.getMessage());
+                e.printStackTrace();
+                sendJsonResponse(response, false, "Error updating game: " + e.getMessage());
             }
 
         } catch (NumberFormatException e) {

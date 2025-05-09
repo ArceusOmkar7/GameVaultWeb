@@ -6,9 +6,13 @@
   const addGameModal = document.getElementById("addGameModal");
   const closeAddGameModal = document.getElementById("closeAddGameModal");
   const cancelAddGame = document.getElementById("cancelAddGame");
+  const addGameForm = document.getElementById("addGameForm");
 
   addGameBtn.addEventListener("click", () => {
     addGameModal.classList.remove("hidden");
+    // Initialize rating slider display
+    document.getElementById("ratingValue").textContent =
+      document.getElementById("rating").value;
   });
 
   closeAddGameModal.addEventListener("click", () => {
@@ -17,7 +21,131 @@
 
   cancelAddGame.addEventListener("click", () => {
     addGameModal.classList.add("hidden");
-  });
+  }); // Add Game Form Submission
+  if (addGameForm) {
+    addGameForm.addEventListener("submit", function (e) {
+      console.log("Form submission started");
+      // Prevent default behavior initially
+      e.preventDefault();
+
+      // Validate form
+      const title = this.querySelector("#title").value.trim();
+      const description = this.querySelector("#description").value.trim();
+      const developer = this.querySelector("#developer").value.trim();
+      const price = this.querySelector("#price").value.trim();
+      const releaseDate = this.querySelector("#releaseDate").value.trim();
+      const platformSelect = this.querySelector("#platform");
+      const genreSelect = this.querySelector("#genre");
+
+      // Get selected platforms and genres
+      const selectedPlatforms = Array.from(platformSelect.selectedOptions).map(
+        (option) => option.value
+      );
+      const selectedGenres = Array.from(genreSelect.selectedOptions).map(
+        (option) => option.value
+      );
+
+      console.log("Selected platforms:", selectedPlatforms);
+      console.log("Selected genres:", selectedGenres);
+
+      // Validation
+      let isValid = true;
+      const errorMessages = [];
+
+      if (!title) {
+        errorMessages.push("Title is required");
+        isValid = false;
+      }
+
+      if (!description) {
+        errorMessages.push("Description is required");
+        isValid = false;
+      }
+
+      if (!developer) {
+        errorMessages.push("Developer is required");
+        isValid = false;
+      }
+
+      if (!price) {
+        errorMessages.push("Price is required");
+        isValid = false;
+      }
+
+      if (!releaseDate) {
+        errorMessages.push("Release date is required");
+        isValid = false;
+      }
+
+      if (selectedPlatforms.length === 0) {
+        errorMessages.push("Please select at least one platform");
+        isValid = false;
+      }
+
+      if (selectedGenres.length === 0) {
+        errorMessages.push("Please select at least one genre");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        alert(
+          "Please correct the following errors:\n" + errorMessages.join("\n")
+        );
+        return;
+      }
+
+      console.log("Form validation passed, submitting form manually");
+
+      // Create a new form that will be submitted
+      const manualForm = document.createElement("form");
+      manualForm.method = "post";
+      manualForm.action = this.action;
+      manualForm.style.display = "none";
+
+      // Add the standard fields
+      const addField = (name, value) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        manualForm.appendChild(input);
+      };
+
+      // Add all the basic form fields
+      addField("title", title);
+      addField("description", description);
+      addField("developer", developer);
+      addField("price", price);
+      addField("releaseDate", releaseDate);
+
+      // Add the image path if present
+      const imagePath = this.querySelector("#imagePath").value;
+      if (imagePath) {
+        addField("imagePath", imagePath);
+      }
+
+      // Add the rating if present
+      const rating = this.querySelector("#rating").value;
+      if (rating) {
+        addField("rating", rating);
+      }
+
+      // Add each selected platform as a separate field
+      selectedPlatforms.forEach((platform) => {
+        addField("platform", platform);
+      });
+
+      // Add each selected genre as a separate field
+      selectedGenres.forEach((genre) => {
+        addField("genre", genre);
+      });
+
+      // Add the form to the document and submit it
+      document.body.appendChild(manualForm);
+      console.log("Submitting manual form with fields:", manualForm.elements);
+      manualForm.submit();
+    });
+  }
 
   // Delete Game Modal
   const deleteModal = document.getElementById("deleteModal");
@@ -70,17 +198,95 @@
         throw new Error("Network response was not ok");
       }
 
-      const game = await response.json();
+      const data = await response.json();
+      const game = data.game || data; // Backwards compatibility for older format
+      const platforms = data.platforms || [];
+      const genres = data.genres || [];
 
       // Populate form fields
       document.getElementById("editGameId").value = game.gameId;
       document.getElementById("editTitle").value = game.title || "";
       document.getElementById("editDescription").value = game.description || "";
       document.getElementById("editDeveloper").value = game.developer || "";
-      document.getElementById("editPrice").value = game.price || "";
-      document.getElementById("editPlatform").value = game.platform || "";
-      document.getElementById("editGenre").value = game.genre || "";
-      document.getElementById("editRating").value = game.rating || "";
+      document.getElementById("editPrice").value = game.price || ""; // Populate platform dropdown
+      const platformSelect = document.getElementById("editPlatform");
+      // First clear existing options
+      while (platformSelect.options.length > 0) {
+        platformSelect.remove(0);
+      }
+
+      // Parse platforms from game (could be comma-separated)
+      const gamePlatforms = game.platform ? game.platform.split(", ") : [];
+
+      // Add new options
+      platforms.forEach((platform) => {
+        const option = document.createElement("option");
+        option.value = platform.name;
+        option.textContent = platform.name;
+        // Check if this platform is in the game's platforms
+        if (gamePlatforms.includes(platform.name)) {
+          option.selected = true;
+        }
+        platformSelect.appendChild(option);
+      });
+
+      // If we have platform values but no matching options, add them
+      gamePlatforms.forEach((platformName) => {
+        if (
+          !Array.from(platformSelect.options).some(
+            (opt) => opt.value === platformName
+          )
+        ) {
+          const option = document.createElement("option");
+          option.value = platformName;
+          option.textContent = platformName;
+          option.selected = true;
+          platformSelect.appendChild(option);
+        }
+      });
+
+      // Populate genre dropdown
+      const genreSelect = document.getElementById("editGenre");
+      // First clear existing options
+      while (genreSelect.options.length > 0) {
+        genreSelect.remove(0);
+      }
+
+      // Parse genres from game (could be comma-separated)
+      const gameGenres = game.genre ? game.genre.split(", ") : [];
+
+      // Add new options
+      genres.forEach((genre) => {
+        const option = document.createElement("option");
+        option.value = genre.name;
+        option.textContent = genre.name;
+        // Check if this genre is in the game's genres
+        if (gameGenres.includes(genre.name)) {
+          option.selected = true;
+        }
+        genreSelect.appendChild(option);
+      });
+
+      // If we have genre values but no matching options, add them
+      gameGenres.forEach((genreName) => {
+        if (
+          !Array.from(genreSelect.options).some(
+            (opt) => opt.value === genreName
+          )
+        ) {
+          const option = document.createElement("option");
+          option.value = genreName;
+          option.textContent = genreName;
+          option.selected = true;
+          genreSelect.appendChild(option);
+        }
+      });
+
+      // Set rating slider and display value
+      const editRating = document.getElementById("editRating");
+      editRating.value = game.rating || 0;
+      document.getElementById("editRatingValue").textContent = editRating.value;
+
       document.getElementById("editImagePath").value = game.imagePath || "";
 
       // Handle release date (convert to YYYY-MM-DD)
@@ -129,15 +335,95 @@
   cancelEditGame.addEventListener("click", () => {
     editModal.classList.add("hidden");
   });
-
   // Handle edit form submission
   document
     .getElementById("editGameForm")
     .addEventListener("submit", async function (e) {
       e.preventDefault();
 
+      // Basic validation
+      const title = document.getElementById("editTitle").value.trim();
+      const description = document
+        .getElementById("editDescription")
+        .value.trim();
+      const developer = document.getElementById("editDeveloper").value.trim();
+      const price = document.getElementById("editPrice").value.trim();
+      const releaseDate = document
+        .getElementById("editReleaseDate")
+        .value.trim();
+
+      // Get the selected platforms and genres
+      const platformSelect = document.getElementById("editPlatform");
+      const genreSelect = document.getElementById("editGenre");
+
+      const selectedPlatforms = Array.from(platformSelect.selectedOptions).map(
+        (option) => option.value
+      );
+      const selectedGenres = Array.from(genreSelect.selectedOptions).map(
+        (option) => option.value
+      );
+
+      let isValid = true;
+      let errorMessages = [];
+
+      // Validate required fields
+      if (!title) {
+        errorMessages.push("Title is required");
+        isValid = false;
+      }
+
+      if (!description) {
+        errorMessages.push("Description is required");
+        isValid = false;
+      }
+
+      if (!developer) {
+        errorMessages.push("Developer is required");
+        isValid = false;
+      }
+
+      if (!price) {
+        errorMessages.push("Price is required");
+        isValid = false;
+      }
+
+      if (!releaseDate) {
+        errorMessages.push("Release date is required");
+        isValid = false;
+      }
+
+      if (selectedPlatforms.length === 0) {
+        errorMessages.push("Please select at least one platform");
+        isValid = false;
+      }
+
+      if (selectedGenres.length === 0) {
+        errorMessages.push("Please select at least one genre");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        alert(
+          "Please correct the following errors:\n" + errorMessages.join("\n")
+        );
+        return;
+      }
+
       // Create FormData from the form
       const formData = new FormData(this);
+
+      // Clear the existing platform and genre inputs
+      formData.delete("platform");
+      formData.delete("genre");
+
+      // Add the selected platforms and genres as separate values
+      selectedPlatforms.forEach((platform) => {
+        formData.append("platform", platform);
+      });
+
+      selectedGenres.forEach((genre) => {
+        formData.append("genre", genre);
+      });
 
       try {
         const response = await fetch(this.action, {
@@ -165,7 +451,6 @@
         alert("An error occurred while updating the game. Please try again.");
       }
     });
-
   // Close modals when clicking outside
   window.addEventListener("click", (e) => {
     if (e.target === addGameModal) {
@@ -178,4 +463,107 @@
       editGameModal.classList.add("hidden");
     }
   });
+
+  // Add Game Form Validation and Submission
+  document
+    .getElementById("addGameForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Basic validation
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const developer = document.getElementById("developer").value.trim();
+      const price = document.getElementById("price").value.trim();
+      const releaseDate = document.getElementById("releaseDate").value.trim();
+
+      // Get the selected platforms and genres
+      const platformSelect = document.getElementById("platform");
+      const genreSelect = document.getElementById("genre");
+
+      const selectedPlatforms = Array.from(platformSelect.selectedOptions).map(
+        (option) => option.value
+      );
+      const selectedGenres = Array.from(genreSelect.selectedOptions).map(
+        (option) => option.value
+      );
+
+      let isValid = true;
+      let errorMessages = [];
+
+      // Validate required fields
+      if (!title) {
+        errorMessages.push("Title is required");
+        isValid = false;
+      }
+
+      if (!description) {
+        errorMessages.push("Description is required");
+        isValid = false;
+      }
+
+      if (!developer) {
+        errorMessages.push("Developer is required");
+        isValid = false;
+      }
+
+      if (!price) {
+        errorMessages.push("Price is required");
+        isValid = false;
+      }
+
+      if (!releaseDate) {
+        errorMessages.push("Release date is required");
+        isValid = false;
+      }
+
+      if (selectedPlatforms.length === 0) {
+        errorMessages.push("Please select at least one platform");
+        isValid = false;
+      }
+
+      if (selectedGenres.length === 0) {
+        errorMessages.push("Please select at least one genre");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        alert(
+          "Please correct the following errors:\n" + errorMessages.join("\n")
+        );
+        return;
+      }
+
+      // Create a FormData object
+      const formData = new FormData(this);
+
+      // Clear the existing platform and genre inputs
+      formData.delete("platform");
+      formData.delete("genre");
+
+      // Add the selected platforms and genres as separate values
+      selectedPlatforms.forEach((platform) => {
+        formData.append("platform", platform);
+      });
+
+      selectedGenres.forEach((genre) => {
+        formData.append("genre", genre);
+      });
+
+      // Submit the form using fetch
+      fetch(this.action, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error submitting form:", error);
+          alert("Failed to add game. Please try again.");
+        });
+    });
 </script>
