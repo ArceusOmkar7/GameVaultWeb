@@ -57,7 +57,9 @@ public class AdminExportReportServlet extends AdminBaseServlet {
         out.println();
         out.println("--- Top Selling Games ---");
         out.println("Title,Units Sold");
+        @SuppressWarnings("unchecked")
         List<String> titles = (List<String>) topGames.get("titles");
+        @SuppressWarnings("unchecked")
         List<Integer> salesList = (List<Integer>) topGames.get("sales");
         if (titles != null && salesList != null) {
             for (int i = 0; i < titles.size(); i++) {
@@ -67,7 +69,9 @@ public class AdminExportReportServlet extends AdminBaseServlet {
         out.println();
         out.println("--- Revenue Breakdown ---");
         out.println("Genre,Revenue");
+        @SuppressWarnings("unchecked")
         List<String> genres = (List<String>) revenue.get("genres");
+        @SuppressWarnings("unchecked")
         List<Double> revenues = (List<Double>) revenue.get("revenues");
         if (genres != null && revenues != null) {
             for (int i = 0; i < genres.size(); i++) {
@@ -77,7 +81,9 @@ public class AdminExportReportServlet extends AdminBaseServlet {
         out.println();
         out.println("--- Platform Distribution ---");
         out.println("Platform,Count");
+        @SuppressWarnings("unchecked")
         List<String> platformNames = (List<String>) platforms.get("platforms");
+        @SuppressWarnings("unchecked")
         List<Integer> counts = (List<Integer>) platforms.get("counts");
         if (platformNames != null && counts != null) {
             for (int i = 0; i < platformNames.size(); i++) {
