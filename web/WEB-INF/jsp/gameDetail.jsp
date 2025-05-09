@@ -151,7 +151,7 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
                   <div class="flex items-center gap-4">
                     <button
                       type="button"
-                      onclick="addToCart('${game.gameId}', '<c:out value=&quot;${game.title}&quot; escapeXml=&quot;true&quot;/>')"
+                      onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}', event)"
                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
                     >
                       Add to Cart
@@ -296,19 +296,60 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
       function showNotification(message, type) {
         const container = document.getElementById("notification-container");
         const notification = document.createElement("div");
-        notification.className = `notification notification-${type}`;
+        notification.className = `notification notification-${type} fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ease-in-out opacity-0 translate-y-[-1rem]`;
+
+        // Set background color based on type
+        switch (type) {
+          case "success":
+            notification.classList.add(
+              "bg-green-100",
+              "border-green-400",
+              "text-green-700"
+            );
+            break;
+          case "error":
+            notification.classList.add(
+              "bg-red-100",
+              "border-red-400",
+              "text-red-700"
+            );
+            break;
+          case "warning":
+            notification.classList.add(
+              "bg-yellow-100",
+              "border-yellow-400",
+              "text-yellow-700"
+            );
+            break;
+          case "info":
+            notification.classList.add(
+              "bg-blue-100",
+              "border-blue-400",
+              "text-blue-700"
+            );
+            break;
+          default:
+            notification.classList.add(
+              "bg-blue-100",
+              "border-blue-400",
+              "text-blue-700"
+            );
+        }
+
         notification.innerHTML = message;
 
         container.appendChild(notification);
 
         // Show the notification after a small delay to allow CSS transition
         setTimeout(() => {
-          notification.classList.add("show");
+          notification.classList.remove("opacity-0", "translate-y-[-1rem]");
+          notification.classList.add("opacity-100", "translate-y-0");
         }, 10);
 
         // Automatically close the notification after 4 seconds
         setTimeout(() => {
-          notification.classList.remove("show");
+          notification.classList.remove("opacity-100", "translate-y-0");
+          notification.classList.add("opacity-0", "translate-y-[-1rem]");
           // Remove from DOM after animation completes
           setTimeout(() => {
             container.removeChild(notification);
@@ -317,27 +358,20 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
       }
 
       // Function to handle the "Add to Cart" action
-      function addToCart(gameId, gameTitle) {
-        // Disable the button temporarily to prevent multiple clicks
+      function addToCart(gameId, gameTitle, event) {
         event.target.disabled = true;
-
-        // Create the form data to send
-        const formData = new FormData();
+        const formData = new URLSearchParams();
         formData.append("gameId", gameId);
-
-        // Send AJAX request
         fetch("${pageContext.request.contextPath}/addToCart", {
           method: "POST",
           body: formData,
           headers: {
             "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         })
           .then((response) => {
-            // Check if response is ok (status in the range 200-299)
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
+            if (!response.ok) throw new Error("Network response was not ok");
             return response.json();
           })
           .then((data) => {
@@ -346,29 +380,28 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
                 `<strong>Success!</strong> ${data.message}`,
                 "success"
               );
+            } else if (
+              data.message &&
+              data.message.toLowerCase().includes("already own")
+            ) {
+              showNotification(
+                `<div style='display:flex;align-items:center;font-weight:bold;font-size:1.1em;'><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"22\" height=\"22\" style=\"margin-right:8px;\"><path d=\"M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z\"/></svg>Game Already Owned</div>`,
+                "info"
+              );
             } else {
-              if (data.message.includes("already own this game")) {
-                showNotification(
-                  `<strong>Notice:</strong> You already own "${gameTitle}"`,
-                  "warning"
-                );
-              } else {
-                showNotification(
-                  `<strong>Error:</strong> ${data.message}`,
-                  "error"
-                );
-              }
+              showNotification(
+                `<strong>Notice:</strong> ${data.message}`,
+                "info"
+              );
             }
-            // Re-enable the button
             event.target.disabled = false;
           })
           .catch((error) => {
             console.error("Error:", error);
             showNotification(
-              "<strong>Error:</strong> Failed to communicate with the server.",
-              "error"
+              "<strong>Notice:</strong> Unable to add game to cart. Please try again.",
+              "info"
             );
-            // Re-enable the button
             event.target.disabled = false;
           });
       }

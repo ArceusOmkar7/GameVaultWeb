@@ -40,27 +40,41 @@ public class AddToCartServlet extends UserBaseServlet {
 
         if (gameIdParam == null || gameIdParam.trim().isEmpty()) {
             message = "Invalid request: Missing game ID.";
+        } else if (currentUser == null) {
+            message = "Session expired or user not logged in.";
         } else {
             try {
                 int gameId = Integer.parseInt(gameIdParam.trim());
 
                 // Perform the add to cart operation
-                getCartManagement().addGameToCart(currentUser.getUserId(), gameId);
-                message = "Game added to cart successfully.";
-                messageType = "success";
-                success = true;
-
+                boolean addResult = false;
+                try {
+                    getCartManagement().addGameToCart(currentUser.getUserId(), gameId);
+                    addResult = true;
+                } catch (Exception e) {
+                    // If CartManagement throws, check if it's a known cause
+                    Throwable cause = e.getCause();
+                    if (cause != null) {
+                        message = cause.getMessage();
+                    } else {
+                        message = e.getMessage();
+                    }
+                }
+                if (addResult) {
+                    message = "Game added to cart successfully.";
+                    messageType = "success";
+                    success = true;
+                }
             } catch (NumberFormatException e) {
                 message = "Invalid game ID format provided.";
             } catch (GameNotFoundException e) {
                 message = "The requested game was not found.";
-            } catch (GameAlreadyOwnedException e) {
-                message = "You already own this game.";
             } catch (Exception e) {
-                System.err.println("Error adding to cart (User: " + currentUser.getUserId() + ", Game: "
+                System.err.println("Error adding to cart (User: "
+                        + (currentUser != null ? currentUser.getUserId() : "null") + ", Game: "
                         + gameIdParam + "): " + e.getMessage());
                 e.printStackTrace();
-                message = "An error occurred while adding the game to your cart.";
+                message = "An error occurred while adding the game to your cart: " + e.getMessage();
             }
         }
 
