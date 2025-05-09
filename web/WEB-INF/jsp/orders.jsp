@@ -256,7 +256,8 @@
                             orderItems.push({
                                 title: "${fn:replace(item.key.title, '"', '\\"')}",
                                 platform: "${fn:replace(item.key.platform, '"', '\\"')}",
-                                price: "${item.value}"
+                                price: "${item.value}",
+                                imagePath: "${fn:replace(item.key.imagePath, '"', '\\"')}"
                             });
                         </c:forEach>
 
@@ -265,8 +266,15 @@
                             itemsHtml = itemsHtml + 
                                 "<div class=\"flex items-center justify-between p-3 bg-gray-50 rounded-lg\">" +
                                 "<div class=\"flex items-center gap-3\">" +
-                                "<div class=\"w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center\">" +
-                                "<i class=\"bi bi-controller text-xl text-gray-400\"></i>" +
+                                "<div class=\"w-12 h-12 bg-gray-200 rounded-lg overflow-hidden\">" +
+                                (item.imagePath ? 
+                                    "<img src=\"" + (item.imagePath.startsWith('http') ? item.imagePath : "${pageContext.request.contextPath}/" + item.imagePath) + "\" " +
+                                    "alt=\"" + item.title + "\" " +
+                                    "class=\"w-full h-full object-cover\">" :
+                                    "<div class=\"w-full h-full flex items-center justify-center\">" +
+                                    "<i class=\"bi bi-controller text-xl text-gray-400\"></i>" +
+                                    "</div>"
+                                ) +
                                 "</div>" +
                                 "<div>" +
                                 "<h5 class=\"font-medium text-gray-900\">" + item.title + "</h5>" +
