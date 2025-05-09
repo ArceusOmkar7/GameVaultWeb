@@ -1,5 +1,6 @@
 package gamevaultbase.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 
 public class User {
@@ -10,6 +11,11 @@ public class User {
     private float walletBalance;
     private Date createdAt;
     private boolean isAdmin;
+
+    // No-args constructor required for JSON deserialization
+    public User() {
+        this.createdAt = new Date();
+    }
 
     public User(String email, String password, String username, float walletBalance) {
         this.email = email;
@@ -52,6 +58,7 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
+    @JsonProperty("userId")
     public int getUserId() {
         return userId;
     }
@@ -60,6 +67,7 @@ public class User {
         this.userId = userId;
     }
 
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
@@ -68,6 +76,7 @@ public class User {
         this.email = email;
     }
 
+    @JsonProperty("password")
     public String getPassword() {
         return password;
     }
@@ -76,6 +85,7 @@ public class User {
         this.password = password;
     }
 
+    @JsonProperty("username")
     public String getUsername() {
         return username;
     }
@@ -84,6 +94,7 @@ public class User {
         this.username = username;
     }
 
+    @JsonProperty("walletBalance")
     public float getWalletBalance() {
         return walletBalance;
     }
@@ -92,6 +103,7 @@ public class User {
         this.walletBalance = walletBalance;
     }
 
+    @JsonProperty("createdAt")
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -100,6 +112,7 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    @JsonProperty("admin")
     public boolean isAdmin() {
         return isAdmin;
     }

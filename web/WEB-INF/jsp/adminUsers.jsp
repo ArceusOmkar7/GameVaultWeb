@@ -136,14 +136,16 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
-                      onclick="editUser(${user.userId})"
-                      class="text-blue-600 hover:text-blue-900 mr-3"
+                      onclick="editUser('${user.userId}')"
+                      class="text-blue-600 hover:text-blue-900 mr-3 ${user.email == 'admin@gamevault.com' || user.email == 'user@gamevault.com' ? 'opacity-50 cursor-not-allowed' : ''}"
+                      ${user.email == 'admin@gamevault.com' || user.email == 'user@gamevault.com' ? 'disabled' : ''}
                     >
                       <i class="bi bi-pencil"></i>
                     </button>
                     <button
-                      onclick="deleteUser(${user.userId})"
-                      class="text-red-600 hover:text-red-900"
+                      onclick="deleteUser('${user.userId}')"
+                      class="text-red-600 hover:text-red-900 ${user.email == 'admin@gamevault.com' || user.email == 'user@gamevault.com' ? 'opacity-50 cursor-not-allowed' : ''}"
+                      ${user.email == 'admin@gamevault.com' || user.email == 'user@gamevault.com' ? 'disabled' : ''}
                     >
                       <i class="bi bi-trash"></i>
                     </button>
@@ -275,27 +277,46 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         fetch(`${pageContext.request.contextPath}/admin/users/${userId}`)
           .then((response) => response.json())
           .then((user) => {
+            // Check if trying to edit default users
+            if (user.email === 'admin@gamevault.com' || user.email === 'user@gamevault.com') {
+              alert('Cannot edit default users');
+              return;
+            }
             document.getElementById("modalTitle").textContent = "Edit User";
             document.getElementById("userId").value = user.userId;
             document.getElementById("username").value = user.username;
             document.getElementById("email").value = user.email;
             document.getElementById("walletBalance").value = user.walletBalance;
-            document.getElementById("isAdmin").value = user.admin;
+            document.getElementById("isAdmin").value = user.isAdmin;
             document.getElementById("password").required = false;
             document.getElementById("userModal").classList.remove("hidden");
           });
       }
 
       function deleteUser(userId) {
-        if (confirm("Are you sure you want to delete this user?")) {
-          fetch(`${pageContext.request.contextPath}/admin/users/${userId}`, {
-            method: "DELETE",
-          }).then((response) => {
-            if (response.ok) {
-              location.reload();
+        // First fetch the user to check if it's a default user
+        fetch(`${pageContext.request.contextPath}/admin/users/${userId}`)
+          .then((response) => response.json())
+          .then((user) => {
+            if (user.email === 'admin@gamevault.com' || user.email === 'user@gamevault.com') {
+              alert('Cannot delete default users');
+              return;
+            }
+            
+            if (confirm("Are you sure you want to delete this user?")) {
+              fetch(`${pageContext.request.contextPath}/admin/users/${userId}`, {
+                method: "DELETE",
+              }).then((response) => {
+                if (response.ok) {
+                  location.reload();
+                } else {
+                  response.text().then(text => {
+                    alert(text || 'Failed to delete user');
+                  });
+                }
+              });
             }
           });
-        }
       }
 
       function closeModal() {
@@ -319,26 +340,46 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           ? `${pageContext.request.contextPath}/admin/users/${userId}`
           : `${pageContext.request.contextPath}/admin/users`;
 
+        // Create user object
+        const userData = {
+          userId: userId || null,
+          username: document.getElementById("username").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+          walletBalance: parseFloat(
+            document.getElementById("walletBalance").value
+          ),
+          isAdmin: document.getElementById("isAdmin").value === "true",
+          createdAt: new Date().toISOString(),
+        };
+
+        // Show loading state
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = "Saving...";
+
         fetch(url, {
           method: method,
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            userId: userId || null,
-            username: document.getElementById("username").value,
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-            walletBalance: parseFloat(
-              document.getElementById("walletBalance").value
-            ),
-            admin: document.getElementById("isAdmin").value === "true",
-          }),
-        }).then((response) => {
-          if (response.ok) {
+          body: JSON.stringify(userData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.text().then((text) => {
+                throw new Error(text || "Failed to save user");
+              });
+            }
             location.reload();
-          }
-        });
+          })
+          .catch((error) => {
+            // Show error message
+            alert(error.message);
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+          });
       });
 
       // Search and filter functionality
