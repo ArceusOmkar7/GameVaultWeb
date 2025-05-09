@@ -111,12 +111,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                     <td
                       class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                     >
-                      <%--
-                      <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                        >View Details</a
+                      <button
+                        onclick="showOrderDetails(${order.orderId})"
+                        class="text-indigo-600 hover:text-indigo-900"
                       >
-                      --%> <%-- TODO: Implement Order Details View if needed
-                      --%>
+                        View Details
+                      </button>
                     </td>
                   </tr>
                 </c:forEach>
@@ -158,6 +158,141 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         </c:otherwise>
       </c:choose>
     </div>
+
+    <!-- Order Details Modal -->
+    <div
+      id="orderDetailsModal"
+      class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div
+          class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+        >
+          <h3 class="text-lg font-semibold text-gray-900">Order Details</h3>
+          <button
+            type="button"
+            id="closeOrderDetails"
+            class="text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div id="orderDetailsContent" class="p-6">
+          <div class="flex justify-center">
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"
+            ></div>
+          </div>
+          <p class="text-center mt-4 text-gray-600">Loading order details...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Function to show order details modal
+      function showOrderDetails(orderId) {
+          const modal = document.getElementById('orderDetailsModal');
+          const content = document.getElementById('orderDetailsContent');
+
+          // Show modal
+          modal.classList.remove('hidden');
+
+          // Initialize HTML content structure
+          content.innerHTML =
+              '<div class="border-b border-gray-200 pb-4 mb-4">' +
+                  '<h4 class="text-lg font-semibold mb-2">Order #' + orderId + '</h4>' +
+                  '<p class="text-gray-600">' +
+                      '<span class="font-medium">Date:</span> ' +
+                      '<span id="orderDate"></span>' +
+                  '</p>' +
+                  '<p class="text-gray-600">' +
+                      '<span class="font-medium">Status:</span> ' +
+                      '<span class="text-green-600">Completed</span>' +
+                  '</p>' +
+              '</div>' +
+              '<div class="mb-4">' +
+                  '<h4 class="text-lg font-semibold mb-2">Order Items</h4>' +
+                  '<div id="orderItems" class="space-y-2"></div>' +
+              '</div>' +
+              '<div class="border-t border-gray-200 pt-4 flex justify-between items-center">' +
+                  '<span class="text-gray-600 font-medium">Total Amount:</span>' +
+                  '<span class="text-xl font-bold" id="orderTotal"></span>' +
+              '</div>';
+
+          // Populate order details
+          <c:forEach var="order" items="${orderList}">
+              if (${order.orderId} == orderId) {
+                  // Format date
+                  var orderDateStr = "${order.orderDate}";
+                  try {
+                      var dateObj = new Date(orderDateStr);
+                      if (!isNaN(dateObj.getTime())) {
+                          document.getElementById('orderDate').textContent = dateObj.toLocaleString();
+                      } else {
+                          document.getElementById('orderDate').textContent = orderDateStr;
+                      }
+                  } catch (e) {
+                      document.getElementById('orderDate').textContent = orderDateStr;
+                  }
+
+                  // Add order items
+                  var orderItemsContainer = document.getElementById('orderItems');
+                  var itemsHtml = '';
+                  var hasItems = false;
+
+                  <c:if test="${not empty order.orderItems}">
+                      // Create a JavaScript array of order items for this order
+                      var orderItems = [];
+                      <c:forEach var="item" items="${order.orderItems}">
+                          orderItems.push({
+                              title: "${item.key.title}",
+                              developer: "${item.key.developer}",
+                              price: "${item.value}"
+                          });
+                      </c:forEach>
+
+                      // Now use the JavaScript array to build the HTML
+                      if (orderItems.length > 0) {
+                          hasItems = true;
+                          orderItems.forEach(function(item) {
+                              itemsHtml +=
+                                  '<div class="flex justify-between items-center p-2 bg-gray-50 rounded">' +
+                                      '<div>' +
+                                          '<span class="font-medium">' + item.title + '</span>' +
+                                          '<span class="text-gray-500 text-sm ml-2">' + item.developer + '</span>' +
+                                      '</div>' +
+                                      '<span class="font-medium">$' + item.price + '</span>' +
+                                  '</div>';
+                          });
+                      }
+                  </c:if>
+
+                  if (hasItems) {
+                      orderItemsContainer.innerHTML = itemsHtml;
+                  } else {
+                      orderItemsContainer.innerHTML = '<p class="text-gray-500">No items available</p>';
+                  }
+
+                  // Set total amount
+                  document.getElementById('orderTotal').textContent = '$' + ${order.totalAmount}.toFixed(2);
+              }
+          </c:forEach>
+      }
+
+      // Close modal when clicking the close button
+      document.getElementById('closeOrderDetails').addEventListener('click', function() {
+          document.getElementById('orderDetailsModal').classList.add('hidden');
+      });
+
+      // Close modal when clicking outside
+      document.getElementById('orderDetailsModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+              this.classList.add('hidden');
+          }
+      });
+    </script>
 
     <jsp:include page="footer.jsp" />
   </body>
