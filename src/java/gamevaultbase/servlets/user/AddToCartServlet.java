@@ -5,6 +5,9 @@ import gamevaultbase.exceptions.GameAlreadyOwnedException;
 import gamevaultbase.exceptions.GameNotFoundException;
 import gamevaultbase.servlets.base.UserBaseServlet;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +36,7 @@ public class AddToCartServlet extends UserBaseServlet {
         String gameIdParam = request.getParameter("gameId");
         String message = null;
         String messageType = "error"; // Default to error
+        boolean success = false;
 
         if (gameIdParam == null || gameIdParam.trim().isEmpty()) {
             message = "Invalid request: Missing game ID.";
@@ -44,6 +48,7 @@ public class AddToCartServlet extends UserBaseServlet {
                 getCartManagement().addGameToCart(currentUser.getUserId(), gameId);
                 message = "Game added to cart successfully.";
                 messageType = "success";
+                success = true;
 
             } catch (NumberFormatException e) {
                 message = "Invalid game ID format provided.";
@@ -59,12 +64,83 @@ public class AddToCartServlet extends UserBaseServlet {
             }
         }
 
-        // Redirect back to the referring page or cart
-        String referer = request.getHeader("Referer");
-        if (referer != null && !referer.isEmpty()) {
-            redirectWithMessage(request, response, referer, message, messageType);
+        // Check if this is an AJAX request
+        boolean isAjaxRequest = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
+        if (isAjaxRequest) {
+            // Send JSON response for AJAX requests
+            sendJsonResponse(response, success, message);
         } else {
-            redirectWithMessage(request, response, "/viewCart", message, messageType);
+            // For non-AJAX requests, use the redirect with message approach (backwards
+            // compatibility)
+            String referer = request.getHeader("Referer");
+            if (referer != null && !referer.isEmpty()) {
+                redirectWithMessage(request, response, referer, message, messageType);
+            } else {
+                redirectWithMessage(request, response, "/viewCart", message, messageType);
+            }
         }
+    }
+
+    /**
+     * Send a JSON response with success status and message
+     */
+    private void sendJsonResponse(HttpServletResponse response, boolean success, String message)
+            throws IOException {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", success);
+        result.put("message", message);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        // Simple JSON creation without requiring a library
+        out.print("{");
+        out.print("\"success\": " + success + ",");
+        out.print("\"message\": \"" + escapeJsonString(message) + "\"");
+        out.print("}");
+
+        out.flush();
+    }
+
+    /**
+     * Escape special characters in a string for JSON
+     */
+    private String escapeJsonString(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            switch (ch) {
+                case '"':
+                    builder.append("\\\"");
+                    break;
+                case '\\':
+                    builder.append("\\\\");
+                    break;
+                case '\b':
+                    builder.append("\\b");
+                    break;
+                case '\f':
+                    builder.append("\\f");
+                    break;
+                case '\n':
+                    builder.append("\\n");
+                    break;
+                case '\r':
+                    builder.append("\\r");
+                    break;
+                case '\t':
+                    builder.append("\\t");
+                    break;
+                default:
+                    builder.append(ch);
+            }
+        }
+        return builder.toString();
     }
 }

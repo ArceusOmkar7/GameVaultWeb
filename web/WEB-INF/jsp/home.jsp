@@ -41,11 +41,49 @@
         .dark-gradient {
             background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%);
         }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification-success {
+            background-color: #10B981;
+            color: white;
+        }
+        .notification-error {
+            background-color: #EF4444;
+            color: white;
+        }
+        .notification-warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+        .notification-info {
+            background-color: #3B82F6;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white pt-20">
 
     <jsp:include page="header.jsp" />
+    
+    <!-- Notification container -->
+    <div id="notification-container"></div>
 
     <div class="container mx-auto px-4 py-8">
         <%-- Messages (keep as is) --%>
@@ -122,14 +160,12 @@
                                         <a href="${pageContext.request.contextPath}/game?id=${mainFeaturedGame.gameId}" 
                                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-all">
                                             View Details
-                                        </a>
-                                        <c:if test="${not empty sessionScope.loggedInUser}">
-                                            <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
-                                                <input type="hidden" name="gameId" value="${mainFeaturedGame.gameId}" />
-                                                <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-all flex items-center gap-2">
-                                                    <i class="bi bi-cart-plus"></i> $<fmt:formatNumber value="${mainFeaturedGame.price}" pattern="#,##0.00" />
-                                                </button>
-                                            </form>
+                                        </a>                                        <c:if test="${not empty sessionScope.loggedInUser}">
+                                            <button type="button" 
+                                                   onclick="addToCart('${mainFeaturedGame.gameId}', '${fn:escapeXml(mainFeaturedGame.title)}')" 
+                                                   class="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-all flex items-center gap-2">
+                                                <i class="bi bi-cart-plus"></i> $<fmt:formatNumber value="${mainFeaturedGame.price}" pattern="#,##0.00" />
+                                            </button>
                                         </c:if>
                                     </div>
                                 </div>
@@ -286,18 +322,16 @@
                         <div class="p-3">
                             <a href="${pageContext.request.contextPath}/game?id=${game.gameId}" class="hover:text-blue-400">
                                 <h3 class="font-semibold text-sm mb-1 line-clamp-1">${game.title}</h3>
-                            </a>
-                            
-                            <div class="flex items-center justify-between">
+                            </a>                                <div class="flex items-center justify-between">
                                 <span class="text-blue-400 font-medium">$<fmt:formatNumber value="${game.price}" pattern="#,##0.00" /></span>
                                 
                                 <c:if test="${not empty sessionScope.loggedInUser}">
-                                    <form action="${pageContext.request.contextPath}/addToCart" method="post">
-                                        <input type="hidden" name="gameId" value="${game.gameId}" />
-                                        <button type="submit" class="text-xs bg-gray-700 hover:bg-gray-600 rounded-full p-1" title="Add to Cart">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                        onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}')" 
+                                        class="text-xs bg-gray-700 hover:bg-gray-600 rounded-full p-1" 
+                                        title="Add to Cart">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
                                 </c:if>
                             </div>
                             
@@ -327,10 +361,87 @@
     </div>
 
     <jsp:include page="footer.jsp" />
-    
-    <script>
-        // You could add any interactive JS here if needed
+      <script>
+        // Function to create and show notifications
+        function showNotification(message, type) {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = message;
+            
+            container.appendChild(notification);
+            
+            // Show the notification after a small delay to allow CSS transition
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Automatically close the notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                // Remove from DOM after animation completes
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            }, 4000);
+        }
+          // Function to handle the "Add to Cart" action
+        function addToCart(gameId, gameTitle) {
+            // Disable the button temporarily to prevent multiple clicks
+            event.target.disabled = true;
+            
+            // Create the form data to send
+            const formData = new FormData();
+            formData.append('gameId', gameId);
+              // Send AJAX request
+            fetch('${pageContext.request.contextPath}/addToCart', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification(`<strong>Success!</strong> ${data.message}`, 'success');                } else {
+                    if (data.message.includes('already own this game')) {
+                        showNotification(`<strong>Notice:</strong> You already own "${gameTitle}"`, 'warning');
+                    } else {
+                        showNotification(`<strong>Error:</strong> ${data.message}`, 'error');
+                    }
+                }
+                // Re-enable the button
+                event.target.disabled = false;
+            })            .catch(error => {
+                console.error('Error:', error);
+                showNotification('<strong>Error:</strong> Failed to communicate with the server.', 'error');
+                // Re-enable the button
+                event.target.disabled = false;
+            });
+        }
+        
+        // Check if there's a message in the URL parameters (for backward compatibility)
         document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const messageType = urlParams.get('messageType') || 'info';
+            
+            if (message) {
+                showNotification(`<strong>${messageType.charAt(0).toUpperCase() + messageType.slice(1)}:</strong> ${message}`, messageType);
+                
+                // Clean up the URL to remove the message parameters
+                const newUrl = window.location.pathname + 
+                    (window.location.search.replace(/[?&]message=[^&]*/, '').replace(/[?&]messageType=[^&]*/, '').replace(/^\?$/, ''));
+                window.history.replaceState({}, document.title, newUrl);
+            }
+            
             console.log('Home page loaded');
         });
     </script>

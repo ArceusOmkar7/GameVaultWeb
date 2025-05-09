@@ -179,8 +179,76 @@ public abstract class BaseServlet extends HttpServlet {
      */
     protected void redirectWithMessage(HttpServletRequest request, HttpServletResponse response,
             String path, String message, String messageType) throws IOException {
-        response.sendRedirect(request.getContextPath() + path + "?message=" +
-                java.net.URLEncoder.encode(message, "UTF-8") + "&messageType=" + messageType);
+        // Check if path is a full URL or an external URL (starts with http:// or
+        // https://)
+        boolean isExternalUrl = path.toLowerCase().startsWith("http://") || path.toLowerCase().startsWith("https://");
+
+        // For external URLs, don't add context path
+        String redirectUrl = isExternalUrl ? path : (request.getContextPath() + path);
+
+        // Check if this is an AJAX request
+        boolean isAjaxRequest = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
+        if (isAjaxRequest) {
+            // For AJAX requests, send a proper JSON response instead of redirecting
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            boolean success = "success".equals(messageType);
+
+            // Simple JSON response
+            String jsonResponse = "{\"success\":" + success + ",\"message\":\"" + escapeJsonString(message) + "\"}";
+            response.getWriter().write(jsonResponse);
+        } else {
+            // Standard redirect with parameters for traditional page navigation
+            String separator = redirectUrl.contains("?") ? "&" : "?";
+            redirectUrl += separator + "message=" + java.net.URLEncoder.encode(message, "UTF-8")
+                    + "&messageType=" + messageType;
+
+            response.sendRedirect(redirectUrl);
+        }
+    }
+
+    /**
+     * Escape special characters in a string for JSON
+     * 
+     * @param input String to escape
+     * @return Escaped string
+     */
+    private String escapeJsonString(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            switch (ch) {
+                case '"':
+                    builder.append("\\\"");
+                    break;
+                case '\\':
+                    builder.append("\\\\");
+                    break;
+                case '\b':
+                    builder.append("\\b");
+                    break;
+                case '\f':
+                    builder.append("\\f");
+                    break;
+                case '\n':
+                    builder.append("\\n");
+                    break;
+                case '\r':
+                    builder.append("\\r");
+                    break;
+                case '\t':
+                    builder.append("\\t");
+                    break;
+                default:
+                    builder.append(ch);
+            }
+        }
+        return builder.toString();
     }
 
     /**

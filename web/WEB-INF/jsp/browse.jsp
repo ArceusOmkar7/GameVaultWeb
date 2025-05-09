@@ -10,9 +10,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Games</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification-success {
+            background-color: #10B981;
+            color: white;
+        }
+        .notification-error {
+            background-color: #EF4444;
+            color: white;
+        }
+        .notification-warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+        .notification-info {
+            background-color: #3B82F6;
+            color: white;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <jsp:include page="header.jsp" />
+    
+    <!-- Notification container -->
+    <div id="notification-container"></div>
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Browse Games</h2>
         <form action="${pageContext.request.contextPath}/browse" method="get" class="mb-6 flex flex-wrap gap-4 items-end">
@@ -95,15 +134,15 @@
                                 </a>
                             </h3>
                             <p class="text-gray-600 mb-1">By <c:out value="${game.developer}"/></p>
-                            <p class="text-gray-500 text-sm mb-2">Platform: <c:out value="${game.platform}"/></p>
-                            <p class="text-green-700 font-bold mb-2">
+                            <p class="text-gray-500 text-sm mb-2">Platform: <c:out value="${game.platform}"/></p>                            <p class="text-green-700 font-bold mb-2">
                                 <fmt:formatNumber value="${game.price}" type="currency" currencySymbol="$" />
                             </p>
                             <c:if test="${not empty sessionScope.loggedInUser}">
-                                <form action="${pageContext.request.contextPath}/addToCart" method="post">
-                                    <input type="hidden" name="gameId" value="${game.gameId}" />
-                                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">Add to Cart</button>
-                                </form>
+                                <button type="button" 
+                                        onclick="addToCart('${game.gameId}', '${game.title}')" 
+                                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm add-to-cart-btn">
+                                    Add to Cart
+                                </button>
                             </c:if>
                         </div>
                     </c:forEach>
@@ -112,8 +151,94 @@
             <c:otherwise>
                 <p class="text-gray-500">No games found.</p>
             </c:otherwise>
-        </c:choose>
-    </div>
+        </c:choose>    </div>
     <jsp:include page="footer.jsp" />
+    
+    <!-- JavaScript for AJAX and notifications -->
+    <script>
+        // Function to create and show notifications
+        function showNotification(message, type) {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = message;
+            
+            container.appendChild(notification);
+            
+            // Show the notification after a small delay to allow CSS transition
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Automatically close the notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                // Remove from DOM after animation completes
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            }, 4000);
+        }
+        
+        // Function to handle the "Add to Cart" action
+        function addToCart(gameId, gameTitle) {
+            // Disable the button temporarily to prevent multiple clicks
+            event.target.disabled = true;
+            
+            // Create the form data to send
+            const formData = new FormData();
+            formData.append('gameId', gameId);
+              // Send AJAX request
+            fetch('${pageContext.request.contextPath}/addToCart', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification(`<strong>Success!</strong> ${data.message}`, 'success');
+                } else {
+                    if (data.message.includes('already own this game')) {
+                        showNotification(`<strong>Notice:</strong> You already own "${gameTitle}"`, 'warning');
+                    } else {
+                        showNotification(`<strong>Error:</strong> ${data.message}`, 'error');
+                    }
+                }
+                // Re-enable the button
+                event.target.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('<strong>Error:</strong> Failed to communicate with the server.', 'error');
+                // Re-enable the button
+                event.target.disabled = false;
+            });
+        }
+        
+        // Check if there's a message in the URL parameters (for backward compatibility)
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const messageType = urlParams.get('messageType') || 'info';
+            
+            if (message) {
+                showNotification(`<strong>${messageType.charAt(0).toUpperCase() + messageType.slice(1)}:</strong> ${message}`, messageType);
+                
+                // Clean up the URL to remove the message parameters
+                const newUrl = window.location.pathname + 
+                    (window.location.search.replace(/[?&]message=[^&]*/, '').replace(/[?&]messageType=[^&]*/, '').replace(/^\?$/, ''));
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        });
+    </script>
 </body>
 </html>
