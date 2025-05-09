@@ -101,7 +101,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col custom-scroll">
+<body class="text-white min-h-screen flex flex-col custom-scroll" style="background: linear-gradient(135deg, #1a1c2e 0%, #2d1b69 100%); background-attachment: fixed;">
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-gray-900 to-indigo-900 -z-10"></div>
     
     <jsp:include page="header.jsp" />
@@ -206,12 +206,10 @@
                                         View Details
                                     </a>
                                     <c:if test="${not empty sessionScope.loggedInUser}">
-                                        <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
-                                            <input type="hidden" name="gameId" value="${game.gameId}" />
-                                            <button type="submit" class="text-indigo-400 hover:text-indigo-300 transition-colors">
-                                                <i class="bi bi-cart-plus text-xl"></i>
-                                            </button>
-                                        </form>
+                                        <button onclick="addToCart('${game.gameId}', '${game.title}', event)" 
+                                                class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                                            <i class="bi bi-cart-plus text-xl"></i>
+                                        </button>
                                     </c:if>
                                 </div>
                             </div>
@@ -273,12 +271,10 @@
                                         View Details
                                     </a>
                                     <c:if test="${not empty sessionScope.loggedInUser}">
-                                        <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
-                                            <input type="hidden" name="gameId" value="${game.gameId}" />
-                                            <button type="submit" class="text-indigo-400 hover:text-indigo-300 transition-colors">
-                                                <i class="bi bi-cart-plus text-xl"></i>
-                                            </button>
-                                        </form>
+                                        <button onclick="addToCart('${game.gameId}', '${game.title}', event)" 
+                                                class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                                            <i class="bi bi-cart-plus text-xl"></i>
+                                        </button>
                                     </c:if>
                                 </div>
                             </div>
@@ -340,12 +336,10 @@
                                         View Details
                                     </a>
                                     <c:if test="${not empty sessionScope.loggedInUser}">
-                                        <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
-                                            <input type="hidden" name="gameId" value="${game.gameId}" />
-                                            <button type="submit" class="text-indigo-400 hover:text-indigo-300 transition-colors">
-                                                <i class="bi bi-cart-plus text-xl"></i>
-                                            </button>
-                                        </form>
+                                        <button onclick="addToCart('${game.gameId}', '${game.title}', event)" 
+                                                class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                                            <i class="bi bi-cart-plus text-xl"></i>
+                                        </button>
                                     </c:if>
                                 </div>
                             </div>
@@ -407,12 +401,10 @@
                                         View Details
                                     </a>
                                     <c:if test="${not empty sessionScope.loggedInUser}">
-                                        <form action="${pageContext.request.contextPath}/addToCart" method="post" class="inline">
-                                            <input type="hidden" name="gameId" value="${game.gameId}" />
-                                            <button type="submit" class="text-indigo-400 hover:text-indigo-300 transition-colors">
-                                                <i class="bi bi-cart-plus text-xl"></i>
-                                            </button>
-                                        </form>
+                                        <button onclick="addToCart('${game.gameId}', '${game.title}', event)" 
+                                                class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                                            <i class="bi bi-cart-plus text-xl"></i>
+                                        </button>
                                     </c:if>
                                 </div>
                             </div>
@@ -458,6 +450,66 @@
             setupScrollButtons('strategy-games-scroll', 'scroll-left-strategy', 'scroll-right-strategy');
             setupScrollButtons('rpg-games-scroll', 'scroll-left-rpg', 'scroll-right-rpg');
         });
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = message;
+            container.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add to cart function
+        function addToCart(gameId, gameTitle, event) {
+            event.preventDefault();
+            
+            // Show loading state
+            const button = event.currentTarget;
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-arrow-repeat animate-spin text-xl"></i>';
+            button.disabled = true;
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('gameId', gameId);
+
+            // Send AJAX request
+            fetch('${pageContext.request.contextPath}/addToCart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                // Restore button state
+                button.innerHTML = originalContent;
+                button.disabled = false;
+
+                // Show appropriate notification
+                if (result.includes('already own')) {
+                    showNotification('You already own this game', 'warning');
+                } else if (result.includes('success')) {
+                    showNotification('Game added to cart successfully!', 'success');
+                } else {
+                    showNotification('Error adding game to cart', 'error');
+                }
+            })
+            .catch(error => {
+                // Restore button state
+                button.innerHTML = originalContent;
+                button.disabled = false;
+                showNotification('Error adding game to cart', 'error');
+            });
+        }
     </script>
 </body>
 </html>
