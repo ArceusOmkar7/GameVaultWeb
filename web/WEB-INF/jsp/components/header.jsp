@@ -1,7 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<header class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md">
+<header
+  class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md w-full"
+>
   <div class="container mx-auto px-4 py-3">
     <div class="flex flex-wrap items-center justify-between">
       <!-- Logo -->

@@ -13,7 +13,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
   <body class="bg-gray-100">
     <jsp:include page="header.jsp" />
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 pt-8">
       <%-- Messages --%>
       <c:if test="${not empty message}">
         <div

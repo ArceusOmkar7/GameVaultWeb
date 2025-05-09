@@ -56,7 +56,7 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
     <!-- Notification container -->
     <div id="notification-container"></div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 pt-8">
       <%-- Display messages --%>
       <c:if test="${not empty message}">
         <div
