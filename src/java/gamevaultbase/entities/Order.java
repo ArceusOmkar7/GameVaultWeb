@@ -10,6 +10,7 @@ public class Order {
     private double totalAmount;
     private Date orderDate;
     private Map<Game, Float> orderItems; // Added to store the order items
+    private String status;
 
     public Order(int userId, double totalAmount, Date orderDate) {
         this.userId = userId;
@@ -68,5 +69,13 @@ public class Order {
 
     public void removeOrderItem(Game game) {
         this.orderItems.remove(game);
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

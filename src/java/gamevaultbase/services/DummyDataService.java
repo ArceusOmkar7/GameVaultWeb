@@ -333,6 +333,11 @@ public class DummyDataService {
                 order.setUserId(userId);
                 order.setTotalAmount(totalAmount);
                 order.setOrderDate(calendar.getTime());
+                // Set status to COMPLETED for all dummy orders
+                try {
+                    order.setStatus("COMPLETED");
+                } catch (Exception e) {
+                }
 
                 logs.add("Saving order to database");
                 orderStorage.save(order);

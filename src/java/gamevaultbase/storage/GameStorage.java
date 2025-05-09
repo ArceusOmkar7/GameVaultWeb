@@ -162,7 +162,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
         String sql = "SELECT DISTINCT g.* FROM Games g " +
                 "JOIN OrderItems oi ON g.gameId = oi.gameId " +
                 "JOIN Orders o ON oi.orderId = o.orderId " +
-                "WHERE o.userId = ?";
+                "WHERE o.userId = ? AND o.status = 'COMPLETED'";
         try {
             List<Game> games = DBUtil.executeQuery(sql, rs -> mapResultSetToGame(rs), userId);
 

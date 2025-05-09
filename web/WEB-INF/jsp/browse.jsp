@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page import="gamevaultbase.helpers.GameJspHelper" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -138,11 +139,22 @@
                                 <fmt:formatNumber value="${game.price}" type="currency" currencySymbol="$" />
                             </p>
                             <c:if test="${not empty sessionScope.loggedInUser}">
-                                <button type="button" 
-                                        onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}', event)" 
-                                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm add-to-cart-btn">
-                                    Add to Cart
-                                </button>
+                                <c:choose>
+                                    <c:when test="${ownedGameIds.contains(game.gameId)}">
+                                        <button type="button"
+                                                class="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded text-base cursor-not-allowed opacity-80 mt-2"
+                                                disabled>
+                                            Owned
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="button"
+                                                onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}', event)"
+                                                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-base mt-2 add-to-cart-btn">
+                                            Add to Cart
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:if>
                         </div>
                     </c:forEach>

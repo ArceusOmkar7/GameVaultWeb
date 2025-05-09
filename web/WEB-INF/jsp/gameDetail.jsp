@@ -149,32 +149,47 @@ uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
                 <%-- Action Buttons --%>
                 <c:if test="${not empty sessionScope.loggedInUser}">
                   <div class="flex items-center gap-4">
-                    <button
-                      type="button"
-                      onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}', event)"
-                      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
-                    >
-                      Add to Cart
-                    </button>
-
-                    <form
-                      action="${pageContext.request.contextPath}/addToCart"
-                      method="post"
-                      style="display: inline"
-                    >
-                      <input
-                        type="hidden"
-                        name="gameId"
-                        value="${game.gameId}"
-                      />
-                      <input type="hidden" name="buyNow" value="true" />
-                      <button
-                        type="submit"
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+                    <c:choose>
+                      <c:when
+                        test="${gameManagement.isGameOwnedByUser(sessionScope.loggedInUser.userId, game.gameId)}"
                       >
-                        Buy Now
-                      </button>
-                    </form>
+                        <button
+                          type="button"
+                          class="bg-gray-500 text-white font-bold py-2 px-4 rounded transition duration-200"
+                          disabled
+                        >
+                          Owned
+                        </button>
+                      </c:when>
+                      <c:otherwise>
+                        <button
+                          type="button"
+                          onclick="addToCart('${game.gameId}', '${fn:escapeXml(game.title)}', event)"
+                          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+                        >
+                          Add to Cart
+                        </button>
+
+                        <form
+                          action="${pageContext.request.contextPath}/addToCart"
+                          method="post"
+                          style="display: inline"
+                        >
+                          <input
+                            type="hidden"
+                            name="gameId"
+                            value="${game.gameId}"
+                          />
+                          <input type="hidden" name="buyNow" value="true" />
+                          <button
+                            type="submit"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+                          >
+                            Buy Now
+                          </button>
+                        </form>
+                      </c:otherwise>
+                    </c:choose>
                   </div>
                 </c:if>
                 <c:if test="${empty sessionScope.loggedInUser}">

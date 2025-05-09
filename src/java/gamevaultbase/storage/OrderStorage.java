@@ -65,14 +65,15 @@ public class OrderStorage implements StorageInterface<Order, Integer> {
 
     @Override
     public void save(Order order) {
-        String orderSql = "INSERT INTO Orders (userId, totalAmount, orderDate) VALUES (?, ?, ?)";
+        String orderSql = "INSERT INTO Orders (userId, totalAmount, orderDate, status) VALUES (?, ?, ?, ?)";
         try {
             // Insert order
             int orderId = DBUtil.executeInsertAndGetKey(orderSql,
                     order.getUserId(),
                     order.getTotalAmount(),
                     order.getOrderDate() != null ? new Timestamp(order.getOrderDate().getTime())
-                            : new Timestamp(System.currentTimeMillis()));
+                            : new Timestamp(System.currentTimeMillis()),
+                    order.getStatus() != null ? order.getStatus() : "COMPLETED");
 
             if (orderId == -1) {
                 System.err.println("Failed to get generated order ID");
@@ -172,6 +173,11 @@ public class OrderStorage implements StorageInterface<Order, Integer> {
         order.setUserId(rs.getInt("userId"));
         order.setTotalAmount(rs.getDouble("totalAmount"));
         order.setOrderDate(rs.getTimestamp("orderDate"));
+        try {
+            order.setStatus(rs.getString("status"));
+        } catch (Exception e) {
+            order.setStatus("COMPLETED");
+        }
         return order;
     }
 }

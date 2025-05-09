@@ -81,6 +81,32 @@ public class BrowseServlet extends PublicBaseServlet {
             request.setAttribute("totalGames", totalGames);
             request.setAttribute("pageSize", pageSize);
 
+            // Fetch owned games for the logged-in user and pass their IDs as a List
+            Object loggedInUserObj = request.getSession(false) != null
+                    ? request.getSession(false).getAttribute("loggedInUser")
+                    : null;
+            java.util.List<Integer> ownedGameIds = new java.util.ArrayList<>();
+            if (loggedInUserObj != null && loggedInUserObj instanceof gamevaultbase.entities.User) {
+                gamevaultbase.entities.User loggedInUser = (gamevaultbase.entities.User) loggedInUserObj;
+                java.util.List<Game> ownedGames = getGameManagement().getOwnedGames(loggedInUser.getUserId());
+                for (Game g : ownedGames) {
+                    ownedGameIds.add(g.getGameId());
+                }
+                // Debug output
+                System.out.println("BrowseServlet: User ID = " + loggedInUser.getUserId());
+                System.out.println("BrowseServlet: Owned games count = " + ownedGames.size());
+                for (Game g : ownedGames) {
+                    System.out.println("BrowseServlet: Owned game ID = " + g.getGameId() + ", Title = " + g.getTitle());
+                }
+                for (Game g : pagedGames) {
+                    System.out.println("BrowseServlet: Page game ID = " + g.getGameId() + ", Title = " + g.getTitle());
+                }
+                for (Integer id : ownedGameIds) {
+                    System.out.println("BrowseServlet: ownedGameIds contains = " + id);
+                }
+            }
+            request.setAttribute("ownedGameIds", ownedGameIds);
+
         } catch (Exception e) {
             setErrorMessage(request, "An error occurred while retrieving games.");
             games = Collections.emptyList();

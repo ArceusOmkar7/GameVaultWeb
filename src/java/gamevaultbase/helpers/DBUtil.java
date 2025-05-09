@@ -643,6 +643,7 @@ public class DBUtil {
             "userId INT NOT NULL," +
             "totalAmount DOUBLE NOT NULL," +
             "orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+            "status VARCHAR(20) DEFAULT 'COMPLETED'," +
             "FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE RESTRICT" +
             ") ENGINE=InnoDB;";
 
