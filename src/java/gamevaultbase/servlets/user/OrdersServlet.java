@@ -4,7 +4,6 @@ import gamevaultbase.entities.Order;
 import gamevaultbase.entities.User;
 import gamevaultbase.servlets.base.UserBaseServlet;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -19,28 +18,17 @@ public class OrdersServlet extends UserBaseServlet {
     protected void processUserGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User currentUser = getLoggedInUser(request);
-        List<Order> userOrders = Collections.emptyList();
+        List<Order> userOrders = null;
         String errorMessage = null;
 
         try {
-            // Fetch ALL orders and then filter (less efficient, but simpler without
-            // dedicated storage method)
-            // Ideally, OrderStorage would have a findByUserId method.
-            List<Order> allOrders = getOrderManagement().getAllOrders();
-            if (allOrders != null) {
-                userOrders = new ArrayList<>();
-                for (Order order : allOrders) {
-                    if (order.getUserId() == currentUser.getUserId()) {
-                        userOrders.add(order);
-                    }
-                }
-                // Optional: Sort orders by date descending
-                userOrders.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
-            }
+            // Use the more efficient findByUserId method
+            userOrders = getOrderManagement().getOrderStorage().findByUserId(currentUser.getUserId());
         } catch (Exception e) {
             System.err.println("Error retrieving orders for user " + currentUser.getUserId() + ": " + e.getMessage());
             e.printStackTrace();
             errorMessage = "An error occurred while retrieving your order history.";
+            userOrders = Collections.emptyList(); // Empty list instead of null
         }
 
         // Pass messages if any
@@ -54,5 +42,12 @@ public class OrdersServlet extends UserBaseServlet {
         request.setAttribute("orderList", userOrders);
         request.setAttribute("errorMessage", errorMessage);
         forwardToJsp(request, response, "/WEB-INF/jsp/orders.jsp");
+    }
+
+    @Override
+    protected void processUserPostRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Orders view should be GET only
+        redirectTo(request, response, "/orders");
     }
 }

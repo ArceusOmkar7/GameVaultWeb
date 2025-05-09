@@ -1,6 +1,6 @@
 package gamevaultbase.servlets.user;
 
-import gamevaultbase.servlets.base.PublicBaseServlet;
+import gamevaultbase.servlets.base.UserBaseServlet;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebServlet(name = "LogoutServlet", urlPatterns = { "/logout" })
-public class LogoutServlet extends PublicBaseServlet {
+public class LogoutServlet extends UserBaseServlet {
 
     @Override
-    protected void processPublicGetRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false); // Don't create session if it doesn't exist
         if (session != null) {
@@ -27,9 +27,9 @@ public class LogoutServlet extends PublicBaseServlet {
     }
 
     @Override
-    protected void processPublicPostRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Typically logout is done via GET, but handle POST just in case
-        processPublicGetRequest(request, response);
+        processUserGetRequest(request, response);
     }
 }

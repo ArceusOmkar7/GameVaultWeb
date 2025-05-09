@@ -3,7 +3,7 @@ package gamevaultbase.servlets.user;
 import gamevaultbase.entities.Review;
 import gamevaultbase.entities.User;
 import gamevaultbase.management.ReviewManagement;
-import gamevaultbase.servlets.base.PublicBaseServlet;
+import gamevaultbase.servlets.base.UserBaseServlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -13,15 +13,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "ReviewServlet", urlPatterns = { "/reviews" })
-public class ReviewServlet extends PublicBaseServlet {
+public class ReviewServlet extends UserBaseServlet {
 
     /**
      * Processes HTTP GET requests - displays reviews for a specific game.
      */
     @Override
-    protected void processPublicGetRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String gameIdParam = request.getParameter("gameId");
         String errorMessage = null;
 
@@ -72,22 +71,12 @@ public class ReviewServlet extends PublicBaseServlet {
      * Processes HTTP POST requests - submits a new review for a game.
      */
     @Override
-    protected void processPublicPostRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String gameIdParam = request.getParameter("gameId");
         String comment = request.getParameter("comment");
         String message = null;
         String messageType = "error"; // Default to error styling
-
-        // Check if user is logged in
-        User currentUser = getLoggedInUser(request);
-
-        if (currentUser == null) {
-            redirectWithMessage(request, response, "/login",
-                    "Please login to submit a review", "error");
-            return;
-        }
 
         // Validate required parameters
         if (gameIdParam == null || gameIdParam.trim().isEmpty()) {
@@ -105,7 +94,7 @@ public class ReviewServlet extends PublicBaseServlet {
                 try {
                     // Parse gameId and create review
                     int gameId = Integer.parseInt(gameIdParam.trim());
-                    Review review = new Review(gameId, currentUser.getUserId(), comment.trim());
+                    Review review = new Review(gameId, getLoggedInUser(request).getUserId(), comment.trim());
 
                     // Save the review
                     reviewManagement.addReview(review);

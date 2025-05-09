@@ -54,7 +54,7 @@ public class PlaceOrderServlet extends UserBaseServlet {
                             "User data inconsistency. Please log in again.", "error");
                     return; // Stop further processing
                 }
-            } catch (UserNotFoundException unfEx) {
+            } catch (UserNotFoundException e) {
                 System.err.println("WARN: Could not find user " + currentUser.getUserId()
                         + " after placing order to update session (UserNotFoundException).");
                 request.getSession().invalidate(); // Log out user

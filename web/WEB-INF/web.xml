@@ -167,7 +167,7 @@
     
     <servlet>
         <servlet-name>AddBalanceServlet</servlet-name>
-        <servlet-class>gamevaultbase.servlets.AddBalanceServlet</servlet-class>
+        <servlet-class>gamevaultbase.servlets.user.AddBalanceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddBalanceServlet</servlet-name>

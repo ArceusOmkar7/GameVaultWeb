@@ -64,4 +64,11 @@ public class CartServlet extends UserBaseServlet {
         // Forward to the cart JSP
         forwardToJsp(request, response, "/WEB-INF/jsp/cart.jsp");
     }
+
+    @Override
+    protected void processUserPostRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Cart view should be GET only
+        redirectTo(request, response, "/viewCart");
+    }
 }

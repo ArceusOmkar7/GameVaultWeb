@@ -3,60 +3,31 @@ package gamevaultbase.servlets.user;
 import gamevaultbase.entities.User;
 import gamevaultbase.exceptions.InvalidUserDataException;
 import gamevaultbase.exceptions.UserNotFoundException;
-import gamevaultbase.management.UserManagement;
+import gamevaultbase.servlets.base.UserBaseServlet;
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 // Mapped in web.xml as /editProfile
-public class EditProfileServlet extends HttpServlet {
+public class EditProfileServlet extends UserBaseServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("loggedInUser") : null;
-
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login?message=Please login to edit your profile.&messageType=error");
-            return;
-        }
-
-        // Forward to the JSP with current user data
+        User currentUser = getLoggedInUser(request);
         request.setAttribute("user", currentUser);
-        request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
+        forwardToJsp(request, response, "/WEB-INF/jsp/editProfile.jsp");
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void processUserPostRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("loggedInUser") : null;
-
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login?message=Session expired. Please login again.&messageType=error");
-            return;
-        }
-
-        // Get parameters from form
+        User currentUser = getLoggedInUser(request);
         String email = request.getParameter("email");
         String username = request.getParameter("username");
-        String errorMessage = null;
-        String successMessage = null;
-
-        UserManagement userManagement = (UserManagement) getServletContext().getAttribute("userManagement");
-
-        if (userManagement == null) {
-            System.err.println("FATAL: UserManagement not found in ServletContext!");
-            errorMessage = "Profile update service is currently unavailable.";
-            request.setAttribute("errorMessage", errorMessage);
-            request.setAttribute("user", currentUser);
-            request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
-            return;
-        }
+        String message = null;
+        String messageType = "error";
 
         try {
             // Basic Validation
@@ -82,33 +53,33 @@ public class EditProfileServlet extends HttpServlet {
             updatedUser.setIsAdmin(currentUser.isAdmin());
 
             // Update user in database
-            userManagement.updateUser(updatedUser);
+            getUserManagement().updateUser(updatedUser);
 
             // Update session
-            session.setAttribute("loggedInUser", updatedUser);
-            successMessage = "Profile updated successfully!";
+            request.getSession().setAttribute("loggedInUser", updatedUser);
+            message = "Profile updated successfully!";
+            messageType = "success";
 
             // Redirect back to profile page with success message
-            response.sendRedirect(request.getContextPath() + "/profile?message=" + 
-                java.net.URLEncoder.encode(successMessage, "UTF-8") + "&messageType=success");
+            redirectWithMessage(request, response, "/profile", message, messageType);
             return;
 
         } catch (InvalidUserDataException e) {
-            errorMessage = e.getMessage();
+            message = e.getMessage();
         } catch (UserNotFoundException e) {
-            errorMessage = "Could not find user profile to update.";
-            session.invalidate();
-            response.sendRedirect(request.getContextPath() + "/login?message=Error finding profile. Please login again.&messageType=error");
+            message = "Could not find user profile to update.";
+            request.getSession().invalidate();
+            redirectWithMessage(request, response, "/login", "Error finding profile. Please login again.", messageType);
             return;
         } catch (Exception e) {
             System.err.println("Error updating profile for user " + currentUser.getUserId() + ": " + e.getMessage());
             e.printStackTrace();
-            errorMessage = "An unexpected error occurred while updating your profile.";
+            message = "An unexpected error occurred while updating your profile.";
         }
 
         // If error occurred, forward back to edit page
-        request.setAttribute("errorMessage", errorMessage);
+        request.setAttribute("errorMessage", message);
         request.setAttribute("user", currentUser);
-        request.getRequestDispatcher("/WEB-INF/jsp/editProfile.jsp").forward(request, response);
+        forwardToJsp(request, response, "/WEB-INF/jsp/editProfile.jsp");
     }
 }
