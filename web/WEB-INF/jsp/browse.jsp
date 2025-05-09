@@ -147,6 +147,51 @@
                         </div>
                     </c:forEach>
                 </div>
+
+                <!-- Pagination Controls -->
+                <c:if test="${totalPages > 1}">
+                    <div class="mt-8 flex justify-center items-center space-x-4">
+                        <!-- Previous Page Button -->
+                        <c:if test="${currentPage > 1}">
+                            <a href="${pageContext.request.contextPath}/browse?page=${currentPage - 1}&search=${searchQuery}&filter-platform=${selectedPlatform}&filter-genre=${selectedGenre}&sort=${selectedSort}" 
+                               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                        </c:if>
+
+                        <!-- Page Numbers -->
+                        <div class="flex space-x-2">
+                            <c:forEach begin="1" end="${totalPages}" var="pageNum">
+                                <c:choose>
+                                    <c:when test="${pageNum == currentPage}">
+                                        <span class="px-4 py-2 border border-blue-500 rounded-md text-sm font-medium text-white bg-blue-500">
+                                            ${pageNum}
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="${pageContext.request.contextPath}/browse?page=${pageNum}&search=${searchQuery}&filter-platform=${selectedPlatform}&filter-genre=${selectedGenre}&sort=${selectedSort}"
+                                           class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                            ${pageNum}
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </div>
+
+                        <!-- Next Page Button -->
+                        <c:if test="${currentPage < totalPages}">
+                            <a href="${pageContext.request.contextPath}/browse?page=${currentPage + 1}&search=${searchQuery}&filter-platform=${selectedPlatform}&filter-genre=${selectedGenre}&sort=${selectedSort}"
+                               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
+                        </c:if>
+                    </div>
+
+                    <!-- Page Info -->
+                    <div class="mt-4 text-center text-sm text-gray-500">
+                        Showing ${(currentPage - 1) * pageSize + 1} to ${Math.min(currentPage * pageSize, totalGames)} of ${totalGames} games
+                    </div>
+                </c:if>
             </c:when>
             <c:otherwise>
                 <p class="text-gray-500">No games found.</p>
