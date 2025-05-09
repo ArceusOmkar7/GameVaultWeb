@@ -144,26 +144,16 @@
                                                     <fmt:formatNumber value="${orderItem.value}" type="currency" currencySymbol="$" />
                                                 </p>
                                             </div>
-                                            <a href="${pageContext.request.contextPath}/game?id=${orderItem.key.gameId}" 
-                                               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 inline-flex items-center gap-2">
-                                                <i class="bi bi-download"></i>
-                                                Download
-                                            </a>
                                         </div>
                                     </c:forEach>
                                 </div>
 
                                 <!-- Order Actions -->
                                 <div class="mt-6 flex justify-end gap-4">
-                                    <button onclick="generateInvoice('${order.orderId}')"
-                                            class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
-                                        <i class="bi bi-receipt mr-2"></i>
-                                        View Invoice
-                                    </button>
                                     <button onclick="showOrderDetails('${order.orderId}')"
                                             class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                                         <i class="bi bi-eye mr-2"></i>
-                                        View Details
+                                        View Invoice
                                     </button>
                                 </div>
                             </div>
@@ -285,7 +275,7 @@
                                 "</div>" +
                                 "<div class=\"text-right\">" +
                                 "<p class=\"text-sm text-gray-500\">Price paid:</p>" +
-                                "<p class=\"font-bold text-gray-900\">" + item.price + "</p>" +
+                                "<p class=\"font-bold text-gray-900\">$" + parseFloat(item.price).toFixed(2) + "</p>" +
                                 "</div>" +
                                 "</div>";
                         });
@@ -298,8 +288,8 @@
                         orderItemsContainer.innerHTML = "<p class=\"text-gray-500 text-center\">No items found in this order.</p>";
                     }
 
-                    // Set total amount
-                    document.getElementById("orderTotal").textContent = "${order.totalAmount}";
+                    // Set total amount with dollar symbol and 2 decimal places
+                    document.getElementById("orderTotal").textContent = "$" + parseFloat("${order.totalAmount}").toFixed(2);
                 }
             </c:forEach>
         }

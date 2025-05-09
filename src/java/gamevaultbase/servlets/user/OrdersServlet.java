@@ -41,6 +41,26 @@ public class OrdersServlet extends UserBaseServlet {
 
         request.setAttribute("orderList", userOrders);
         request.setAttribute("errorMessage", errorMessage);
+        // Calculate total spent
+        double totalSpent = 0.0;
+        if (userOrders != null) {
+            for (Order order : userOrders) {
+                totalSpent += order.getTotalAmount();
+            }
+        }
+        request.setAttribute("totalSpent", totalSpent);
+        // Calculate games owned
+        int totalGames = 0;
+        if (currentUser != null) {
+            try {
+                gamevaultbase.management.GameManagement gameManagement = (gamevaultbase.management.GameManagement) getServletContext()
+                        .getAttribute("gameManagement");
+                totalGames = gameManagement.getOwnedGames(currentUser.getUserId()).size();
+            } catch (Exception e) {
+                totalGames = 0;
+            }
+        }
+        request.setAttribute("totalGames", totalGames);
         forwardToJsp(request, response, "/WEB-INF/jsp/orders.jsp");
     }
 

@@ -94,13 +94,27 @@
                 </div>
                 <div class="stats-card p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
                     <div class="text-4xl font-bold text-purple-600 mb-2">
-                        <fmt:formatNumber value="${totalSpent}" type="currency" currencySymbol="$" />
+                        <c:choose>
+                            <c:when test="${not empty totalSpent}">
+                                <fmt:formatNumber value="${totalSpent}" type="currency" currencySymbol="$" />
+                            </c:when>
+                            <c:otherwise>
+                                N/A
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <div class="text-gray-600">Total Spent</div>
                 </div>
                 <div class="stats-card p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
                     <div class="text-4xl font-bold text-blue-600 mb-2">
-                        ${totalGames}
+                        <c:choose>
+                            <c:when test="${not empty totalGames}">
+                                ${totalGames}
+                            </c:when>
+                            <c:otherwise>
+                                N/A
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <div class="text-gray-600">Games Owned</div>
                 </div>
@@ -210,29 +224,19 @@
                                             <div class="text-right">
                                                 <p class="text-sm text-gray-500">Price paid:</p>
                                                 <p class="font-bold text-gray-900">
-                                                    <fmt:formatNumber value="${orderItem.value}" type="currency" currencySymbol="$" />
+                                                    $<fmt:formatNumber value="${orderItem.value}" pattern="#,##0.00" />
                                                 </p>
                                             </div>
-                                            <a href="${pageContext.request.contextPath}/game?id=${orderItem.key.gameId}" 
-                                               class="download-button px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 inline-flex items-center gap-2">
-                                                <i class="bi bi-download"></i>
-                                                Download
-                                            </a>
                                         </div>
                                     </c:forEach>
                                 </div>
 
                                 <!-- Order Actions -->
                                 <div class="mt-6 flex justify-end gap-4">
-                                    <button onclick="generateInvoice('${order.orderId}')"
-                                            class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
-                                        <i class="bi bi-receipt mr-2"></i>
-                                        View Invoice
-                                    </button>
                                     <button onclick="showOrderDetails('${order.orderId}')"
                                             class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                                         <i class="bi bi-eye mr-2"></i>
-                                        View Details
+                                        View Invoice
                                     </button>
                                 </div>
                             </div>
@@ -277,6 +281,9 @@
             // Implement invoice generation
             alert('Generating invoice for order #' + orderId);
         }
+
+        // Set total amount
+        document.getElementById("orderTotal").textContent = "$" + parseFloat("${order.totalAmount}").toFixed(2);
     </script>
 </body>
 </html>
