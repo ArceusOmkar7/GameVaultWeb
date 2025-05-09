@@ -40,25 +40,42 @@ public class EditGameServlet extends AdminBaseServlet {
             throws ServletException, IOException {
         // Get the game ID to edit
         String gameIdStr = request.getParameter("id");
+        System.out.println("Received edit request for game ID: " + gameIdStr);
+
         if (gameIdStr == null || gameIdStr.trim().isEmpty()) {
-            redirectWithMessage(request, response, "/admin/game-management",
-                    "No game specified for editing", "error");
+            System.out.println("No game ID provided in request");
+            if (isAjaxRequest(request)) {
+                sendJsonResponse(response, false, "No game specified for editing");
+            } else {
+                redirectWithMessage(request, response, "/admin/game-management",
+                        "No game specified for editing", "error");
+            }
             return;
         }
 
         try {
             int gameId = Integer.parseInt(gameIdStr);
+            System.out.println("Parsed game ID: " + gameId);
 
             // Fetch the game to edit
             GameStorage gameStorage = new GameStorage();
             Game game = gameStorage.findById(gameId);
+            System.out.println("Found game: " + (game != null ? game.getTitle() : "null"));
 
             if (game == null) {
-                redirectWithMessage(request, response, "/admin/game-management",
-                        "Game not found", "error");
+                System.out.println("Game not found for ID: " + gameId);
+                if (isAjaxRequest(request)) {
+                    sendJsonResponse(response, false, "Game not found");
+                } else {
+                    redirectWithMessage(request, response, "/admin/game-management",
+                            "Game not found", "error");
+                }
                 return;
-            } // Check if this is an AJAX request
-            boolean isAjax = "true".equals(request.getParameter("ajax"));
+            }
+
+            // Check if this is an AJAX request
+            boolean isAjax = isAjaxRequest(request);
+            System.out.println("Is AJAX request: " + isAjax);
 
             // Get all platforms and genres for the dropdown menus
             List<Platform> platforms = gameStorage.findAllPlatforms();
@@ -67,6 +84,7 @@ public class EditGameServlet extends AdminBaseServlet {
             if (isAjax) {
                 // Create a response object with game data, platforms, and genres
                 Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
                 responseData.put("game", game);
                 responseData.put("platforms", platforms);
                 responseData.put("genres", genres);
@@ -75,7 +93,9 @@ public class EditGameServlet extends AdminBaseServlet {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter out = response.getWriter();
-                out.print(objectMapper.writeValueAsString(responseData));
+                String jsonResponse = objectMapper.writeValueAsString(responseData);
+                System.out.println("Sending JSON response: " + jsonResponse);
+                out.print(jsonResponse);
                 out.flush();
                 return;
             }
@@ -91,14 +111,34 @@ public class EditGameServlet extends AdminBaseServlet {
             forwardToJsp(request, response, "/WEB-INF/jsp/adminEditGame.jsp");
 
         } catch (NumberFormatException e) {
-            redirectWithMessage(request, response, "/admin/game-management",
-                    "Invalid game ID format", "error");
+            if (isAjaxRequest(request)) {
+                sendJsonResponse(response, false, "Invalid game ID format");
+            } else {
+                redirectWithMessage(request, response, "/admin/game-management",
+                        "Invalid game ID format", "error");
+            }
         } catch (Exception e) {
             System.err.println("Error loading game for editing: " + e.getMessage());
             e.printStackTrace();
-            redirectWithMessage(request, response, "/admin/game-management",
-                    "Error loading game: " + e.getMessage(), "error");
+            if (isAjaxRequest(request)) {
+                sendJsonResponse(response, false, "Error loading game: " + e.getMessage());
+            } else {
+                redirectWithMessage(request, response, "/admin/game-management",
+                        "Error loading game: " + e.getMessage(), "error");
+            }
         }
+    }
+
+    private boolean isAjaxRequest(HttpServletRequest request) {
+        return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, boolean success, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print("{\"success\":" + success + ",\"message\":\"" + message + "\"}");
+        out.flush();
     }
 
     @Override
@@ -106,141 +146,75 @@ public class EditGameServlet extends AdminBaseServlet {
             throws ServletException, IOException {
         // Get form data
         String gameIdStr = request.getParameter("gameId");
+        System.out.println("Received POST request with gameId: " + gameIdStr);
+        System.out.println("Request parameters: " + request.getParameterMap());
+
         if (gameIdStr == null || gameIdStr.trim().isEmpty()) {
+            System.out.println("No game ID provided in POST request");
             sendJsonResponse(response, false, "No game ID provided");
             return;
         }
 
         try {
             int gameId = Integer.parseInt(gameIdStr);
+            System.out.println("Parsed game ID: " + gameId);
 
             // Get the existing game
             GameStorage gameStorage = new GameStorage();
             Game game = gameStorage.findById(gameId);
+            System.out.println("Found game: " + (game != null ? game.getTitle() : "null"));
 
             if (game == null) {
+                System.out.println("Game not found for ID: " + gameId);
                 sendJsonResponse(response, false, "Game not found");
                 return;
-            } // Update game with form data
-            game.setTitle(request.getParameter("title"));
-            game.setDescription(request.getParameter("description"));
-            game.setDeveloper(request.getParameter("developer")); // Handle multiple platforms
-            String[] platformValues = request.getParameterValues("platform");
-            System.out.println(
-                    "Edit - Platform values received: " + (platformValues != null ? platformValues.length : "null"));
-
-            // Clear existing platforms
-            game.setPlatforms(new java.util.ArrayList<>());
-
-            if (platformValues != null && platformValues.length > 0) {
-                // Join multiple platforms with comma
-                for (String platform : platformValues) {
-                    System.out.println("Edit - Platform value: " + platform);
-                }
-                game.setPlatform(String.join(", ", platformValues));
-                System.out.println("Edit - Joined platform string: " + game.getPlatform());
-
-                // Also add as Platform objects for proper relationship handling
-                for (String platformName : platformValues) {
-                    Platform platform = new Platform(platformName.trim());
-                    game.addPlatform(platform);
-                }
-            } else {
-                System.out.println("Edit - No platform values received");
-                game.setPlatform("");
             }
 
-            // Handle multiple genres
-            String[] genreValues = request.getParameterValues("genre");
-            System.out.println("Edit - Genre values received: " + (genreValues != null ? genreValues.length : "null"));
-
-            // Clear existing genres
-            game.setGenres(new java.util.ArrayList<>());
-
-            if (genreValues != null && genreValues.length > 0) {
-                // Join multiple genres with comma
-                for (String genre : genreValues) {
-                    System.out.println("Edit - Genre value: " + genre);
-                }
-                game.setGenre(String.join(", ", genreValues));
-                System.out.println("Edit - Joined genre string: " + game.getGenre());
-
-                // Also add as Genre objects for proper relationship handling
-                for (String genreName : genreValues) {
-                    Genre genre = new Genre(genreName.trim());
-                    game.addGenre(genre);
-                }
-            } else {
-                System.out.println("Edit - No genre values received");
-                game.setGenre("");
-            }
-
+            // Update game with form data
             String priceStr = request.getParameter("price");
+            System.out.println("Received price: " + priceStr);
             if (priceStr != null && !priceStr.isEmpty()) {
                 try {
-                    game.setPrice(Float.parseFloat(priceStr));
+                    float price = Float.parseFloat(priceStr);
+                    game.setPrice(price);
+                    System.out.println("Updated price to: " + price);
                 } catch (NumberFormatException e) {
-                    // If conversion fails, retain existing price
                     System.err.println("Invalid price format: " + priceStr);
                 }
             }
 
-            // Handle release date
-            String releaseDateStr = request.getParameter("releaseDate");
-            if (releaseDateStr != null && !releaseDateStr.isEmpty()) {
+            String ratingStr = request.getParameter("rating");
+            System.out.println("Received rating: " + ratingStr);
+            if (ratingStr != null && !ratingStr.isEmpty()) {
                 try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date releaseDate = dateFormat.parse(releaseDateStr);
-                    game.setReleaseDate(releaseDate);
-                } catch (ParseException e) {
-                    // If parsing fails, retain existing date
-                    System.err.println("Invalid date format: " + releaseDateStr);
+                    float rating = Float.parseFloat(ratingStr);
+                    game.setRating(rating);
+                    System.out.println("Updated rating to: " + rating);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid rating format: " + ratingStr);
                 }
             }
 
-            game.setImagePath(request.getParameter("imagePath"));
-
-            String ratingStr = request.getParameter("rating");
-            if (ratingStr != null && !ratingStr.isEmpty()) {
-                try {
-                    game.setRating(Float.parseFloat(ratingStr));
-                } catch (NumberFormatException e) {
-                    // If conversion fails, retain existing rating
-                    System.err.println("Invalid rating format: " + ratingStr);
-                }
-            } // Update the game
-            System.out.println("===== GAME DATA BEFORE UPDATE =====");
-            System.out.println("Title: " + game.getTitle());
-            System.out.println("Description: " + game.getDescription());
-            System.out.println("Developer: " + game.getDeveloper());
-            System.out.println("Platform: " + game.getPlatform());
-            System.out.println("Genre: " + game.getGenre());
-            System.out.println("Price: " + game.getPrice());
-            System.out.println("Rating: " + game.getRating());
-            System.out.println("ImagePath: " + game.getImagePath());
-            System.out.println("ReleaseDate: " + game.getReleaseDate());
-            System.out
-                    .println("Platforms size: " + (game.getPlatforms() != null ? game.getPlatforms().size() : "null"));
-            System.out.println("Genres size: " + (game.getGenres() != null ? game.getGenres().size() : "null"));
+            String imagePath = request.getParameter("imagePath");
+            System.out.println("Received imagePath: " + imagePath);
+            if (imagePath != null) {
+                game.setImagePath(imagePath);
+                System.out.println("Updated imagePath to: " + imagePath);
+            }
 
             try {
                 gameStorage.update(game);
                 System.out.println("Game updated successfully with ID: " + game.getGameId());
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", "Game updated successfully");
+                responseData.put("game", game);
 
-                // Check if request expects JSON response (from AJAX)
-                String contentType = request.getContentType();
-                boolean expectsJson = contentType != null &&
-                        (contentType.contains("application/json") ||
-                                request.getHeader("X-Requested-With") != null ||
-                                "XMLHttpRequest".equals(request.getHeader("X-Requested-With")));
-
-                if (expectsJson) {
-                    sendJsonResponse(response, true, "Game updated successfully");
-                } else {
-                    // Redirect back to game management with success message for regular form posts
-                    redirectWithMessage(request, response, "/admin/game-management",
-                            "Game updated successfully", "success");
-                }
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+                out.print(objectMapper.writeValueAsString(responseData));
+                out.flush();
             } catch (Exception e) {
                 System.err.println("Error updating game: " + e.getMessage());
                 e.printStackTrace();
@@ -248,27 +222,12 @@ public class EditGameServlet extends AdminBaseServlet {
             }
 
         } catch (NumberFormatException e) {
+            System.err.println("Invalid game ID format: " + gameIdStr);
             sendJsonResponse(response, false, "Invalid game ID format");
         } catch (Exception e) {
             System.err.println("Error updating game: " + e.getMessage());
             e.printStackTrace();
             sendJsonResponse(response, false, "Error updating game: " + e.getMessage());
         }
-    }
-
-    /**
-     * Send a JSON response with success status and message
-     */
-    private void sendJsonResponse(HttpServletResponse response, boolean success, String message)
-            throws IOException {
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", success);
-        result.put("message", message);
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(objectMapper.writeValueAsString(result));
-        out.flush();
     }
 }

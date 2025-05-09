@@ -191,30 +191,61 @@
   // Function to load game data for editing
   async function loadGameForEdit(gameId) {
     try {
-      const response = await fetch(
-        `${pageContext.request.contextPath}/admin/edit-game?id=${gameId}&ajax=true`,
-        {
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
-        }
+      console.log("Fetching game data for ID:", gameId);
+      const url = new URL(
+        `${pageContext.request.contextPath}/admin/edit-game`,
+        window.location.origin
       );
+      url.searchParams.append("id", gameId);
+      console.log("Request URL:", url.toString());
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      console.log("Response status:", response.status);
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
-      const game = data.game || data;
 
-      // Only set the fields that exist in the modal
-      document.getElementById("editGameId").value = game.gameId || "";
-      console.log("Loaded gameId for edit:", game.gameId);
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        throw new Error("Invalid JSON response from server");
+      }
+
+      console.log("Parsed response data:", data);
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to load game data");
+      }
+
+      const game = data.game;
+      if (!game) {
+        throw new Error("No game data received");
+      }
+
+      console.log("Loaded game data:", game);
+
+      // Set the game ID first
+      document.getElementById("editGameId").value = game.gameId;
+      console.log("Set gameId to:", game.gameId);
+
+      // Set other fields
       document.getElementById("editPrice").value = game.price || "";
-      const editRating = document.getElementById("editRating");
-      editRating.value = game.rating || 0;
-      document.getElementById("editRatingValue").textContent = editRating.value;
+      document.getElementById("editRating").value = game.rating || "";
       document.getElementById("editImagePath").value = game.imagePath || "";
+      document.getElementById("editRatingValue").textContent =
+        game.rating || "0";
 
-      // Display current image if available
+      // Update image preview
       const currentImageContainer = document.getElementById(
         "currentImageContainer"
       );
@@ -227,11 +258,11 @@
         currentImageContainer.classList.add("hidden");
       }
 
-      // Show the edit modal
-      editModal.classList.remove("hidden");
+      // Show the modal
+      document.getElementById("editGameModal").classList.remove("hidden");
     } catch (error) {
       console.error("Error loading game data:", error);
-      alert("Failed to load game data. Please try again.");
+      alert("Error loading game data: " + error.message);
     }
   }
 
@@ -240,9 +271,13 @@
     button.addEventListener("click", (e) => {
       e.preventDefault();
       const gameId = button.getAttribute("data-id");
-      if (gameId) {
-        loadGameForEdit(gameId);
+      console.log("Edit button clicked, gameId:", gameId);
+      if (!gameId) {
+        console.error("No game ID found on edit button");
+        alert("Error: No game ID found");
+        return;
       }
+      loadGameForEdit(gameId);
     });
   });
 
@@ -265,10 +300,15 @@
       const rating = document.getElementById("editRating").value;
       const imagePath = document.getElementById("editImagePath").value.trim();
       const gameId = document.getElementById("editGameId").value;
-      console.log("Submitting gameId:", gameId);
+      console.log("Submitting form with gameId:", gameId);
 
       let isValid = true;
       let errorMessages = [];
+
+      if (!gameId) {
+        errorMessages.push("Game ID is missing");
+        isValid = false;
+      }
 
       if (!price || isNaN(price) || Number(price) < 0) {
         errorMessages.push("Valid price is required");
@@ -292,16 +332,27 @@
       }
 
       // Create FormData from the form
-      const formData = new FormData();
+      const formData = new URLSearchParams();
       formData.append("gameId", gameId);
       formData.append("price", price);
       formData.append("rating", rating);
       formData.append("imagePath", imagePath);
 
+      console.log("Submitting form data:", {
+        gameId,
+        price,
+        rating,
+        imagePath,
+      });
+
       try {
         const response = await fetch(this.action, {
           method: "POST",
           body: formData,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         });
 
         if (!response.ok) {
@@ -309,6 +360,7 @@
         }
 
         const result = await response.json();
+        console.log("Server response:", result);
 
         if (result.success) {
           // Hide the modal
@@ -408,17 +460,31 @@
       }
 
       // Create a FormData object
-      const formData = new FormData(this);
+      const formData = new URLSearchParams();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("developer", developer);
+      formData.append("price", price);
+      formData.append("releaseDate", releaseDate);
 
-      // Clear the existing platform and genre inputs
-      formData.delete("platform");
-      formData.delete("genre");
+      // Add the image path if present
+      const imagePath = this.querySelector("#imagePath").value;
+      if (imagePath) {
+        formData.append("imagePath", imagePath);
+      }
 
-      // Add the selected platforms and genres as separate values
+      // Add the rating if present
+      const rating = this.querySelector("#rating").value;
+      if (rating) {
+        formData.append("rating", rating);
+      }
+
+      // Add each selected platform as a separate field
       selectedPlatforms.forEach((platform) => {
         formData.append("platform", platform);
       });
 
+      // Add each selected genre as a separate field
       selectedGenres.forEach((genre) => {
         formData.append("genre", genre);
       });
