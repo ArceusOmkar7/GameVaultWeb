@@ -47,20 +47,20 @@ public class CartManagement {
         }
 
         // Attempt to add to cart - this will validate if user and game exist
-        boolean success = cartStorage.addGameToCart(userId, gameId);
+        String result = cartStorage.addGameToCart(userId, gameId);
 
         // Handle validation errors
-        if (!success) {
-            // Try to determine the specific reason for failure
-            // We'll need to check the logs to see specific errors,
-            // but we can make some educated guesses based on the IDs
-            if (userId <= 0) {
+        switch (result) {
+            case "success":
+                return;
+            case "already_in_cart":
+                throw new GameAlreadyOwnedException("This game is already in your cart");
+            case "User not found":
                 throw new UserNotFoundException("Invalid user ID: " + userId);
-            } else if (gameId <= 0) {
+            case "Game not found":
                 throw new GameNotFoundException("Invalid game ID: " + gameId);
-            } else {
+            default:
                 throw new RuntimeException("Failed to add game to cart. See server logs for details.");
-            }
         }
     }
 

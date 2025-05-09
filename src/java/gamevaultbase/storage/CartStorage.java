@@ -79,17 +79,17 @@ public class CartStorage implements StorageInterface<Cart, Integer> {
     }
 
     // Adds game to cart
-    public boolean addGameToCart(int userId, int gameId) {
+    public String addGameToCart(int userId, int gameId) {
         // Verify user exists first
         if (!doesUserExist(userId)) {
             System.err.println("Error: Unable to add to cart - User ID " + userId + " doesn't exist in the database");
-            return false;
+            return "User not found";
         }
 
         // Verify game exists
         if (!doesGameExist(gameId)) {
             System.err.println("Error: Unable to add to cart - Game ID " + gameId + " doesn't exist in the database");
-            return false;
+            return "Game not found";
         }
 
         // Now ensure the cart exists
@@ -98,17 +98,17 @@ public class CartStorage implements StorageInterface<Cart, Integer> {
         // Check if game is already in cart
         if (isGameInCart(userId, gameId)) {
             System.out.println("Game is already in user's cart");
-            return true; // Already in cart, consider this a success
+            return "already_in_cart";
         }
 
         // Then add the game to the cart
         String sql = "INSERT INTO CartItems (userId, gameId) VALUES (?, ?)";
         try {
             DBUtil.executeUpdate(sql, userId, gameId);
-            return true;
+            return "success";
         } catch (SQLException e) {
             System.err.println("Error adding game to cart: " + e.getMessage());
-            return false;
+            return "error";
         }
     }
 
