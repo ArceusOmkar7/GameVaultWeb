@@ -24,6 +24,7 @@ public class DashboardDataService {
     private final RevenueBreakdownService revenueBreakdownService;
     private final PlatformDistributionService platformDistributionService;
     private final GrowthTrendService growthTrendService;
+    private final GameStatsService gameStatsService;
 
     /**
      * Constructor initializing all required services with necessary data.
@@ -44,6 +45,7 @@ public class DashboardDataService {
         this.revenueBreakdownService = new RevenueBreakdownService(orders, games);
         this.platformDistributionService = new PlatformDistributionService(games);
         this.growthTrendService = new GrowthTrendService(games, users, orders);
+        this.gameStatsService = new GameStatsService(games);
     }
 
     /**
@@ -118,6 +120,15 @@ public class DashboardDataService {
      */
     public Map<String, Object> getGrowthTrendsData() {
         return growthTrendService.generateData();
+    }
+
+    /**
+     * Get game stats data.
+     * 
+     * @return Map containing game stats data
+     */
+    public Map<String, Object> getGameStatsData() {
+        return gameStatsService.generateData();
     }
 
     /**

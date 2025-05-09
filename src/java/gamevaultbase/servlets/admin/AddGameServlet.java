@@ -130,7 +130,12 @@ public class AddGameServlet extends AdminBaseServlet {
             }
 
             // Set image path
-            game.setImagePath(request.getParameter("imagePath"));
+            String imagePath = request.getParameter("imagePath");
+            if (imagePath == null || imagePath.trim().isEmpty()) {
+                // If no image path provided, set a default image
+                imagePath = "/images/default-game.jpg";
+            }
+            game.setImagePath(imagePath.trim());
 
             // Handle price
             String priceStr = request.getParameter("price");

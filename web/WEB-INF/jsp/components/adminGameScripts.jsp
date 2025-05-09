@@ -119,9 +119,22 @@
       addField("releaseDate", releaseDate);
 
       // Add the image path if present
-      const imagePath = this.querySelector("#imagePath").value;
-      if (imagePath) {
-        addField("imagePath", imagePath);
+      const imageUploadType = document.getElementById("imageUploadType").value;
+      if (imageUploadType === "url") {
+        const imageUrl = document.getElementById("imageUrl").value.trim();
+        if (imageUrl) {
+          addField("imagePath", imageUrl);
+        }
+      } else {
+        const imageFile = document.getElementById("imageFile").files[0];
+        if (imageFile) {
+          // For file upload, we'll need to handle it differently
+          // The server will need to process the file and set the path
+          const formData = new FormData();
+          formData.append("imageFile", imageFile);
+          // Add other form fields to formData
+          addField("imagePath", ""); // Empty path for now, server will set it
+        }
       }
 
       // Add the rating if present
@@ -468,13 +481,17 @@
       formData.append("releaseDate", releaseDate);
 
       // Handle image upload
-      const imageFile = document.getElementById("imageFile").files[0];
-      const imageUrl = document.getElementById("imageUrl").value.trim();
-
-      if (imageFile) {
-        formData.append("imageFile", imageFile);
-      } else if (imageUrl) {
-        formData.append("imageUrl", imageUrl);
+      const imageUploadType = document.getElementById("imageUploadType").value;
+      if (imageUploadType === "url") {
+        const imageUrl = document.getElementById("imageUrl").value.trim();
+        if (imageUrl) {
+          formData.append("imageUrl", imageUrl);
+        }
+      } else {
+        const imageFile = document.getElementById("imageFile").files[0];
+        if (imageFile) {
+          formData.append("imageFile", imageFile);
+        }
       }
 
       // Add the rating if present

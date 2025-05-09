@@ -238,151 +238,87 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             conn = gamevaultbase.helpers.DBConnectionUtil.getConnection();
             if (conn == null) {
                 System.err.println("ERROR: Failed to get database connection");
-                return;
+                throw new SQLException("Failed to get database connection");
             }
 
             conn.setAutoCommit(false); // Start transaction
             System.out.println("GameStorage: Database connection established successfully");
 
-            // 1. Insert the game
-            String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating, addedAt) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            System.out.println("GameStorage: Preparing SQL: " + sql);
+            try {
+                // 1. Insert the game
+                String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating, addedAt) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            // Ensure releaseDate is not null before attempting to get time
-            java.sql.Date sqlReleaseDate = null;
-            if (game.getReleaseDate() != null) {
-                sqlReleaseDate = new java.sql.Date(game.getReleaseDate().getTime());
-            }
+                pstmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, game.getTitle());
+                pstmt.setString(2, game.getDescription());
+                pstmt.setString(3, game.getDeveloper());
+                pstmt.setString(4, game.getPlatform());
+                pstmt.setFloat(5, game.getPrice());
+                pstmt.setDate(6, new java.sql.Date(game.getReleaseDate().getTime()));
+                pstmt.setString(7, game.getImagePath());
+                pstmt.setString(8, game.getGenre());
+                pstmt.setFloat(9, game.getRating());
+                pstmt.setTimestamp(10, new java.sql.Timestamp(System.currentTimeMillis()));
 
-            // Debug values being inserted
-            System.out.println("GameStorage: Values being inserted:");
-            System.out.println("1. Title: " + game.getTitle());
-            System.out.println("2. Description: " + (game.getDescription() != null
-                    ? game.getDescription().substring(0, Math.min(20, game.getDescription().length())) + "..."
-                    : "null"));
-            System.out.println("3. Developer: " + game.getDeveloper());
-            System.out.println("4. Platform: " + game.getPlatform());
-            System.out.println("5. Price: " + game.getPrice());
-            System.out.println("6. Release Date: " + game.getReleaseDate());
-            System.out.println("7. Image Path: " + game.getImagePath());
-            System.out.println("8. Genre: " + game.getGenre());
-            System.out.println("9. Rating: " + game.getRating());
-            System.out.println("10. Added At: " + game.getAddedAt());
+                System.out.println("GameStorage: Executing game insert with title: " + game.getTitle());
+                int affectedRows = pstmt.executeUpdate();
 
-            pstmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
-            pstmt.setString(1, game.getTitle());
-            pstmt.setString(2, game.getDescription());
-            pstmt.setString(3, game.getDeveloper());
-            pstmt.setString(4, game.getPlatform());
-            pstmt.setFloat(5, game.getPrice());
-            pstmt.setDate(6, sqlReleaseDate); // Use java.sql.Date
-            pstmt.setString(7, game.getImagePath());
-            pstmt.setString(8, game.getGenre());
-            pstmt.setFloat(9, game.getRating());
-            pstmt.setTimestamp(10, new java.sql.Timestamp(game.getAddedAt().getTime()));
+                if (affectedRows == 0) {
+                    throw new SQLException("Creating game failed, no rows affected.");
+                }
 
-            System.out.println("GameStorage: Executing INSERT statement...");
-            int rowsAffected = pstmt.executeUpdate();
-            System.out.println("GameStorage: INSERT completed. Rows affected: " + rowsAffected);
-
-            if (rowsAffected <= 0) {
-                throw new SQLException("Failed to insert game record. No rows affected.");
-            }
-
-            // Get the generated game ID
-            System.out.println("GameStorage: Retrieving generated game ID...");
-            ResultSet rs = pstmt.getGeneratedKeys();
-            int gameId = -1;
-            if (rs.next()) {
-                gameId = rs.getInt(1);
-                game.setGameId(gameId);
-                System.out.println("GameStorage: Generated game ID: " + gameId);
-            } else {
-                throw new SQLException("Failed to retrieve generated game ID");
-            }
-
-            // 2. Save genres and link to the game
-            if (game.getGenres() != null && !game.getGenres().isEmpty()) {
-                System.out.println("GameStorage: Saving " + game.getGenres().size() + " genres for game ID " + gameId);
-                saveGameGenres(conn, game);
-            } else if (game.getGenre() != null && !game.getGenre().isEmpty()) {
-                // If there are no Genre objects but there's a genre string, parse it
-                System.out.println("GameStorage: Parsing genres from string: " + game.getGenre());
-                String[] genreNames = game.getGenre().split(",");
-                for (String genreName : genreNames) {
-                    genreName = genreName.trim();
-                    if (!genreName.isEmpty()) {
-                        Genre genre = new Genre(genreName);
-                        game.addGenre(genre);
-                        System.out.println("GameStorage: Added genre: " + genreName);
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        game.setGameId(generatedKeys.getInt(1));
+                        System.out.println("GameStorage: Game inserted with ID: " + game.getGameId());
+                    } else {
+                        throw new SQLException("Creating game failed, no ID obtained.");
                     }
                 }
-                if (!game.getGenres().isEmpty()) {
-                    System.out.println("GameStorage: Saving " + game.getGenres().size() + " parsed genres");
-                    saveGameGenres(conn, game);
-                }
-            }
 
-            // 3. Save platforms and link to the game
-            if (game.getPlatforms() != null && !game.getPlatforms().isEmpty()) {
-                System.out.println(
-                        "GameStorage: Saving " + game.getPlatforms().size() + " platforms for game ID " + gameId);
+                // 2. Save platforms
                 saveGamePlatforms(conn, game);
-            } else if (game.getPlatform() != null && !game.getPlatform().isEmpty()) {
-                // If there are no Platform objects but there's a platform string, parse it
-                System.out.println("GameStorage: Parsing platforms from string: " + game.getPlatform());
-                String[] platformNames = game.getPlatform().split(",");
-                for (String platformName : platformNames) {
-                    platformName = platformName.trim();
-                    if (!platformName.isEmpty()) {
-                        Platform platform = new Platform(platformName);
-                        game.addPlatform(platform);
-                        System.out.println("GameStorage: Added platform: " + platformName);
+
+                // 3. Save genres
+                saveGameGenres(conn, game);
+
+                // If we get here, commit the transaction
+                conn.commit();
+                System.out.println("GameStorage: Transaction committed successfully");
+
+            } catch (SQLException e) {
+                // If there's an error, rollback the transaction
+                if (conn != null) {
+                    try {
+                        conn.rollback();
+                        System.err.println("GameStorage: Transaction rolled back due to error: " + e.getMessage());
+                    } catch (SQLException ex) {
+                        System.err.println("GameStorage: Error rolling back transaction: " + ex.getMessage());
                     }
                 }
-                if (!game.getPlatforms().isEmpty()) {
-                    System.out.println("GameStorage: Saving " + game.getPlatforms().size() + " parsed platforms");
-                    saveGamePlatforms(conn, game);
+                throw e;
+            } finally {
+                // Close the prepared statement
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+                    } catch (SQLException e) {
+                        System.err.println("GameStorage: Error closing prepared statement: " + e.getMessage());
+                    }
                 }
             }
-
-            // Update the legacy fields after relationships are saved
-            game.updateLegacyFields();
-
-            System.out.println("GameStorage: Committing transaction...");
-            conn.commit(); // Commit transaction
-            System.out.println("GameStorage: Transaction committed successfully");
         } catch (SQLException e) {
-            System.err.println("SQL Error saving game: " + e.getMessage());
+            System.err.println("GameStorage: Error saving game: " + e.getMessage());
             e.printStackTrace();
-            if (conn != null) {
-                try {
-                    System.err.println("Rolling back transaction...");
-                    conn.rollback(); // Rollback on error
-                    System.err.println("Transaction rolled back");
-                } catch (SQLException ex) {
-                    System.err.println("Error rolling back transaction: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            }
-            // Log the error but don't rethrow
+            throw new RuntimeException("Failed to save game: " + e.getMessage(), e);
         } finally {
-            if (pstmt != null) {
-                try {
-                    pstmt.close();
-                } catch (SQLException e) {
-                    System.err.println("Error closing PreparedStatement: " + e.getMessage());
-                }
-            }
+            // Close the connection
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true); // Reset auto-commit
-                    gamevaultbase.helpers.DBConnectionUtil.closeConnection(conn);
-                    System.out.println("GameStorage: Database connection closed");
+                    conn.close();
                 } catch (SQLException e) {
-                    System.err.println("Error closing connection: " + e.getMessage());
+                    System.err.println("GameStorage: Error closing connection: " + e.getMessage());
                 }
             }
         }

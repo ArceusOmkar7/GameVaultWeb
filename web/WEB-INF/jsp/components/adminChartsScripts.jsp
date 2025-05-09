@@ -17,6 +17,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     initializeUserGrowthChart();
     initializeRevenueBreakdownChart();
     initializePlatformDistributionChart();
+    initializeGameStatsCharts();
   });
   // Function to fetch chart data via AJAX
   async function fetchChartData(chartType) {
@@ -313,6 +314,160 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         responsive: true,
         plugins: {
           legend: { position: "bottom" },
+        },
+      },
+    });
+  }
+
+  // Initialize Game Statistics Charts
+  function initializeGameStatsCharts() {
+    // Rating Distribution Chart
+    const ratingCtx = document
+      .getElementById("ratingDistributionChart")
+      .getContext("2d");
+    new Chart(ratingCtx, {
+      type: "pie",
+      data: {
+        labels: [
+          <c:forEach
+            var="label"
+            items="${gameStatsData.ratingDistribution.labels}"
+            varStatus="loop"
+          >
+            "${label}"<c:if test="${!loop.last}">, </c:if>
+          </c:forEach>,
+        ],
+        datasets: [
+          {
+            data: [
+              <c:forEach
+                var="value"
+                items="${gameStatsData.ratingDistribution.data}"
+                varStatus="loop"
+              >
+                ${value}
+                <c:if test="${!loop.last}">, </c:if>
+              </c:forEach>,
+            ],
+            backgroundColor: [
+              "#EF4444", // Red
+              "#F97316", // Orange
+              "#FBBF24", // Yellow
+              "#34D399", // Green
+              "#3B82F6", // Blue
+            ],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+
+    // Price Ranges Chart
+    const priceCtx = document
+      .getElementById("priceRangesChart")
+      .getContext("2d");
+    new Chart(priceCtx, {
+      type: "bar",
+      data: {
+        labels: [
+          <c:forEach
+            var="label"
+            items="${gameStatsData.priceRanges.labels}"
+            varStatus="loop"
+          >
+            "${label}"<c:if test="${!loop.last}">, </c:if>
+          </c:forEach>,
+        ],
+        datasets: [
+          {
+            label: "Number of Games",
+            data: [
+              <c:forEach
+                var="value"
+                items="${gameStatsData.priceRanges.data}"
+                varStatus="loop"
+              >
+                ${value}
+                <c:if test="${!loop.last}">, </c:if>
+              </c:forEach>,
+            ],
+            backgroundColor: "#3B82F6",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+            },
+          },
+        },
+      },
+    });
+
+    // Genre Popularity Chart
+    const genreCtx = document
+      .getElementById("genrePopularityChart")
+      .getContext("2d");
+    new Chart(genreCtx, {
+      type: "bar",
+      data: {
+        labels: [
+          <c:forEach
+            var="label"
+            items="${gameStatsData.genrePopularity.labels}"
+            varStatus="loop"
+          >
+            "${label}"<c:if test="${!loop.last}">, </c:if>
+          </c:forEach>,
+        ],
+        datasets: [
+          {
+            label: "Number of Games",
+            data: [
+              <c:forEach
+                var="value"
+                items="${gameStatsData.genrePopularity.data}"
+                varStatus="loop"
+              >
+                ${value}
+                <c:if test="${!loop.last}">, </c:if>
+              </c:forEach>,
+            ],
+            backgroundColor: "#10B981",
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+            },
+          },
         },
       },
     });

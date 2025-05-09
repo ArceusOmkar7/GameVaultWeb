@@ -49,6 +49,7 @@ public class AdminDashboardServlet extends AdminBaseServlet {
 
         // Get and set growth trends data
         request.setAttribute("growthTrends", dashboardService.getGrowthTrendsData());
+        request.setAttribute("gameStatsData", dashboardService.getGameStatsData());
 
         // Forward to the admin dashboard JSP
         forwardToJsp(request, response, "/WEB-INF/jsp/adminDashboard.jsp");
