@@ -34,8 +34,8 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       </li>
       <li>
         <a
-          href="#"
-          class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-800 text-gray-200"
+          href="${pageContext.request.contextPath}/admin/users"
+          class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-800 text-gray-200 ${requestScope['javax.servlet.forward.servlet_path'] eq '/admin/users' ? 'bg-gray-800' : ''}"
           ><i class="bi bi-people text-gray-200"></i>
           <span class="sidebar-label text-gray-200">Users</span></a
         >
