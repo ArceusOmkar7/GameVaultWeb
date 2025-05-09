@@ -11,10 +11,12 @@
         <param-value>jdbc:mysql://localhost:3306/gamevaultdb?sslMode=DISABLED</param-value>
     </context-param>
     <context-param>
+        <!-- Enter your MySQL database username here -->
         <param-name>db.user</param-name>
         <param-value>root</param-value>
     </context-param>
     <context-param>
+        <!-- Enter your MySQL database password here -->
         <param-name>db.password</param-name>
         <param-value>1234</param-value>
     </context-param>
