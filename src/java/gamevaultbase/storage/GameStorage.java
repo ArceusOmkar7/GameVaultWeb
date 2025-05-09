@@ -245,7 +245,9 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             System.out.println("GameStorage: Database connection established successfully");
 
             // 1. Insert the game
-            String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Games (title, description, developer, platform, price, releaseDate, imagePath, genre, rating, addedAt) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             System.out.println("GameStorage: Preparing SQL: " + sql);
 
             // Ensure releaseDate is not null before attempting to get time
@@ -263,10 +265,11 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             System.out.println("3. Developer: " + game.getDeveloper());
             System.out.println("4. Platform: " + game.getPlatform());
             System.out.println("5. Price: " + game.getPrice());
-            System.out.println("6. ReleaseDate: " + sqlReleaseDate);
-            System.out.println("7. ImagePath: " + game.getImagePath());
+            System.out.println("6. Release Date: " + game.getReleaseDate());
+            System.out.println("7. Image Path: " + game.getImagePath());
             System.out.println("8. Genre: " + game.getGenre());
             System.out.println("9. Rating: " + game.getRating());
+            System.out.println("10. Added At: " + game.getAddedAt());
 
             pstmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, game.getTitle());
@@ -278,6 +281,7 @@ public class GameStorage implements StorageInterface<Game, Integer> {
             pstmt.setString(7, game.getImagePath());
             pstmt.setString(8, game.getGenre());
             pstmt.setFloat(9, game.getRating());
+            pstmt.setTimestamp(10, new java.sql.Timestamp(game.getAddedAt().getTime()));
 
             System.out.println("GameStorage: Executing INSERT statement...");
             int rowsAffected = pstmt.executeUpdate();

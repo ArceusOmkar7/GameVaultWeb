@@ -19,11 +19,13 @@ public class Game {
     private Date releaseDate;
     private String imagePath;
     private float rating;
+    private Date addedAt;
 
     public Game() {
         // Default empty constructor
         this.platforms = new ArrayList<>();
         this.genres = new ArrayList<>();
+        this.addedAt = new Date(); // Set current date as default
     }
 
     public Game(String title, String description, String developer, String platform, float price, Date releaseDate) {
@@ -226,6 +228,14 @@ public class Game {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public Date getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(Date addedAt) {
+        this.addedAt = addedAt;
     }
 
     // Helper method to get a default image path if none is set

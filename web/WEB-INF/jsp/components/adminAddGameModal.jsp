@@ -171,22 +171,42 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           </div>
 
           <div class="col-span-2">
-            <label
-              for="imagePath"
-              class="block text-sm font-medium text-gray-700"
-              >Image Path</label
-            >
-            <input
-              type="text"
-              name="imagePath"
-              id="imagePath"
-              class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              placeholder="URL or path to image"
-            />
-            <p class="mt-1 text-xs text-gray-500">
-              Enter a URL or upload an image separately via the image upload
-              tool
-            </p>
+            <label class="block text-sm font-medium text-gray-700">Image</label>
+            <div class="mt-1">
+              <select
+                id="imageUploadType"
+                class="mb-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              >
+                <option value="file">Upload from Computer</option>
+                <option value="url">Enter Image URL</option>
+              </select>
+
+              <div id="imageFileContainer">
+                <input
+                  type="file"
+                  name="imageFile"
+                  id="imageFile"
+                  accept="image/*"
+                  class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Upload an image file (JPG, PNG, GIF)
+                </p>
+              </div>
+
+              <div id="imageUrlContainer" class="hidden">
+                <input
+                  type="url"
+                  name="imageUrl"
+                  id="imageUrl"
+                  class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Enter a URL to an image
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -37,7 +37,7 @@ public class GrowthTrendService implements DashboardService {
         Map<String, Object> trends = new HashMap<>();
 
         // Calculate game growth (compare last month to previous month)
-        trends.put("gamesGrowth", calculateGrowthPercentage(games, Game::getReleaseDate));
+        trends.put("gamesGrowth", calculateGrowthPercentage(games, Game::getAddedAt));
 
         // Calculate user growth
         trends.put("usersGrowth", calculateGrowthPercentage(users, User::getCreatedAt));

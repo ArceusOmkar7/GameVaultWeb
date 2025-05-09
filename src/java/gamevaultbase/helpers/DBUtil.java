@@ -591,7 +591,8 @@ public class DBUtil {
             "releaseDate DATE," +
             "imagePath VARCHAR(255)," +
             "genre VARCHAR(100)," +
-            "rating FLOAT DEFAULT 0.0" +
+            "rating FLOAT DEFAULT 0.0," +
+            "addedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
             ") ENGINE=InnoDB;";
 
     private static final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE IF NOT EXISTS Genres (" +

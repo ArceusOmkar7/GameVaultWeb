@@ -85,6 +85,9 @@ public class DBConnectionUtil {
      */
     public static Connection getConnection() throws SQLException {
         try {
+            // First ensure database exists
+            createDatabaseIfNotExists();
+
             // Connect directly to the gamevault database
             String url = "jdbc:mysql://localhost:3306/" + DB_NAME
                     + "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true";

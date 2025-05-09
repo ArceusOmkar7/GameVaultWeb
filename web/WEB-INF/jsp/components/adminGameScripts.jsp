@@ -460,17 +460,21 @@
       }
 
       // Create a FormData object
-      const formData = new URLSearchParams();
+      const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
       formData.append("developer", developer);
       formData.append("price", price);
       formData.append("releaseDate", releaseDate);
 
-      // Add the image path if present
-      const imagePath = this.querySelector("#imagePath").value;
-      if (imagePath) {
-        formData.append("imagePath", imagePath);
+      // Handle image upload
+      const imageFile = document.getElementById("imageFile").files[0];
+      const imageUrl = document.getElementById("imageUrl").value.trim();
+
+      if (imageFile) {
+        formData.append("imageFile", imageFile);
+      } else if (imageUrl) {
+        formData.append("imageUrl", imageUrl);
       }
 
       // Add the rating if present
@@ -505,4 +509,21 @@
           alert("Failed to add game. Please try again.");
         });
     });
+
+  // Handle image upload type toggle
+  const imageUploadType = document.getElementById("imageUploadType");
+  const imageFileContainer = document.getElementById("imageFileContainer");
+  const imageUrlContainer = document.getElementById("imageUrlContainer");
+
+  if (imageUploadType) {
+    imageUploadType.addEventListener("change", function () {
+      if (this.value === "file") {
+        imageFileContainer.classList.remove("hidden");
+        imageUrlContainer.classList.add("hidden");
+      } else {
+        imageFileContainer.classList.add("hidden");
+        imageUrlContainer.classList.remove("hidden");
+      }
+    });
+  }
 </script>
